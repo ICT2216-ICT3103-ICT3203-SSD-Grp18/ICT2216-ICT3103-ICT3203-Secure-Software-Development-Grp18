@@ -1,0 +1,137 @@
+@font-face {
+  font-family: 'CabinetGrostesk-bold';
+  src: url(../fonts/CabinetGrotesk/CabinetGrotesk-Bold.otf);
+}
+
+@font-face {
+  font-family: 'GeneralSans-Med';
+  src: url(../fonts/GeneralSans/GeneralSans-Medium.otf);
+}
+
+.LandingPage {
+  font-family: Arial, sans-serif;
+}
+
+.LandingPage-header {
+  text-align: center;
+  font-family: 'CabinetGrostesk-bold';
+  font-size: 28px;
+  padding: 2rem 0;
+  height: 368px;
+  background-image: url(../images/banner.png);
+  background-size:cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.LandingPage-header h1 {
+  padding-top: 120px;
+  color: #4F4CEE;
+}
+.search-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 996px;
+  height: 49px;
+  margin-left: 180px;
+  gap: 1rem;
+  margin-top: 140px;
+  border: 2px solid black;
+  padding: 0.5rem;
+  background-color: #fff;
+}
+
+.search-bar input[type="text"],
+.search-bar input[type="date"] {
+  padding: 0.5rem;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  flex: 1;
+}
+
+.search-bar input[type="date"] {
+  padding-left: 2rem;
+}
+
+.search-bar button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: #4F4CEE;
+  margin-right: 10px;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.section-header h2{
+  font-family: 'CabinetGrostesk-bold';
+  margin-left: 50px;
+  position: relative;
+}
+
+.section-header .view-all {
+  color: #4F4CEE;
+  margin-right: 80px;
+  font-family: 'GeneralSans-Med';
+  text-decoration: none;
+  font-size: 16px;
+  position: relative;
+}
+
+.section-header .view-all::after {
+  content: '>';
+  position: absolute;
+  font-family: 'GeneralSans-Med';
+  right: -15px;
+  top: 0;
+  font-size: 16px;
+}
+
+.upcoming-events {
+  padding: 2rem;
+  margin-top: 50px;
+}
+
+
+.events-container {
+  position: relative;
+  justify-content: center;
+ 
+  display: flex;
+  align-items: center;
+}
+
+.events-list {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 1rem 0;
+}
+
+.events-list::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-right {
+  position: relative;
+  right: 1%;
+  top: 50%;
+  transform: translateY(-10%);
+  background-color: #4F4CEE;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+  padding: 0.5rem;
+  border-radius: 1%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}

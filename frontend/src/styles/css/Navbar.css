@@ -1,0 +1,73 @@
+@font-face {
+    font-family: 'CabinetGrostesk-bold';
+    src: url(../fonts/CabinetGrotesk/CabinetGrotesk-Bold.otf);
+}
+
+@font-face {
+  font-family: 'GeneralSans-Med';
+  src: url(../fonts/GeneralSans/GeneralSans-Medium.otf);
+}
+
+@font-face {
+  font-family: 'CabinetGrostesk-Med';
+  src: url(../fonts/CabinetGrotesk/CabinetGrotesk-Medium.otf);
+}
+
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #fff;
+  }
+
+  
+  .navbar-logo {
+    font-size: 30px ;
+    padding: 1rem;
+    font-family: 'CabinetGrostesk-bold';
+    color: #4F4CEE;
+
+  }
+  
+  .navbar-links {
+    list-style: none;
+    padding-top: 20px;
+    display: flex;
+    gap: 3rem;
+  }
+  
+  .navbar-links a {
+    font-family: 'CabinetGrostesk-Med';
+    font-size: 18px;
+    text-decoration: none;
+    color: #000;
+  }
+  
+  .navbar-buttons button {
+    margin-right: 0.5rem;
+  }
+  
+  .login, .signup {
+    padding: 0.5rem 1rem;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .login {
+    background-color: #fff;
+    color:#4F4CEE;
+    border: 1px solid #4F4CEE;
+    font-family: 'GeneralSans-Med';
+    font-size: 14px;
+  }
+  
+  .signup {
+    background-color: #4F4CEE;
+    color: #fff;
+    border: 1px solid #4F4CEE;
+    font-family: 'GeneralSans-Med';
+    font-size: 14px;
+  }
+  

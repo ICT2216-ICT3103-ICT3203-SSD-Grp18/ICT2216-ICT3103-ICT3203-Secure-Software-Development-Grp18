@@ -1,0 +1,19 @@
+.hot-offers {
+    padding: 2rem;
+    margin-top: 20px;
+  }
+  
+  .offers-list {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+  }
+  
+  .offer-image {
+    width: 570px;
+    height: 344px;
+    margin-right: 40px;
+    
+    border-radius: 8px;
+  }
+  

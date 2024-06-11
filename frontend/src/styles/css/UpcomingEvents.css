@@ -1,0 +1,81 @@
+@font-face {
+    font-family: 'CabinetGrostesk-bold';
+    src: url(../fonts/CabinetGrotesk/CabinetGrotesk-Bold.otf);
+  }
+  
+  @font-face {
+    font-family: 'GeneralSans-Med';
+    src: url(../fonts/GeneralSans/GeneralSans-Medium.otf);
+  }
+
+
+
+.upcoming-events {
+    padding: 2rem;
+    margin-top: 50px;
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .section-header h2 {
+    font-family: 'CabinetGrostesk-bold';
+    margin-left: 50px;
+    position: relative;
+  }
+  
+  .section-header .view-all {
+    color: #4F4CEE;
+    margin-right: 80px;
+    font-family: 'GeneralSans-Med';
+    text-decoration: none;
+    font-size: 16px;
+    position: relative;
+  }
+  
+  .section-header .view-all::after {
+    content: '>';
+    position: absolute;
+    font-family: 'GeneralSans-Med';
+    right: -15px;
+    top: 0;
+    font-size: 16px;
+  }
+  
+  .events-container {
+    position: relative;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+  }
+  
+  .events-list {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding: 1rem 0;
+  }
+  
+  .events-list::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .scroll-right {
+    position: absolute;
+    right: 45px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #4F4CEE;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 0.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
