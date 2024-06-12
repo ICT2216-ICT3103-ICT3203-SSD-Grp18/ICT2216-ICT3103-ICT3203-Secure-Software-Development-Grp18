@@ -1,6 +1,7 @@
+/* Font Faces */
 @font-face {
-    font-family: 'CabinetGrostesk-bold';
-    src: url(../fonts/CabinetGrotesk/CabinetGrotesk-Bold.otf);
+  font-family: 'CabinetGrostesk-bold';
+  src: url(../fonts/CabinetGrotesk/CabinetGrotesk-Bold.otf);
 }
 
 @font-face {
@@ -13,61 +14,131 @@
   src: url(../fonts/CabinetGrotesk/CabinetGrotesk-Medium.otf);
 }
 
-
+/* Navbar Styles */
 .navbar {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #fff;
+  position: relative;
+}
+
+.navbar-logo {
+  font-size: 30px;
+  padding: 1rem;
+  font-family: 'CabinetGrostesk-bold';
+  color: #4F4CEE;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.navbar-menu {
+  display: flex;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  gap: 3rem;
+  margin-bottom: 0;
+  padding-left: 0;
+}
+
+.navbar-links a {
+  font-family: 'CabinetGrostesk-Med';
+  font-size: 18px;
+  text-decoration: none;
+  color: #000;
+}
+
+.navbar-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.navbar-buttons button {
+  padding: 0.5rem 1rem;
+  border: none;
+  cursor: pointer;
+}
+
+.login {
+  background-color: #fff;
+  color: #4F4CEE;
+  border: 1px solid #4F4CEE;
+  font-family: 'GeneralSans-Med';
+  font-size: 14px;
+}
+
+.signup {
+  background-color: #4F4CEE;
+  color: #fff;
+  border: 1px solid #4F4CEE;
+  font-family: 'GeneralSans-Med';
+  font-size: 14px;
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.hamburger .bar {
+  width: 25px;
+  height: 3px;
+  background-color: #333;
+  margin: 4px 0;
+}
+
+/* Hide login and sign-up links in web mode */
+.mobile-only {
+  display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .navbar-buttons {
+    display: none;
+  }
+
+  .navbar-menu {
+    display: none;
+    flex-direction: column;
     align-items: center;
-    padding: 1rem;
+    text-align: center;
+    width: 100%;
+    position: absolute;
+    top: 100%;
+    left: 0;
     background-color: #fff;
-  }
-
-  
-  .navbar-logo {
-    font-size: 30px ;
     padding: 1rem;
-    font-family: 'CabinetGrostesk-bold';
-    color: #4F4CEE;
-
   }
-  
-  .navbar-links {
-    list-style: none;
-    padding-top: 20px;
+
+  .navbar-menu.open {
     display: flex;
-    gap: 3rem;
+    align-items: center;
+  }
+
+  .navbar-links {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .hamburger {
+    display: flex;
   }
   
-  .navbar-links a {
-    font-family: 'CabinetGrostesk-Med';
-    font-size: 18px;
-    text-decoration: none;
-    color: #000;
+  /* Show login and sign-up links in mobile mode */
+  .mobile-only {
+    display: block;
   }
-  
-  .navbar-buttons button {
-    margin-right: 0.5rem;
-  }
-  
-  .login, .signup {
-    padding: 0.5rem 1rem;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .login {
-    background-color: #fff;
-    color:#4F4CEE;
-    border: 1px solid #4F4CEE;
-    font-family: 'GeneralSans-Med';
-    font-size: 14px;
-  }
-  
-  .signup {
-    background-color: #4F4CEE;
-    color: #fff;
-    border: 1px solid #4F4CEE;
-    font-family: 'GeneralSans-Med';
-    font-size: 14px;
-  }
-  
+}
