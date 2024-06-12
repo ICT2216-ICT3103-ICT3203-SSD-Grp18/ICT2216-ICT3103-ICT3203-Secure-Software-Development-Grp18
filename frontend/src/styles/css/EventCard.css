@@ -31,7 +31,7 @@
   padding: 1rem;
 }
 
-.event-date {
+.event-date-card {
   display: flex;
   font-family: 'GeneralSans-Med';
   flex-direction: column;
@@ -65,7 +65,7 @@
 }
 
 .event-price,
-.event-location {
+.event-location-card {
   font-family: 'GeneralSans-Reg';
   font-size: 14px;
   color: #666;
