@@ -2,7 +2,7 @@ import React from 'react';
 import EventCard from './EventCard';
 import '../styles/css/UpcomingEvents.css';
 
-const UpcomingEvents = ({ events }) => {
+const UpcomingEvents = ({ events, onEventClick }) => {
   const scrollRight = () => {
     document.querySelector('.events-list').scrollBy({
       top: 0,
@@ -19,8 +19,10 @@ const UpcomingEvents = ({ events }) => {
       </div>
       <div className="events-container position-relative">
         <div className="events-list d-flex overflow-auto">
-          {events.map((event, index) => (
-            <EventCard key={index} {...event} />
+          {events.map((event) => (
+            <div key={event.id} className="event-card-wrapper" onClick={() => onEventClick(event.id)}>
+              <EventCard {...event} />
+            </div>
           ))}
         </div>
         <button className="scroll-right" onClick={scrollRight}>➔</button>

@@ -2,11 +2,11 @@ import React from 'react';
 import EventCard from './EventCard';
 import '../styles/css/BrowseConcert.css';
 
-const BrowseConcert = ({ events }) => {
+const BrowseConcert = ({ events, onEventClick }) => {
   const scrollRight = () => {
     document.querySelector('.events-list').scrollBy({
       top: 0,
-      left: 250, // Adjust the value as needed
+      left: 250,
       behavior: 'smooth'
     });
   };
@@ -19,11 +19,13 @@ const BrowseConcert = ({ events }) => {
       </div>
       <div className="events-container position-relative">
         <div className="events-list d-flex overflow-auto">
-          {events.map((event, index) => (
-            <EventCard key={index} {...event} />
+          {events.map((event) => (
+            <div key={event.id} onClick={() => onEventClick(event.id)}>
+              <EventCard {...event} />
+            </div>
           ))}
         </div>
-        <button className="scroll-right" onClick={scrollRight}>➔</button>
+        <button className="scroll-right" aria-label="Scroll Right">➔</button>
       </div>
     </section>
   );
