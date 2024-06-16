@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../styles/css/EventDetailPage.css';
 import Navbar from '../components/Navbar';
@@ -7,28 +7,48 @@ import Footer from '../components/Footer';
 const EventDetailPage = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
+  const [event, setEvent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Ideally, fetch the event data based on the eventId.
-  // For simplicity, using static data.
-  const events = [
-    { id: 1, name: 'Panic! at the Disco', date: 'Nov 01', price: 'SGD $88 - $298', location: 'National Stadium', description: 'An amazing concert by Panic! at the Disco.', image: require('../styles/images/upcomingevents/panic.png') },
-    { id: 2, name: 'Falling in Reverse', date: 'Oct 01', price: 'SGD $73 - $245', location: 'The Star Theatre', description: 'Experience the energy of Falling in Reverse.', image: require('../styles/images/upcomingevents/falling.png') },
-    { id: 3, name: 'Disney On Ice', date: 'Oct 20', price: 'SGD $45 - $145', location: 'Indoor Stadium', description: 'A magical experience with Disney On Ice.', image: require('../styles/images/upcomingevents/disney.png') },
-    { id: 4, name: 'Kevin Hart Show', date: 'Nov 06', price: 'SGD $88 - $288', location: 'Indoor Stadium', description: 'Laugh out loud with Kevin Hart.', image: require('../styles/images/upcomingevents/kevin.png') },
-    { id: 5, name: 'Super Junior', date: 'Dec 01', price: 'SGD $88 - $298', location: 'Indoor Stadium', description: 'Enjoy the performances by Super Junior.', image: require('../styles/images/browseconcert/super.png') },
-    { id: 6, name: 'IU: HER World Tour', date: 'Dec 20', price: 'SGD $73 - $245', location: 'National Stadium', description: 'Experience IU\'s mesmerizing world tour.', image: require('../styles/images/browseconcert/iu.png') },
-    { id: 7, name: 'Asking Alexandria', date: 'Dec 23', price: 'SGD $45 - $145', location: 'Expo', description: 'Rock out with Asking Alexandria.', image: require('../styles/images/browseconcert/asking.png') },
-    { id: 8, name: 'Sophia Anne Caruso', date: 'Oct 30', price: 'SGD $88 - $288', location: 'Expo', description: 'A stunning performance by Sophia Anne Caruso.', image: require('../styles/images/browseconcert/sophia.png') },
-  ];
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        const response = await fetch(`/api/events/${eventId}`);
+        if (!response.ok) {
+          throw new Error(`Network response was not ok: ${response.statusText}`);
+        }
+        const data = await response.json();
+        setEvent(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const event = events.find(e => e.id === parseInt(eventId));
+    fetchEvent();
+  }, [eventId]);
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   if (!event) {
     return <div>Event not found</div>;
   }
 
   const handleRaffleClick = () => {
-    navigate(`/ticket/${event.id}`);
+    navigate(`/ticket/${event.event_id}`);
   };
 
   return (
@@ -43,25 +63,25 @@ const EventDetailPage = () => {
             <a href="#twitter"><i className="bi bi-twitter"></i></a>
             <a href="#facebook"><i className="bi bi-facebook"></i></a>
           </div>
-          <img src={event.image} alt={event.name} className="event-image" />
+          <img src={`data:image/png;base64,${event.image}`} alt={event.name} className="event-image" />
         </div>
       </header>
       <div className="event-content">
         <div className="event-main">
-          <h1>{event.name}</h1>
+          <h1>{event.event_name}</h1>
           <p className="event-location"><i className="bi bi-geo-alt"></i> {event.location}</p>
-          <p className="event-date"><i className="bi bi-calendar"></i> {event.date}</p>
+          <p className="event-date"><i className="bi bi-calendar"></i> {formatDate(event.date)}</p>
           <p className="event-description">{event.description}</p>
         </div>
         <div className="ticket-info">
           <p className="ticket-price">Tickets starting at </p>
-          <p className="ticket-price-range"><span>{event.price}</span></p>
+          <p className="ticket-price-range"><span>{event.price_cat5}</span></p>
           <button className="btn btn-primary rafflebtn" onClick={handleRaffleClick}>Enter Raffle</button>
         </div>
       </div>
       <section className="ticket-pricing">
         <h2>Ticket Pricing</h2>
-        <p>Standard: {event.price}</p>
+        <p>Standard: {event.price_cat5}</p>
         <p className="note">Note:</p>
         <ul>
           <li>Limited to only 4 tickets per account.</li>

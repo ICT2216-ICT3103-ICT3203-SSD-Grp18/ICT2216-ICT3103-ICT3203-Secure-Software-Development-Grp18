@@ -77,8 +77,7 @@
 .ticket-info {
   flex: 1;
   text-align: center;
-  border: 2px solid #4F4CEE;
-  box-shadow: 7px 7px 7px #4F4CEE;
+  border: 1px solid #969393;
   border-radius: 10px;   
   padding: 20px;
   background-color: white;

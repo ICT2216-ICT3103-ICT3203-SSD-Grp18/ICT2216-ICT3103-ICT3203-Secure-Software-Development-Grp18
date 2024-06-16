@@ -8,10 +8,8 @@
   src: url(../fonts/GeneralSans/GeneralSans-Regular.otf);
 }
 
-
 .event-card {
   width: 285px;
-  height: 288px;
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -20,26 +18,31 @@
 }
 
 .event-image {
-  height: 150px;
-  object-fit: cover;
+  width: 100%;
+  height: 200px; /* Set a fixed height */
+  object-fit: cover; /* Ensure the image covers the container while maintaining aspect ratio */
 }
 
 .event-info {
   display: flex;
-  /* flex-direction: column; */
-  align-items: center;
+  flex-direction: column;
   padding: 1rem;
 }
 
 .event-date-card {
   display: flex;
-  font-family: 'GeneralSans-Med';
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.event-date-div {
+  display: flex;
   flex-direction: column;
   align-items: center;
   background-color: #f5f5f5;
   padding: 0.5rem 1rem;
   border-radius: 5px;
-  /* margin-bottom: 1rem; */
+  margin-right: 0.5rem;
 }
 
 .event-month {
@@ -53,18 +56,19 @@
 }
 
 .event-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   text-align: center;
-  margin-left: 25px;
+  margin-left: 35px;
 }
 
 .event-name {
-  
   font-family: 'GeneralSans-Med';
   font-size: 16px;
-  margin: 0.5rem 0;
+  margin: 0;
 }
 
-.event-price,
 .event-location-card {
   font-family: 'GeneralSans-Reg';
   font-size: 14px;
