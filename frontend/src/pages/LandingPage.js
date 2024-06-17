@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
@@ -13,6 +14,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [browseConcert, setBrowseConcert] = useState([]);
+  const [loginOpen, setLoginOpen] = useState(false);
 
   useEffect(() => {
     const fetchUpcomingEvents = async () => {
@@ -29,7 +31,6 @@ const LandingPage = () => {
       }
     };
 
-    
     const fetchBrowseConcert = async () => {
       try {
         const response = await fetch('/api/events/browse');
@@ -52,25 +53,26 @@ const LandingPage = () => {
     navigate(`/event/${eventId}`);
   };
 
+  const toggleLoginModal = () => {
+    setLoginOpen(!loginOpen);
+  };
+
   return (
-    <div className="LandingPage">
-      <Navbar />
+    <div className={`LandingPage ${loginOpen ? 'blur' : ''}`}>
+      <Navbar toggleLoginModal={toggleLoginModal} />
       <header className="LandingPage-header">
-
         <h1>Exclusive events, priceless moments</h1>
-
         <div className="search-bar">
           <input type="text" className="form-control" placeholder="Search by name" />
           <input type="date" className="form-control" />
           <button className="btn btn-primary">Search</button>
         </div>
-
       </header>
       <UpcomingEvents events={upcomingEvents} onEventClick={handleEventClick} />
       <HotOffers />
       <TopSelling />
       <BrowseConcert events={browseConcert} onEventClick={handleEventClick} />
-      <Footer/>
+      <Footer />
     </div>
   );
 };

@@ -12,6 +12,10 @@
   font-family: Arial, sans-serif;
 }
 
+.LandingPage.blur {
+  filter: blur(5px);
+}
+
 .LandingPage-header {
   text-align: center;
   font-family: 'CabinetGrostesk-bold';
