@@ -1,0 +1,13 @@
+{
+  "name": "ticketing-huat",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+    "start:frontend": "npm --prefix frontend start",
+    "start:backend": "npm --prefix backend start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

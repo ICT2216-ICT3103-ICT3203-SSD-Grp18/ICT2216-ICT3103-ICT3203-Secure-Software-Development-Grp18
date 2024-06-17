@@ -1,0 +1,192 @@
+@font-face {
+    font-family: 'CabinetGrotesk-Bold';
+    src: url(../fonts/CabinetGrotesk/CabinetGrotesk-Bold.otf);
+}
+
+@font-face {
+    font-family: 'GeneralSans-Med';
+    src: url(../fonts/GeneralSans/GeneralSans-Medium.otf);
+}
+
+@font-face {
+    font-family: 'GeneralSans-Reg';
+    src: url(../fonts/GeneralSans/GeneralSans-Regular.otf);
+}
+
+.ticket-page-container {
+    padding: 20px;
+}
+
+.back-button-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.back-button {
+    background: none;
+    border: 2px solid #4F4CEE;
+    border-radius: 5px;
+    padding: 5px;
+    width: 40px;
+    height: 40px;
+    line-height: 10px;
+    cursor: pointer;
+    margin-right: 10px;
+    color: #4F4CEE;
+    font-size: 1.5em;
+}
+
+.back-button-container h2 {
+    margin-left: 50px;
+}
+
+.concert-details {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 50px;
+    border-bottom: 1px #ddd solid;
+    justify-content: center;
+}
+
+.concert-image {
+    width: 550px;
+    height: 280px;
+    object-fit: cover;
+    margin-right: 60px;
+}
+
+.concert-info {
+    max-width: 600px;
+}
+
+.concert-info h1 {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.concert-info p {
+    margin: 5px 0;
+}
+
+.ticket-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.ticket-category {
+    background-color: #f9f9f9;
+    border: 2px solid #d1d1d1;
+    padding: 20px;
+    margin: 1rem;
+    width: 250px;
+    height: 250px;
+    text-align: center;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.ticket-category.selected {
+    border-color: #4F4CEE; /* Blue border when selected */
+    box-shadow: 5px 5px 5px #4F4CEE; /* Blue shadow when selected */
+}
+
+.ticket-category h2 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.ticket-category p {
+    font-size: 1em;
+    margin-bottom: 10px;
+}
+
+.ticket-quantity {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+}
+
+.ticket-quantity button {
+    background-color: white;
+    font-size: 100px;
+    color: #4F4CEE;
+    border: 2px solid #4F4CEE;
+    padding: 2px 5px;
+    width: 30px;
+    margin: 20px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.ticket-quantity button:disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
+}
+
+.ticket-quantity span {
+    font-size: 1.2em;
+}
+
+.ticket-error-msg{
+    color:red;
+    text-align: center;
+}
+
+.footer-ticket-page {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #8e89f9;
+    color: white;
+    display: flex;
+    justify-content: center; /* Center align content horizontally */
+    align-items: center;
+    padding: 20px;
+    text-align: center;
+}
+
+.footer-ticket-page .summary {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px; /* Adjust the max-width as needed */
+}
+
+.summary-header, .summary-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px;
+}
+
+.summary p {
+    margin: 0 20px; /* Adjust the margins as needed */
+    text-align: center; /* Center align text within each column */
+}
+
+.purchase-button {
+    background-color: white;
+    color: #4F4CEE;
+    border: 1px solid #4F4CEE;
+    padding: 10px 30px;
+    cursor: pointer;
+    font-size: 1.2em;
+    margin-left: auto; /* Ensure it sticks to the right */
+}
+
+.purchase-button:hover {
+    background-color: #ddd;
+}
+
+.footer-message {
+    font-size: 1.5em;
+    text-align: center;
+}
