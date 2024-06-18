@@ -1,15 +1,17 @@
-// src/components/LoginModal.js
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/css/LoginModal.css';
 
-const LoginModal = ({ isOpen, onClose }) => {
+const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(initialIsLogin);
+
+  useEffect(() => {
+    setIsLogin(initialIsLogin);
+  }, [initialIsLogin]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -18,7 +20,37 @@ const LoginModal = ({ isOpen, onClose }) => {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    // Add your sign-up API call logic here
+
+    const name = `${firstName} ${lastName}`;
+    const user = {
+      name,
+      phone_number: phoneNumber,
+      email,
+      password
+    };
+
+    console.log('Data to be sent:', user);  // Log data being sent
+
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(user)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert('User registered successfully');
+        onClose();  // Close the modal after successful registration
+      } else {
+        const error = await response.json();
+        alert(`Error: ${error.message}`);
+      }
+    } catch (error) {
+      alert(`Error: ${error.message}`);
+    }
   };
 
   if (!isOpen) {
@@ -32,7 +64,7 @@ const LoginModal = ({ isOpen, onClose }) => {
           &times;
         </button>
         <div className="modal-header">
-          <h2>Log in to continue</h2>
+          <h2>{isLogin ? 'Log in to continue' : 'Sign Up to continue'}</h2>
         </div>
         <div className="tab-container">
           <button

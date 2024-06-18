@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const eventRoutes = require('./routes/eventRoutes');
+const authRoutes = require('./routes/authRoutes');
+
 
 // Load environment variables from .env file
 dotenv.config();
@@ -16,6 +18,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api', eventRoutes);
+app.use('/api/auth', authRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

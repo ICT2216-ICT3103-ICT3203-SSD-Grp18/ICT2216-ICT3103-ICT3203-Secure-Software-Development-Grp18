@@ -1,5 +1,4 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import HotOffers from '../components/HotOffers';
@@ -19,7 +18,7 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchUpcomingEvents = async () => {
       try {
-        const response = await fetch('/api/events/upcoming');
+        const response = await fetch('http://localhost:5500/api/events/upcoming');
         if (!response.ok) {
           throw new Error(`Network response was not ok: ${response.statusText}`);
         }
@@ -33,7 +32,7 @@ const LandingPage = () => {
 
     const fetchBrowseConcert = async () => {
       try {
-        const response = await fetch('/api/events/browse');
+        const response = await fetch('http://localhost:5500/api/events/browse');
         if (!response.ok) {
           throw new Error(`Network response was not ok: ${response.statusText}`);
         }
