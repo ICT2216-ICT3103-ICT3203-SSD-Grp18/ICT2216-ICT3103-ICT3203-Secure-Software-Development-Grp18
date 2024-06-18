@@ -11,7 +11,6 @@ const login = async (req, res) => {
       res.status(401).json({ message: 'Invalid email or password' });
     }
   } catch (error) {
-    console.error('Login error:', error);
     res.status(500).json({ message: 'Server error', error });
   }
 };
@@ -22,31 +21,15 @@ const register = async (req, res) => {
   // Log the data received
   console.log('Data received:', { name, phone_number, email, password });
 
-  // Validate data
-  if (typeof name !== 'string' || name.length > 100) {
-    console.error('Invalid name:', name);
-    return res.status(400).json({ message: 'Invalid name' });
-  }
-  if (typeof phone_number !== 'string' || phone_number.length > 15) {
-    console.error('Invalid phone number:', phone_number);
-    return res.status(400).json({ message: 'Invalid phone number' });
-  }
-  if (typeof email !== 'string' || email.length > 100) {
-    console.error('Invalid email:', email);
-    return res.status(400).json({ message: 'Invalid email' });
-  }
-  if (typeof password !== 'string' || password.length > 255) {
-    console.error('Invalid password:', password);
-    return res.status(400).json({ message: 'Invalid password' });
-  }
+  const defaultUserRole = 'user';  // Default value for user_role
+  const defaultStatus = 'active';  // Default value for status
+  const defaultTicketsPurchased = 0;  // Default value for tickets_purchased
 
   try {
     const [result] = await db.execute(
-      'INSERT INTO user (name, phone_number, email, password) VALUES (?, ?, ?, ?)',
-      [name, phone_number, email, password]
+      'INSERT INTO user (name, phone_number, email, password, user_role, status, tickets_purchased) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [name, phone_number, email, password, defaultUserRole, defaultStatus, defaultTicketsPurchased]
     );
-
-    console.log('User insertion result:', result);  // Log the result of the insert operation
 
     res.status(201).json({ message: 'User registered successfully', userId: result.insertId });
   } catch (error) {
