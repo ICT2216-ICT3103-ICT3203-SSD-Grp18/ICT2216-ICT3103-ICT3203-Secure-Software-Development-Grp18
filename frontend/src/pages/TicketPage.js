@@ -16,7 +16,7 @@ const TicketPage = () => {
     const fetchEventDetails = async () => {
       console.log(`Fetching event details for event ID: ${eventId}`);
       try {
-        const response = await fetch(`/api/events/${eventId}`);
+        const response = await fetch(`http://localhost:5500/api/events/${eventId}`);
         if (!response.ok) {
           throw new Error(`Network response was not ok: ${response.statusText}`);
         }

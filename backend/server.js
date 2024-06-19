@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const eventRoutes = require('./routes/eventRoutes');
 const authRoutes = require('./routes/authRoutes');
+const cors = require('cors');
 
 
 // Load environment variables from .env file
@@ -12,12 +13,13 @@ const app = express();
 const PORT = process.env.PORT || 5500;
 
 app.use(bodyParser.json());
+app.use(cors());
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-app.use('/api', eventRoutes);
+app.use('/api', eventRoutes)
 app.use('/api/auth', authRoutes);
 
 app.listen(PORT, () => {
