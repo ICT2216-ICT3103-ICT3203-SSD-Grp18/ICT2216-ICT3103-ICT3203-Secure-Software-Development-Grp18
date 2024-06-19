@@ -32,7 +32,7 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
     console.log('Data to be sent:', user);  // Log data being sent
 
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('http://localhost:5500/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
