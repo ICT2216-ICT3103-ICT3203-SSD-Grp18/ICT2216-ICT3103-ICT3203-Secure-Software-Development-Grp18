@@ -1,11 +1,23 @@
 import React, { useState } from 'react';
+import LoginModal from "../pages/loginModal"; // Updated the import path
 import '../styles/css/Navbar.css';
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
+  };
+
+  const openLoginModal = (isLoginMode) => {
+    setIsLogin(isLoginMode);
+    setLoginOpen(true);
+  };
+
+  const closeLoginModal = () => {
+    setLoginOpen(false);
   };
 
   return (
@@ -22,8 +34,8 @@ const Navbar = () => {
           </ul>
         </div>
         <div className="navbar-buttons">
-          <button className="login">Log In</button>
-          <button className="signup">Sign Up</button>
+          <button className="login" onClick={() => openLoginModal(true)}>Log In</button>
+          <button className="signup" onClick={() => openLoginModal(false)}>Sign Up</button>
         </div>
       </div>
       <div className="hamburger" onClick={toggleMenu}>
@@ -31,6 +43,7 @@ const Navbar = () => {
         <div className="bar"></div>
         <div className="bar"></div>
       </div>
+      <LoginModal isOpen={loginOpen} onClose={closeLoginModal} isLogin={isLogin} />
     </nav>
   );
 };

@@ -1,0 +1,137 @@
+/* src/styles/css/LoginModal.css */
+
+@font-face {
+  font-family: 'CabinetGrostesk-bold';
+  src: url(../fonts/CabinetGrotesk/CabinetGrotesk-Bold.otf);
+}
+
+@font-face {
+  font-family: 'GeneralSans-Med';
+  src: url(../fonts/GeneralSans/GeneralSans-Medium.otf);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+}
+.modal-content {
+  background-color: white !important;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  position: relative;
+}
+
+
+.modal-header {
+ 
+  padding: 10px;
+  width: 100%;
+  height: 94px;
+  justify-content: center; /* Centers the h2 horizontally */
+  align-items: center;    /* Centers the h2 vertically */
+  
+  background-color: #4F4CEE;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.modal-header h2 {
+  
+  font-family: 'CabinetGrostesk-bold';
+ 
+}
+
+.tab-container {
+  font-family: 'GeneralSans-Med';
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.tab {
+  background: none;
+  
+  border: none;
+  font-size: 18px;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+}
+
+.tab.active {
+  color: #4F4CEE;
+
+  border-bottom: 3px solid #4F4CEE;
+}
+
+label {
+  display: block;
+  color: #1B1B25;
+  font-family: 'GeneralSans-Med';
+  margin-left: 25px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  text-align: left;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+  width: 350px;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 2px solid black;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 10px;
+  background-color: #4F4CEE;
+  border: none;
+  color: black;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background-color: #3a3a3a;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.note {
+  background-color: #f5f5ff;
+  color: #4a4a4a;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import '../styles/css/EventDetailPage.css';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import '../styles/css/EventDetailPage.css';
 
 const EventDetailPage = () => {
   const { eventId } = useParams();
@@ -14,7 +14,7 @@ const EventDetailPage = () => {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const response = await fetch(`/api/events/${eventId}`);
+        const response = await fetch(`http://localhost:5500/api/events/${eventId}`);
         if (!response.ok) {
           throw new Error(`Network response was not ok: ${response.statusText}`);
         }
@@ -63,7 +63,7 @@ const EventDetailPage = () => {
             <a href="#twitter"><i className="bi bi-twitter"></i></a>
             <a href="#facebook"><i className="bi bi-facebook"></i></a>
           </div>
-          <img src={`data:image/png;base64,${event.image}`} alt={event.name} className="event-image" />
+          <img src={`data:image/png;base64,${event.image}`} alt={event.event_name} className="event-image" />
         </div>
       </header>
       <div className="event-content">
