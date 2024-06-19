@@ -13,9 +13,40 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
     setIsLogin(initialIsLogin);
   }, [initialIsLogin]);
 
+
   const handleLogin = async (e) => {
     e.preventDefault();
-    // Add your login API call logic here
+
+    const user = {
+      email,
+      password,
+
+    };
+    console.log('Login data to be sent:', user);  // Log data being sent
+    try {
+      const response = await fetch('http://localhost:5500/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        alert('Login successful');
+        console.log('Login response:', result);
+  
+        // Optionally, you can store the token in local storage for future use
+        // localStorage.setItem('token', result.token);
+        onClose();
+      } else {
+        const error = await response.json();
+        alert(`Error: ${error.message}`);
+      }
+    } catch (error) {
+      alert(`Error: ${error.message}`);
+    }
   };
 
   const handleSignUp = async (e) => {

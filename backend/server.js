@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const eventRoutes = require('./routes/eventRoutes');
 const authRoutes = require('./routes/authRoutes');
 const cors = require('cors');
+const authenticateToken = require('./middleware/authMiddleware');
 
 
 // Load environment variables from .env file

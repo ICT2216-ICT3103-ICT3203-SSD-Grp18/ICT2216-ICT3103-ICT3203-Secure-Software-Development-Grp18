@@ -1,5 +1,10 @@
 const db = require('../utils/db');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+
+
+const jwtSecret = process.env.JWT_SECRET;
 
 
 const login = async (req, res) => {
@@ -18,27 +23,18 @@ const login = async (req, res) => {
 
     const isMatch =await bcrypt.compare(password, user.password);
 
-    if(isMatch) {
-      res.status(200).json({message: 'login succesfully', user});
-    }else{
-      res.status(401).json({message: 'Invalid email and password' });
+    if (isMatch) {
+      const token = jwt.sign({ id: user.user_id, email: user.email }, jwtSecret, { expiresIn: '1h' });
+      res.status(200).json({ message: 'Login successful', token });
+    } else {
+      res.status(401).json({ message: 'Invalid email or password' });
     }
   } catch (error) {
-    res.status(500).json({message: 'Server error', error});
+    console.error('Error during login:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
-  
-
-  // try {
-  //   const user = await loginModel.authenticate(email, password);
-  //   if (user) {
-  //     res.status(200).json({ message: 'Login successful', user });
-  //   } else {
-  //     res.status(401).json({ message: 'Invalid email or password' });
-  //   }
-  // } catch (error) {
-  //   res.status(500).json({ message: 'Server error', error });
-  // }
 };
+
 
 
 
