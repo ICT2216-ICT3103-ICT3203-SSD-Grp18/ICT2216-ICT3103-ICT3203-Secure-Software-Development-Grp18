@@ -1,9 +1,16 @@
+@font-face {
+  font-family: 'GeneralSans-Med';
+  src: url(../fonts/GeneralSans/GeneralSans-Medium.otf);
+}
+
+
 .completion-page {
     text-align: center;
-    padding: 50px;
+    /* padding: 50px; */
+    background-color: #FAFAFA;
   }
   
-  .completion-container {
+  .completion-content {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -11,19 +18,45 @@
     min-height: 60vh;
   }
   
-  .completion-container h1 {
-    font-size: 3em;
-    margin-bottom: 20px;
+  .completion-content .completed-image {
+    margin-top: 20px;
+    /* font-size: 3em;
+    margin-bottom: 20px; */
+    width: 334px; /* Adjust the width as needed */
+    height: 90px; /* Maintain aspect ratio */
+  
+  }
+
+  .completion-content h1{
+    font-size: 24px;
+  }
+
+  .completion-content .trouble {
+    color: black;
+    margin-top: 50px;
+  }
+
+  .completion-content .result-image {
+    /* font-size: 3em;
+    margin-bottom: 20px; */
+    width: 426px; /* Adjust the width as needed */
+    height: 239px; /* Maintain aspect ratio */
+  
   }
   
-  .completion-container p {
-    font-size: 1.5em;
+  .completion-content p {
+    font-family: 'GeneralSans-Med';
+    font-size: 20px ;
+    color: #4F4CEE;
     margin-bottom: 10px;
   }
-  
-  .contact-info p {
-    margin: 5px 0;
+
+  .contact-info {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
   }
+  
   
   button {
     padding: 10px 20px;
