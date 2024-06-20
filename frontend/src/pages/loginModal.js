@@ -39,6 +39,7 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
   
         // Optionally, you can store the token in local storage for future use
         localStorage.setItem('token', result.token);
+        localStorage.setItem('email', user.email);
         onClose();
       } else {
         const error = await response.json();
