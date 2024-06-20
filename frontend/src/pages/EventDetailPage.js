@@ -35,6 +35,15 @@ const EventDetailPage = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  const handleRaffleClick = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('You need to be logged in to enter the raffle');
+      return;
+    }
+    navigate(`/ticket/${eventId}`);
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -46,10 +55,6 @@ const EventDetailPage = () => {
   if (!event) {
     return <div>Event not found</div>;
   }
-
-  const handleRaffleClick = () => {
-    navigate(`/ticket/${event.event_id}`);
-  };
 
   return (
     <div className="event-detail-page">
