@@ -69,9 +69,34 @@ const TicketPage = () => {
 
   const hasSelectedTickets = ticketCount.some(count => count > 0);
 
-  const handlePurchase = () => {
-    // Add purchase handling logic here, e.g., integrating with a payment gateway
-    console.log('Purchase tickets:', ticketCount);
+  const handlePurchase = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('You need to be logged in to purchase tickets');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:5500/api/raffle/enter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ eventId, ticketCount }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert('Tickets purchased successfully');
+        navigate('/');
+      } else {
+        const error = await response.json();
+        alert(`Error: ${error.message}`);
+      }
+    } catch (error) {
+      alert(`Error: ${error.message}`);
+    }
   };
 
   if (loading) {
