@@ -88,8 +88,8 @@ const TicketPage = () => {
 
       if (response.ok) {
         const result = await response.json();
-        alert('Tickets purchased successfully');
-        navigate('/');
+        // alert('Tickets purchased successfully');
+        navigate('/completion');
       } else {
         const error = await response.json();
         alert(`Error: ${error.message}`);
