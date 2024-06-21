@@ -5,6 +5,9 @@ const eventRoutes = require('./routes/eventRoutes');
 const authRoutes = require('./routes/authRoutes');
 const cors = require('cors');
 const authenticateToken = require('./middleware/authMiddleware');
+require('./jobs/raffleCronJob'); 
+
+
 
 
 // Load environment variables from .env file
