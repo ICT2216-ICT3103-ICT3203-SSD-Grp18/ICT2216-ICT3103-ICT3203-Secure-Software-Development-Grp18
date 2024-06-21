@@ -1,0 +1,101 @@
+.checkout-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .checkout-form button {
+    background-color: #6200ea;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    margin-top: 20px;
+    cursor: pointer;
+  }
+  
+  .checkout-form button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .checkout-form .error {
+    color: red;
+    margin-top: 20px;
+  }
+  
+  .checkout-form .success {
+    color: green;
+    margin-top: 20px;
+  }
+
+  .checkout-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .checkout-form button {
+    background-color: #6200ea;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    margin-top: 20px;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  .checkout-form button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .checkout-form .error {
+    color: red;
+    margin-top: 20px;
+  }
+  
+  .checkout-form .success {
+    color: green;
+    margin-top: 20px;
+  }
+  
+  .checkout-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .card-element-container {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .checkout-form button {
+    background-color: #6200ea;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    margin-top: 20px;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  .checkout-form button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .checkout-form .error {
+    color: red;
+    margin-top: 20px;
+  }
+  
+  .checkout-form .success {
+    color: green;
+    margin-top: 20px;
+  }
+  
