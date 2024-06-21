@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import '../styles/css/EventDetailPage.css';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import '../styles/css/EventDetailPage.css';
 
 const EventDetailPage = () => {
   const { eventId } = useParams();
@@ -10,16 +10,30 @@ const EventDetailPage = () => {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(null);
 
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const response = await fetch(`/api/events/${eventId}`);
+        const response = await fetch(`http://localhost:5500/api/events/${eventId}`);
         if (!response.ok) {
           throw new Error(`Network response was not ok: ${response.statusText}`);
         }
         const data = await response.json();
         setEvent(data);
+
+
+        const raffleStartTime = new Date(data.raffle_start_date).getTime();
+        const currentTime = new Date().getTime();
+        setTimeLeft(raffleStartTime - currentTime);
+
+
+        // if (raffleStartDate > currentDate) {
+        //   const countdown = raffleStartDate - currentDate;
+        //   setTimeLeft(countdown);
+        // }
+
+        setLoading(false);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -30,10 +44,55 @@ const EventDetailPage = () => {
     fetchEvent();
   }, [eventId]);
 
-  const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+  useEffect(() => {
+    if (timeLeft > 0) {
+        const timerId = setInterval(() => {
+            setTimeLeft(prevTimeLeft => prevTimeLeft - 1000);
+        }, 1000);
+
+        return () => clearInterval(timerId);
+    }
+}, [timeLeft]);
+
+const formatTimeLeft = () => {
+  const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+  return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+};
+
+
+
+  // const formatDate = (dateString) => {
+  //   const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+  //   return new Date(dateString).toLocaleDateString(undefined, options);
+  // };
+
+  const handleRaffleClick = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('You need to be logged in to enter the raffle');
+      return;
+    }
+
+    if (timeLeft <= 0) {
+      navigate(`/ticket/${eventId}`);
+    }else {
+      alert('Raffle not started yet!');
+    }
   };
+
+
+//   const handleRaffleClick = () => {
+//     if (timeLeft <= 0) {
+//         navigate(`/ticket/${event.event_id}`);
+//     } else {
+//         alert('Raffle not started yet!');
+//     }
+// };
+
 
   if (loading) {
     return <div>Loading...</div>;
@@ -47,76 +106,41 @@ const EventDetailPage = () => {
     return <div>Event not found</div>;
   }
 
-  const handleRaffleClick = () => {
-    navigate(`/ticket/${event.event_id}`);
-  };
-
   return (
     <div className="event-detail-page">
-      <Navbar />
-      <header className="event-header">
-        <div className="header-container">
-          <div className="share-buttons">
-            <p>Share</p>
-            <a href="#link"><i className="bi bi-link"></i></a>
-            <a href="#instagram"><i className="bi bi-instagram"></i></a>
-            <a href="#twitter"><i className="bi bi-twitter"></i></a>
-            <a href="#facebook"><i className="bi bi-facebook"></i></a>
-          </div>
-          <img src={`data:image/png;base64,${event.image}`} alt={event.name} className="event-image" />
+        <Navbar />
+        <header className="event-header">
+            <div className="header-container">
+                <div className="share-buttons">
+                    <p>Share</p>
+                    <a href="#link"><i className="bi bi-link"></i></a>
+                    <a href="#instagram"><i className="bi bi-instagram"></i></a>
+                    <a href="#twitter"><i className="bi bi-twitter"></i></a>
+                    <a href="#facebook"><i className="bi bi-facebook"></i></a>
+                </div>
+                <img src={`data:image/png;base64,${event.image}`} alt={event.event_name} className="event-image" />
+            </div>
+        </header>
+        <div className="event-content">
+            <div className="event-main">
+                <h1>{event.event_name}</h1>
+                <p className="event-location"><i className="bi bi-geo-alt"></i> {event.location}</p>
+                <p className="event-date"><i className="bi bi-calendar"></i> {new Date(event.date).toLocaleString()}</p>
+                <p className="event-description">{event.description}</p>
+            </div>
+            <div className="ticket-info">
+                <p className="ticket-price">Tickets starting at </p>
+                <p className="ticket-price-range"><span>{event.price_cat5}</span></p>
+                {timeLeft > 0 ? (
+                    <p className="raffle-countdown">Raffle starts in: {formatTimeLeft(timeLeft)}</p>
+                ) : (
+                    <button className="btn btn-primary rafflebtn" onClick={handleRaffleClick}>Enter Raffle</button>
+                )}
+            </div>
         </div>
-      </header>
-      <div className="event-content">
-        <div className="event-main">
-          <h1>{event.event_name}</h1>
-          <p className="event-location"><i className="bi bi-geo-alt"></i> {event.location}</p>
-          <p className="event-date"><i className="bi bi-calendar"></i> {formatDate(event.date)}</p>
-          <p className="event-description">{event.description}</p>
-        </div>
-        <div className="ticket-info">
-          <p className="ticket-price">Tickets starting at </p>
-          <p className="ticket-price-range"><span>{event.price_cat5}</span></p>
-          <button className="btn btn-primary rafflebtn" onClick={handleRaffleClick}>Enter Raffle</button>
-        </div>
-      </div>
-      <section className="ticket-pricing">
-        <h2>Ticket Pricing</h2>
-        <p>Standard: {event.price_cat5}</p>
-        <p className="note">Note:</p>
-        <ul>
-          <li>Limited to only 4 tickets per account.</li>
-          <li>Rescheduling Policy: Rescheduling fees are as follows:</li>
-          <ul>
-            <li>$10 rescheduling fee per ticket from 31 to 60 days.</li>
-            <li>$30 rescheduling fee per ticket for tickets issued within 30 days.</li>
-            <li>$150 rescheduling fee per ticket for tickets priced below SGD 100.</li>
-          </ul>
-        </ul>
-      </section>
-      <section className="exchange-refund-policy">
-        <h2>Exchange & Refund Policy</h2>
-        <p>
-          1. The Organizer/Venue Owner reserves the right without refund or compensation to refuse admission/evict any person(s) whose conduct is disorderly or inappropriate or who poses a threat to security, or to any person affected by COVID-19.
-        </p>
-        <p>
-          2. No refunds on tickets except if the event is canceled or postponed.
-        </p>
-        <p>
-          3. This ticket must be used in accordance with the terms and conditions.
-        </p>
-      </section>
-      <section className="admission-policy">
-        <h2>Admission Policy</h2>
-        <p>Admission Rules:</p>
-        <ul>
-          <li>Admission to the venue will be subject to a security check.</li>
-          <li>Children under 5 years old are not allowed.</li>
-          <li>No professional cameras or recording devices are allowed.</li>
-        </ul>
-      </section>
-      <Footer />
+        <Footer />
     </div>
-  );
+);
 };
 
 export default EventDetailPage;

@@ -10,6 +10,11 @@
 
 .LandingPage {
   font-family: Arial, sans-serif;
+  background-color: #FAFAFA;
+}
+
+.LandingPage.blur {
+  filter: blur(5px);
 }
 
 .LandingPage-header {
