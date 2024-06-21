@@ -19,6 +19,8 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.10.1",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.14",
     "sequelize": "^6.37.3",
     "sequelize-cli": "^6.6.2"
   }
