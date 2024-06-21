@@ -138,8 +138,10 @@ const formatTimeLeft = () => {
                 )}
             </div>
         </div>
-        <Footer />
+      <Footer />
     </div>
+  
+    
 );
 };
 

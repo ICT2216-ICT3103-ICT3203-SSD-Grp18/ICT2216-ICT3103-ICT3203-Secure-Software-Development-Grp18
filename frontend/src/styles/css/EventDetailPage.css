@@ -9,8 +9,8 @@
 }
 
 .event-detail-page {
-  padding: 20px;
-  max-width: 1200px;
+  /* padding: 20px; */
+ 
   margin: auto;
 }
 
@@ -62,11 +62,13 @@
 }
 
 .event-content {
+   /* max-width: 1200px; */
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 40px;
   flex-wrap: wrap;
+  margin-right: 100px;
 }
 
 .event-main {
