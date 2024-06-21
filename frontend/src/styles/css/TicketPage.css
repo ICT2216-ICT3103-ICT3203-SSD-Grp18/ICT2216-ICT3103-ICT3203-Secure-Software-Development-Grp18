@@ -138,7 +138,6 @@
 }
 
 .footer-ticket-page {
-    position: fixed;
     left: 0;
     bottom: 0;
     width: 100%;
@@ -149,12 +148,13 @@
     align-items: center;
     padding: 20px;
     text-align: center;
+    margin-top: 50px;
 }
 
 .footer-ticket-page .summary {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     width: 100%;
     max-width: 800px; /* Adjust the max-width as needed */

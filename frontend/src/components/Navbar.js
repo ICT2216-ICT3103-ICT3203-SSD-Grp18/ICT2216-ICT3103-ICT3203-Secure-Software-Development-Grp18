@@ -1,18 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import LoginModal from "../pages/loginModal"; 
+import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext'; // Import useAuth hook from AuthContext
+import LoginModal from "../pages/LoginModal"; 
 import '../styles/css/Navbar.css';
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
-  }, []);
+  const { isLoggedIn, logout } = useAuth(); 
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -25,13 +20,6 @@ const Navbar = () => {
 
   const closeLoginModal = () => {
     setLoginOpen(false);
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setIsLoggedIn(false);
   };
 
   return (
@@ -40,28 +28,27 @@ const Navbar = () => {
       <div className="navbar-container">
         <div className={`navbar-menu ${menuOpen ? 'open' : ''}`}>
           <ul className="navbar-links">
-            <li><a href="#concerts">Concerts</a></li>
+            <li><a href="/">Concerts</a></li>
             <li><a href="#events">Events</a></li>
             <li><a href="#conference">Conference</a></li>
             {isLoggedIn ? (
-              <li className="mobile-only"><a href="#logout" onClick={handleLogout}>Logout</a></li>
+              <li className="mobile-only"><a href="#logout" onClick={logout}>Logout</a></li>
             ) : (
               <>
-            <li className="mobile-only"><a href="#login">Log In</a></li>
-            <li className="mobile-only"><a href="#register">Sign Up</a></li>
-            </>
+                <li className="mobile-only"><a href="#login" onClick={() => openLoginModal(true)}>Log In</a></li>
+                <li className="mobile-only"><a href="#register" onClick={() => openLoginModal(false)}>Sign Up</a></li>
+              </>
             )}
           </ul>
         </div>
         <div className="navbar-buttons">
-        {isLoggedIn ? (
-            <button className="logout" onClick={handleLogout}>Logout</button>
+          {isLoggedIn ? (
+            <button className="logout" onClick={logout}>Logout</button>
           ) : (
             <>
-
-          <button className="login" onClick={() => openLoginModal(true)}>Log In</button>
-          <button className="signup" onClick={() => openLoginModal(false)}>Sign Up</button>
-          </>
+              <button className="login" onClick={() => openLoginModal(true)}>Log In</button>
+              <button className="signup" onClick={() => openLoginModal(false)}>Sign Up</button>
+            </>
           )}
         </div>
       </div>
