@@ -9,8 +9,8 @@
 }
 
 .event-detail-page {
-  /* padding: 20px; */
- 
+  padding: 20px;
+  max-width: 1200px;
   margin: auto;
 }
 
@@ -62,13 +62,12 @@
 }
 
 .event-content {
-   /* max-width: 1200px; */
+  max-width: 1200px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 40px;
   flex-wrap: wrap;
-  margin-right: 100px;
 }
 
 .event-main {
@@ -142,6 +141,8 @@
 .note {
   font-weight: bold;
   margin-top: 10px;
+  background-color: #cdcdce;
+  color: black;
 }
 
 .ticket-pricing ul, .admission-policy ul {
