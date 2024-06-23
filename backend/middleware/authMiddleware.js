@@ -19,6 +19,18 @@ const authenticateToken = (req, res, next) => {
     req.user = user; // Set  user on the request object
     next(); // Proceed to the next middleware or route handler
   });
+
 };
 
-module.exports = { authenticateToken };
+const isAdmin = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    res.sendStatus(403);
+  }
+};
+
+
+
+
+module.exports = { authenticateToken, isAdmin };

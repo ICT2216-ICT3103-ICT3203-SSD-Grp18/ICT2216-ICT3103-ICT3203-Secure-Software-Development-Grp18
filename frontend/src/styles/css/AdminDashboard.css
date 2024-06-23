@@ -1,0 +1,20 @@
+.admin-dashboard {
+    display: flex;
+  }
+  
+  .main-content {
+    margin-left: 250px;
+    padding: 20px;
+    width: calc(100% - 250px);
+  }
+  
+  .content {
+    background: #ecf0f1;
+    padding: 20px;
+    border-radius: 5px;
+  }
+  
+  .content h2 {
+    margin-top: 0;
+  }
+  

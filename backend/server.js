@@ -8,6 +8,7 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const { authenticateToken } = require('./middleware/authMiddleware');
 require('./jobs/raffleCronJob'); 
+const adminRoutes = require('./routes/adminRoutes');
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api', eventRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

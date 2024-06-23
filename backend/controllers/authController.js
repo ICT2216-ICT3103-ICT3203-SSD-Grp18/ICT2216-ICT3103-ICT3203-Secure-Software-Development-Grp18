@@ -24,7 +24,7 @@ const login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (isMatch) {
-      const token = jwt.sign({ id: user.user_id, email: user.email }, jwtSecret, { expiresIn: '30m' });
+      const token = jwt.sign({ id: user.user_id, email: user.email, role: user.user_role }, jwtSecret, { expiresIn: '30m' });
 
       res.cookie('token', token, {
         httpOnly: true,
@@ -36,7 +36,7 @@ const login = async (req, res) => {
       req.session.userId = user.user_id;
       req.session.email = user.email;
 
-      res.status(200).json({ message: 'Login successful' });
+      res.status(200).json({ message: 'Login successful',  user: { id: user.user_id, email: user.email, role: user.user_role } });
     } else {
       res.status(401).json({ message: 'Invalid email or password' });
     }
@@ -103,7 +103,7 @@ const getUser = (req, res) => {
   // console.log('Fetched user:', user); // Log user
 
   if (user) {
-    res.status(200).json({ email: user.email });
+    res.status(200).json({ email: user.email, role: user.role });
   } else {
     res.status(404).json({ message: 'User not found' });
   }
