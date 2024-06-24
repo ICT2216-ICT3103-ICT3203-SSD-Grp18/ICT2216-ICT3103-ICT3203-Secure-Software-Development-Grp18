@@ -6,7 +6,7 @@ const Header = () => {
   return (
     <header className="header">
       <h1>Admin Dashboard</h1>
-      <button className="logout-button">Logout</button>
+      {/* <button className="logout-button">Logout</button> */}
     </header>
   );
 };

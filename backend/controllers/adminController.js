@@ -1,9 +1,48 @@
 const db = require('../utils/db');
 
 const createEvent = async (req, res) => {
-  const { title, date, location, description } = req.body;
+  const {
+    event_name,
+    description,
+    date,
+    start_time,
+    location,
+    organiser,
+    ticket_availability,
+    price_vip,
+    price_cat1,
+    price_cat2,
+    price_cat3,
+    price_cat4,
+    price_cat5,
+    raffle_start_date,
+    raffle_end_date,
+  } = req.body;
+  
+  const image = req.file ? req.file.buffer : null; // Handle the image file
+
   try {
-    const [result] = await db.execute('INSERT INTO events (title, date, location, description) VALUES (?, ?, ?, ?)', [title, date, location, description]);
+    const [result] = await db.execute(
+      'INSERT INTO events (event_name, description, date, start_time, location, organiser, ticket_availability, price_vip, price_cat1, price_cat2, price_cat3, price_cat4, price_cat5, raffle_start_date, raffle_end_date, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [
+        event_name,
+        description,
+        date,
+        start_time,
+        location,
+        organiser,
+        ticket_availability,
+        price_vip,
+        price_cat1,
+        price_cat2,
+        price_cat3,
+        price_cat4,
+        price_cat5,
+        raffle_start_date,
+        raffle_end_date,
+        image
+      ]
+    );
     res.status(201).json({ message: 'Event created successfully', eventId: result.insertId });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
@@ -12,9 +51,50 @@ const createEvent = async (req, res) => {
 
 const editEvent = async (req, res) => {
   const { id } = req.params;
-  const { title, date, location, description } = req.body;
+  const {
+    event_name,
+    description,
+    date,
+    start_time,
+    location,
+    organiser,
+    ticket_availability,
+    price_vip,
+    price_cat1,
+    price_cat2,
+    price_cat3,
+    price_cat4,
+    price_cat5,
+    raffle_start_date,
+    raffle_end_date,
+  } = req.body;
+
+  // Check if there is a file
+  const image = req.file ? req.file.buffer : null;
+
   try {
-    await db.execute('UPDATE events SET title = ?, date = ?, location = ?, description = ? WHERE id = ?', [title, date, location, description, id]);
+    await db.execute(
+      'UPDATE events SET event_name = ?, description = ?, date = ?, start_time = ?, location = ?, organiser = ?, ticket_availability = ?, price_vip = ?, price_cat1 = ?, price_cat2 = ?, price_cat3 = ?, price_cat4 = ?, price_cat5 = ?, raffle_start_date = ?, raffle_end_date = ?, image = ? WHERE event_id = ?',
+      [
+        event_name,
+        description,
+        date,
+        start_time,
+        location,
+        organiser,
+        ticket_availability,
+        price_vip,
+        price_cat1,
+        price_cat2,
+        price_cat3,
+        price_cat4,
+        price_cat5,
+        raffle_start_date,
+        raffle_end_date,
+        image,
+        id
+      ]
+    );
     res.status(200).json({ message: 'Event updated successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
@@ -24,7 +104,7 @@ const editEvent = async (req, res) => {
 const deleteEvent = async (req, res) => {
   const { id } = req.params;
   try {
-    await db.execute('DELETE FROM events WHERE id = ?', [id]);
+    await db.execute('DELETE FROM events WHERE event_id = ?', [id]);
     res.status(200).json({ message: 'Event deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
@@ -57,7 +137,7 @@ const deleteUser = async (req, res) => {
     await db.execute('DELETE FROM user WHERE id = ?', [id]);
     res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status (500).json({ message: 'Server error', error });
   }
 };
 

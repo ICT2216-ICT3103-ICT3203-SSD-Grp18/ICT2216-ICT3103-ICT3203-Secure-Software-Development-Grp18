@@ -7,7 +7,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import CompletionPage from './pages/CompletionPage';
 import { AuthProvider } from './context/AuthContext';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import AdminDashboard from './pages/AdminDashboard';
+
 
 
 const App = () => {
@@ -20,7 +22,7 @@ const App = () => {
             <Route path="/event/:eventId" element={<EventDetailPage />} />
             <Route path="/ticket/:eventId" element={<TicketPage />} />
             <Route path="/completion" element={<CompletionPage />} />
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/*" element={<AdminDashboard />} />
 
           </Routes>
         </div>

@@ -1,3 +1,13 @@
+@font-face {
+  font-family: 'CabinetGrostesk-bold';
+  src: url(../fonts/CabinetGrotesk/CabinetGrotesk-Bold.otf);
+}
+
+@font-face {
+  font-family: 'GeneralSans-reg';
+  src: url(../fonts/GeneralSans/GeneralSans-Regular.otf);
+}
+
 .admin-dashboard {
     display: flex;
   }
@@ -9,12 +19,18 @@
   }
   
   .content {
-    background: #ecf0f1;
+    background: whitesmoke;
     padding: 20px;
     border-radius: 5px;
   }
   
   .content h2 {
+    font-family: 'CabinetGrostesk-bold';
+
     margin-top: 0;
+  }
+
+  .content p {
+    font-family: 'GeneralSans-reg';
   }
   

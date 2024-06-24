@@ -3,6 +3,8 @@ const router = express.Router();
 const eventController = require('../controllers/eventController');
 const raffleController = require('../controllers/raffleController');
 const { authenticateToken } = require('../middleware/authMiddleware');
+const multer = require('multer');
+
 
 // Routes in eventController.js
 router.get('/events/upcoming', eventController.getUpcomingEvents);
