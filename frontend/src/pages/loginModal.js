@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/css/LoginModal.css';
+import { useAuth } from '../context/AuthContext';
+import apiClient from '../axiosConfig';
 
 const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
   const [email, setEmail] = useState('');
@@ -8,42 +10,21 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
   const [lastName, setLastName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLogin, setIsLogin] = useState(initialIsLogin);
+  const { login } = useAuth();
 
   useEffect(() => {
     setIsLogin(initialIsLogin);
   }, [initialIsLogin]);
 
-
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    const user = {
-      email,
-      password,
+    console.log('Login data to be sent:', { email, password });
 
-    };
-    console.log('Login data to be sent:', user);  // Log data being sent
     try {
-      const response = await fetch('http://localhost:5500/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(user),
-      });
-  
-      if (response.ok) {
-        const result = await response.json();
-        alert('Login successful');
-        console.log('Login response:', result);
-  
-        // Optionally, you can store the token in local storage for future use
-        // localStorage.setItem('token', result.token);
-        onClose();
-      } else {
-        const error = await response.json();
-        alert(`Error: ${error.message}`);
-      }
+      await login(email, password);
+      alert('Login successful');
+      onClose();
     } catch (error) {
       alert(`Error: ${error.message}`);
     }
@@ -60,23 +41,15 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
       password
     };
 
-    console.log('Data to be sent:', user);  // Log data being sent
+    console.log('Data to be sent:', user);
 
     try {
-      const response = await fetch('http://localhost:5500/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(user)
-      });
-
-      if (response.ok) {
-        const result = await response.json();
+      const response = await apiClient.post('/auth/register', user);
+      if (response.status === 201) {
         alert('User registered successfully');
-        onClose();  // Close the modal after successful registration
+        onClose();
       } else {
-        const error = await response.json();
+        const error = await response.data;
         alert(`Error: ${error.message}`);
       }
     } catch (error) {

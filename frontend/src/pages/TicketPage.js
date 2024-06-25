@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import '../styles/css/TicketPage.css';
+import apiClient from '../axiosConfig';
+import { useAuth } from '../context/AuthContext';
 
 const TicketPage = () => {
   const { eventId } = useParams();
@@ -11,16 +13,17 @@ const TicketPage = () => {
   const [ticketCount, setTicketCount] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const { isLoggedIn } = useAuth();
 
   useEffect(() => {
     const fetchEventDetails = async () => {
       console.log(`Fetching event details for event ID: ${eventId}`);
       try {
-        const response = await fetch(`http://localhost:5500/api/events/${eventId}`);
-        if (!response.ok) {
+        const response = await apiClient.get(`/events/${eventId}`, { withCredentials: true });
+        if (response.status !== 200) {
           throw new Error(`Network response was not ok: ${response.statusText}`);
         }
-        const data = await response.json();
+        const data = response.data;
         console.log('Event details fetched:', data);
         setEvent(data);
         setCategories(data.categories || []);
@@ -61,17 +64,36 @@ const TicketPage = () => {
     console.log('Updated ticket count:', newTicketCount);
   };
 
-  const getTotalPrice = () => {
-    const totalPrice = ticketCount.reduce((total, count, index) => total + count * categories[index].price, 0).toFixed(2);
-    console.log('Total price:', totalPrice);
-    return totalPrice;
-  };
-
   const hasSelectedTickets = ticketCount.some(count => count > 0);
 
-  const handlePurchase = () => {
-    // Add purchase handling logic here, e.g., integrating with a payment gateway
-    console.log('Purchase tickets:', ticketCount);
+  const handleSubmit = async () => {
+    if (!isLoggedIn) {
+      alert('You need to be logged in to purchase tickets');
+      return;
+    }
+  
+    try {
+      // Check if user has already entered the raffle
+      const checkEntryResponse = await apiClient.get(`/raffle/hasEntered?eventId=${eventId}`, { withCredentials: true });
+  
+      if (checkEntryResponse.data.hasEntered) {
+        alert('You have already entered the raffle for this event');
+        navigate(`/ticket/${eventId}`);
+        return;
+      }
+  
+      // Enter the raffle
+      const response = await apiClient.post('/raffle/enter', { eventId, ticketCount }, { withCredentials: true });
+  
+      if (response.status >= 200 && response.status < 300) {
+        alert('Raffle entry successful');
+        navigate('/completion');
+      } else {
+        alert(`Error: ${response.data.message}`);
+      }
+    } catch (error) {
+      alert(`Error: ${error.response?.data?.message || error.message}`);
+    }
   };
 
   if (loading) {
@@ -142,7 +164,7 @@ const TicketPage = () => {
           ) : (
             <p className='choose-quantity'>Choose your tickets and quantity.</p>
           )}
-          {hasSelectedTickets && <button className="purchase-button" onClick={handlePurchase}>Buy Tickets</button>}
+          {hasSelectedTickets && <button className="purchase-button" onClick={handleSubmit}>Enter Raffle</button>}
         </div>
       </div>
     </>

@@ -8,6 +8,7 @@ import BrowseConcert from '../components/BrowseConcert';
 import Footer from '../components/Footer';
 import '../styles/css/LandingPage.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import apiClient from '../axiosConfig';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -18,29 +19,39 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchUpcomingEvents = async () => {
       try {
-        const response = await fetch('http://localhost:5500/api/events/upcoming');
-        if (!response.ok) {
+        const response = await apiClient.get('/events/upcoming');
+        console.log('Fetch Upcoming Events Response:', response);
+        if (response.status !== 200) {
           throw new Error(`Network response was not ok: ${response.statusText}`);
         }
-        const data = await response.json();
-        console.log('Upcoming Events:', data);
-        setUpcomingEvents(data);
+        console.log('Upcoming Events Data:', response.data);
+        setUpcomingEvents(response.data);
       } catch (error) {
         console.error('Error fetching upcoming events:', error);
+        if (error.response) {
+          console.error('Error response data:', error.response.data);
+          console.error('Error response status:', error.response.status);
+          console.error('Error response headers:', error.response.headers);
+        }
       }
     };
 
     const fetchBrowseConcert = async () => {
       try {
-        const response = await fetch('http://localhost:5500/api/events/browse');
-        if (!response.ok) {
+        const response = await apiClient.get('/events/browse');
+        console.log('Fetch Browse Concert Response:', response);
+        if (response.status !== 200) {
           throw new Error(`Network response was not ok: ${response.statusText}`);
         }
-        const data = await response.json();
-        console.log('Browse Concerts:', data);
-        setBrowseConcert(data);
+        console.log('Browse Concert Data:', response.data);
+        setBrowseConcert(response.data);
       } catch (error) {
         console.error('Error fetching browse concerts:', error);
+        if (error.response) {
+          console.error('Error response data:', error.response.data);
+          console.error('Error response status:', error.response.status);
+          console.error('Error response headers:', error.response.headers);
+        }
       }
     };
 

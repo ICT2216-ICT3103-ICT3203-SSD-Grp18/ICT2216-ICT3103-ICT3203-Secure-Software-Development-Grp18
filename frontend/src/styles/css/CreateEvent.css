@@ -1,0 +1,113 @@
+@font-face {
+  font-family: 'CabinetGrostesk-bold';
+  src: url(../fonts/CabinetGrotesk/CabinetGrotesk-Bold.otf);
+}
+
+@font-face {
+  font-family: 'GeneralSans-Med';
+  src: url(../fonts/GeneralSans/GeneralSans-Medium.otf);
+}
+
+@font-face {
+  font-family: 'GeneralSans-reg';
+  src: url(../fonts/GeneralSans/GeneralSans-Regular.otf);
+}
+
+@font-face {
+  font-family: 'CabinetGrostesk-Med';
+  src: url(../fonts/CabinetGrotesk/CabinetGrotesk-Medium.otf);
+}
+
+.create-event-form {
+  max-width: 900px; 
+  margin: auto;
+  background-color: white;
+  border-radius: 5px;
+  color: #ecf0f1;
+}
+
+.create-event-form h2 {
+  text-align: center;
+  font-family: 'CabinetGrostesk-Med';
+  font-size: 24px;
+  padding-top: 20px;
+  margin-bottom: 10px;
+  color: white;
+}
+.top{
+  height: 70px;
+  background-color: #4F4CEE;
+  max-width: 100%;
+}
+.create-event-form form {
+  display: flex;
+  margin-top: 30px;
+  flex-direction: column;
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px; /* Consistent spacing */
+}
+
+.form-row label,
+.full-width,
+.full-width-textarea {
+  flex: 1 1 68%; /* Adjust if needed for layout consistency */
+}
+
+.full-width,
+.full-width-textarea {
+  flex-basis: 100%; /* Full row width */
+}
+
+.full-width-textarea textarea {
+  height: 150px; /* Appropriate height */
+  font-family: 'GeneralSans-Med';
+  margin-right: 280px;
+  border: black;
+  border-radius: 3px;
+  border-style: solid;
+  background: white;
+  width: 100%; /* Adjusted to take the full width of its container */
+  resize: none; /* Disable resizing */
+}
+
+.create-event-form label {
+  font-family: 'GeneralSans-Med';
+  display: flex;
+  flex-direction: column; /* Labels above inputs */
+  color:  #4F4CEE;
+  font-size: 16px; /* Readable font size */
+}
+
+.create-event-form input,
+.create-event-form select {
+  width: 100%; /* Ensures uniform width across all inputs */
+  padding: 8px;
+  margin-top: 5px; /* Spacing between label and input */
+  margin-right: 50px;
+  border-radius: 3px;
+  border: black;
+  border-style: solid;
+  background: white;
+  color: black;
+}
+
+.create-event-form button {
+  width: 20%;
+  padding: 10px;
+  background: #4F4CEE;
+  border: black;
+  border-style: solid;
+  border-color: black;
+  border-radius: 3px;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.create-event-form button:hover {
+  background: #4F4CEE;
+}

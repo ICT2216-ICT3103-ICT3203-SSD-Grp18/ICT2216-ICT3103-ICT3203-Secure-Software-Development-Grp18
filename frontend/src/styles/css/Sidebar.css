@@ -1,0 +1,124 @@
+@font-face {
+  font-family: 'CabinetGrostesk-bold';
+  src: url(../fonts/CabinetGrotesk/CabinetGrotesk-Bold.otf);
+}
+
+@font-face {
+  font-family: 'GeneralSans-Med';
+  src: url(../fonts/GeneralSans/GeneralSans-Medium.otf);
+}
+
+@font-face {
+  font-family: 'GeneralSans-reg';
+  src: url(../fonts/GeneralSans/GeneralSans-Regular.otf);
+}
+
+@font-face {
+  font-family: 'CabinetGrostesk-Med';
+  src: url(../fonts/CabinetGrotesk/CabinetGrotesk-Medium.otf);
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #4F4CEE;
+  color: #ecf0f1;
+  height: 100vh;
+  position: fixed;
+  padding-top: 20px;
+  overflow-y: auto;
+  transition: width 0.2s;
+}
+
+.sidebar h2 {
+  font-family: 'CabinetGrostesk-Med';
+  font-size: 18px;
+  text-align: left;
+  padding-left: 30px;
+  margin-top: 100px;
+  color: #b5b9f2;
+}
+
+.sidebar nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar nav ul li {
+  padding: 10px 20px;
+}
+
+.sidebar nav ul li .menu-button {
+  color: white;
+  font-size: 18px;
+  font-family: 'GeneralSans-Med';
+  text-decoration: none;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 10px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s;
+}
+
+.sidebar nav ul li .menu-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.menu-icon {
+  margin-right: 10px;
+}
+
+.submenu {
+  list-style: none;
+  padding-left: 20px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.submenu li {
+  padding: 5px 0;
+}
+
+.submenu li button {
+  padding-left: 30px;
+  background: none;
+  border: none;
+  color: #ecf0f1;
+  font-size: 16px;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+
+.submenu li button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.menu-item.open .submenu,
+.submenu.open { /* Ensuring this class can directly apply regardless of parent */
+  max-height: 200px; /* Adjust based on the number of submenu items */
+}
+
+
+@keyframes slideIn {
+  from {
+    max-height: 0;
+  }
+  to {
+    max-height: 200px;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    max-height: 200px;
+  }
+  to {
+    max-height: 0;
+  }
+}

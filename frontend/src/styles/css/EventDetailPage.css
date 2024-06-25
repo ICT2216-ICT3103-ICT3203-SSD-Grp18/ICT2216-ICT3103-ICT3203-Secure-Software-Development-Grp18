@@ -62,6 +62,7 @@
 }
 
 .event-content {
+  max-width: 1200px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -140,6 +141,8 @@
 .note {
   font-weight: bold;
   margin-top: 10px;
+  background-color: #cdcdce;
+  color: black;
 }
 
 .ticket-pricing ul, .admission-policy ul {

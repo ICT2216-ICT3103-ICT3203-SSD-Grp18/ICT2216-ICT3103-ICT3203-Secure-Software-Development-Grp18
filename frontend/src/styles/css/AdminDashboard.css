@@ -1,0 +1,36 @@
+@font-face {
+  font-family: 'CabinetGrostesk-bold';
+  src: url(../fonts/CabinetGrotesk/CabinetGrotesk-Bold.otf);
+}
+
+@font-face {
+  font-family: 'GeneralSans-reg';
+  src: url(../fonts/GeneralSans/GeneralSans-Regular.otf);
+}
+
+.admin-dashboard {
+    display: flex;
+  }
+  
+  .main-content {
+    margin-left: 250px;
+    padding: 20px;
+    width: calc(100% - 250px);
+  }
+  
+  .content {
+    background: whitesmoke;
+    padding: 20px;
+    border-radius: 5px;
+  }
+  
+  .content h2 {
+    font-family: 'CabinetGrostesk-bold';
+
+    margin-top: 0;
+  }
+
+  .content p {
+    font-family: 'GeneralSans-reg';
+  }
+  

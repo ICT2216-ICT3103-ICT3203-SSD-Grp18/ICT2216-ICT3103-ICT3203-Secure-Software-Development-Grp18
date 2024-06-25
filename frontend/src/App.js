@@ -7,20 +7,30 @@ import BuyerContactInformationPage from './pages/BuyerContactInformationPage';
 import PaymentPage from './pages/PaymentPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import CompletionPage from './pages/CompletionPage';
+import { AuthProvider } from './context/AuthContext';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import AdminDashboard from './pages/AdminDashboard';
+
+
 
 const App = () => {
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          <Route exact path="/" element={<LandingPage />} />
-          <Route path="/event/:eventId" element={<EventDetailPage />} />
-          <Route path="/ticket/:eventId" element={<TicketPage />} />
-          <Route path="/buyer-info" element={<BuyerContactInformationPage />} />
-          <Route path="/payment" element={<PaymentPage />} />
-        </Routes>
-      </div>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <div className="App">
+          <Routes>
+            <Route exact path="/" element={<LandingPage />} />
+            <Route path="/event/:eventId" element={<EventDetailPage />} />
+            <Route path="/ticket/:eventId" element={<TicketPage />} />
+            <Route path="/completion" element={<CompletionPage />} />
+            <Route path="/admin/*" element={<AdminDashboard />} />
+            <Route path="/buyer-info" element={<BuyerContactInformationPage />} />
+            <Route path="/payment" element={<PaymentPage />} />
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 };
 
