@@ -17,6 +17,7 @@
     "mysql2": "^3.10.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.23.1",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.1",
+    "stripe": "^15.12.0"
   }
 }
