@@ -24,9 +24,9 @@ const PaymentPage = () => {
             </button>
             <h2>Payment Method</h2>
           </div>
-          <Elements stripe={stripePromise}>
+          {/* <Elements stripe={stripePromise}>
             <CheckoutForm />
-          </Elements>
+          </Elements> */}
           <BuyButtonComponent
           />
         </div>
@@ -45,7 +45,7 @@ const PaymentPage = () => {
           <p>Total: Sgd. $736.00</p>
         </div>
       </div>
-      <Footer />
+      <Footer /> 
     </div>
   );
 };
