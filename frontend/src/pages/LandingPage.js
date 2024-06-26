@@ -15,6 +15,8 @@ const LandingPage = () => {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [browseConcert, setBrowseConcert] = useState([]);
   const [loginOpen, setLoginOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [topSelling, setTopSelling] = useState([]);
 
   useEffect(() => {
     const fetchUpcomingEvents = async () => {
@@ -55,8 +57,28 @@ const LandingPage = () => {
       }
     };
 
+    const fetchTopSelling = async () => {
+      try {
+        const response = await apiClient.get('/events/topselling');
+        console.log('Fetch Top selling Concert Response:', response);
+        if (response.status !== 200) {
+          throw new Error(`Network response was not ok: ${response.statusText}`);
+        }
+        console.log(' Top selling Concert Data:', response.data);
+        setTopSelling(response.data);
+      } catch (error) {
+        console.error('Error fetching Top selling Concert:', error);
+        if (error.response) {
+          console.error('Error response data:', error.response.data);
+          console.error('Error response status:', error.response.status);
+          console.error('Error response headers:', error.response.headers);
+        }
+      }
+    };
+
     fetchUpcomingEvents();
     fetchBrowseConcert();
+    fetchTopSelling();
   }, []);
 
   const handleEventClick = (eventId) => {
@@ -67,20 +89,35 @@ const LandingPage = () => {
     setLoginOpen(!loginOpen);
   };
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleSearch = () => {
+    navigate(`/events?search=${searchTerm}`);
+  };
+
   return (
     <div className={`LandingPage ${loginOpen ? 'blur' : ''}`}>
       <Navbar toggleLoginModal={toggleLoginModal} />
       <header className="LandingPage-header">
         <h1>Exclusive events, priceless moments</h1>
         <div className="search-bar">
-          <input type="text" className="form-control" placeholder="Search by name" />
-          <input type="date" className="form-control" />
-          <button className="btn btn-primary">Search</button>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search by name"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+          <button className="btn btn-primary" onClick={handleSearch}>
+            Search
+          </button>
         </div>
       </header>
       <UpcomingEvents events={upcomingEvents} onEventClick={handleEventClick} />
       <HotOffers />
-      <TopSelling />
+      <TopSelling events={topSelling} onEventClick={handleEventClick} />
       <BrowseConcert events={browseConcert} onEventClick={handleEventClick} />
       <Footer />
     </div>

@@ -37,9 +37,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 996px;
-  height: 49px;
-  margin-left: 180px;
+  width: 60%;
+  height: 53px;
+  margin-left: 20%;
   gap: 1rem;
   margin-top: 140px;
   border: 2px solid black;
@@ -47,8 +47,7 @@
   background-color: #fff;
 }
 
-.search-bar input[type="text"],
-.search-bar input[type="date"] {
+.search-bar input[type="text"] {
   padding: 0.5rem;
   border: none;
   outline: none;
@@ -56,9 +55,6 @@
   flex: 1;
 }
 
-.search-bar input[type="date"] {
-  padding-left: 2rem;
-}
 
 .search-bar button {
   padding: 0.5rem 1rem;
@@ -120,6 +116,7 @@
   gap: 1rem;
   overflow-x: auto;
   padding: 1rem 0;
+  margin: 50px;
 }
 
 .events-list::-webkit-scrollbar {
@@ -139,4 +136,9 @@
   padding: 0.5rem;
   border-radius: 1%;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.event-page-cards{
+  display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
 }

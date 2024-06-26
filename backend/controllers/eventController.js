@@ -42,6 +42,28 @@ const getBrowseConcerts = async (req, res) => {
   }
 };
 
+const getTopSelling = async (req, res) => {
+  try {
+    const today = new Date().toISOString().split('T')[0]; // Format today's date in YYYY-MM-DD
+
+    const [events] = await db.query(`
+      SELECT * FROM events
+      WHERE ticket_availability > 0 
+      AND raffle_start_date < CURDATE() 
+      ORDER BY ticket_availability ASC 
+      LIMIT 3;
+    `, [today]);
+    const formattedEvents = formatEvents(events);
+    res.json(formattedEvents);
+    console.log("hello")
+    console.log(res)
+  } catch (error) {
+    console.error('Error fetching events with lowest ticket availability:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+
 // route to get indiv event
 const getEventById = async (req, res) => {
   const { eventId } = req.params;
@@ -57,7 +79,13 @@ const getEventById = async (req, res) => {
     }
 
     // to convert price to float
-    const parsePrice = (priceStr) => parseFloat(priceStr.replace(/[^0-9.]/g, ''));
+    const parsePrice = (priceStr) => {
+      if (typeof priceStr !== 'string') {
+          priceStr = String(priceStr);
+      }
+      return parseFloat(priceStr.replace(/[^0-9.]/g, ''));
+  };
+  
 
     // prices to map in ticketPage.js
     const categories = [
@@ -81,4 +109,5 @@ module.exports = {
   getUpcomingEvents,
   getBrowseConcerts,
   getEventById,
+  getTopSelling,
 };

@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import '../styles/css/EventDetailPage.css';
 import apiClient from '../axiosConfig';
+import TicketingEventDetails from '../components/TicketingEventDetails';
 import { useAuth } from '../context/AuthContext';
 
 const EventDetailPage = () => {
@@ -118,6 +119,7 @@ const EventDetailPage = () => {
   return (
     <div className="event-detail-page">
       <Navbar />
+      <div className="event-detail-page-content">
       <header className="event-header">
         <div className="header-container">
           <div className="share-buttons">
@@ -163,6 +165,8 @@ const EventDetailPage = () => {
             </button>
           )}
         </div>
+      </div>
+      <TicketingEventDetails />
       </div>
       <Footer />
     </div>

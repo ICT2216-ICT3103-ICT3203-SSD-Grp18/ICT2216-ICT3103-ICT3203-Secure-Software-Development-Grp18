@@ -8,7 +8,7 @@ const EventCard = ({ event_id, event_name, date, location, image }) => {
 
   return (
     <div className="card event-card">
-      <img src={`data:image/png;base64,${image}`} className="card-img-top event-image" alt={event_name} />
+      <img src={`data:image/png;base64,${image}`} className="card-img-top event-card-image" alt={event_name} />
       <div className="card-body event-info">
         <div className="event-date-card">
           <div className="event-date-div">

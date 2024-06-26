@@ -10,8 +10,9 @@
   }
   
   .offer-image {
-    width: 570px;
-    height: 344px;
+    max-width: 600px; 
+    width: 40%;
+    height: 40%;
     margin-right: 40px;
     
     border-radius: 8px;

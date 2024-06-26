@@ -9,53 +9,63 @@
 }
 
 .top-selling {
-    padding: 2rem;
-    margin-top: 20px;
-  }
-  
-  .top-selling-list {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-  }
-  
-  .top-selling-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  
-  .top-selling-image {
-    /* width: 100%;
-    max-width: 300px; */
-    width: 380px;
-    margin-right: 10px;
-    border-radius: 8px;
-  }
-  
-  .top-selling-info {
-    position: absolute; /* Add this line */
-    /* bottom: 100px;  */
-    margin-top: 320px;
-    /* transform: translateX(-50%);
-    transform: translateY(-100%); */
-    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-    color: white; /* Text color */
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-  }
-  
+  padding: 2rem;
+  margin-top: 20px;
+}
+
+.top-selling-list {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.top-selling-card {
+  position: relative; /* Make it a containing block for absolute positioning */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.top-selling-image {
+  max-width: 300px; 
+  width: 100%;
+  margin-right: 10px;
+  border-radius: 8px;
+}
+
+.top-selling-info {
+  position: absolute;
+  bottom: 10px; /* Adjust as needed to position the text at the bottom */
+  left: 50%; /* Center horizontally */
+  transform: translateX(-50%); /* Center horizontally */
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  color: white; /* Text color */
+  padding: 0.5rem 0.5rem;
+  border-radius: 8px;
+  text-align: center; /* Center the text */
+}
+
+.top-selling-info h3 {
+  font-family: 'CabinetGrostesk-bold';
+  font-size: 25px;
+  margin: 0; /* Remove margin */
+}
+
+.top-selling-info p {
+  font-family: 'GeneralSans-Med';
+  font-size: 14px;
+  color: #EB5757; 
+  margin: 0; 
+}
+
+/* Media query to adjust font size for smaller screens */
+@media (max-width: 768px) {
   .top-selling-info h3 {
-    font-family: 'CabinetGrostesk-bold';
-    font-size: 25px;
-    margin: 0; /* Remove margin */
-  }
-  
-  .top-selling-info p {
-    font-family: 'GeneralSans-Med';
     font-size: 14px;
-    color: #EB5757; 
-    margin: 0; 
+  }
+  .top-selling-info p {
+    font-size: 8px; /* Reduce font size */
   }
   
+}
