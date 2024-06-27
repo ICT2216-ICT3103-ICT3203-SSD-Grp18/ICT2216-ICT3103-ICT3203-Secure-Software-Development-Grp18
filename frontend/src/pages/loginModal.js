@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import '../styles/css/LoginModal.css';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../axiosConfig';
+import validator from 'validator';
+import DOMPurify from 'dompurify';
 
 const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
   const [email, setEmail] = useState('');
@@ -10,38 +12,95 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
   const [lastName, setLastName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLogin, setIsLogin] = useState(initialIsLogin);
+  const [errors, setErrors] = useState({});
   const { login } = useAuth();
 
   useEffect(() => {
     setIsLogin(initialIsLogin);
   }, [initialIsLogin]);
 
+  // sanitize and trim spaces
+  const sanitizeInput = (input) => {
+    return DOMPurify.sanitize(input.trim());
+  };
+
+  const validateEmail = (email) => {
+    return validator.isEmail(email);
+  };
+
+  const validatePhoneNumber = (phoneNumber) => {
+    return validator.isMobilePhone(phoneNumber, 'en-SG');
+  };
+
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,12}$/;
+    return passwordRegex.test(password);
+  };
+
+  const validateName = (name) => {
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    return nameRegex.test(name);
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
+    const sanitizedEmail = sanitizeInput(email);
+    const sanitizedPassword = sanitizeInput(password);
 
-    console.log('Login data to be sent:', { email, password });
+    if (!validateEmail(sanitizedEmail)) {
+      setErrors({ email: 'Please enter a valid email address.' });
+      return;
+    }
 
     try {
-      await login(email, password);
+      await login(sanitizedEmail, sanitizedPassword);
       alert('Login successful');
       onClose();
     } catch (error) {
-      alert(`Error: ${error.message}`);
+      alert('Login failed. Please check your credentials and try again.');
     }
   };
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+    const sanitizedFirstName = sanitizeInput(firstName);
+    const sanitizedLastName = sanitizeInput(lastName);
+    const sanitizedPhoneNumber = sanitizeInput(phoneNumber);
+    const sanitizedEmail = sanitizeInput(email);
+    const sanitizedPassword = sanitizeInput(password);
 
-    const name = `${firstName} ${lastName}`;
+    const newErrors = {};
+
+    if (!validateEmail(sanitizedEmail)) {
+      newErrors.email = 'Please enter a valid email address.';
+    }
+    if (!validatePhoneNumber(sanitizedPhoneNumber)) {
+      newErrors.phoneNumber = 'Please enter a valid phone number.';
+    }
+    if (!validatePassword(sanitizedPassword)) {
+      newErrors.password = 'Password must be 8-12 characters long and include a mix of uppercase letters, lowercase letters, numbers, and special characters.';
+    }
+    if (!validateName(sanitizedFirstName)) {
+      newErrors.firstName = 'Please enter a valid first name.';
+    }
+    if (!validateName(sanitizedLastName)) {
+      newErrors.lastName = 'Please enter a valid last name.';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
+
+    const name = `${sanitizedFirstName} ${sanitizedLastName}`;
     const user = {
       name,
-      phone_number: phoneNumber,
-      email,
-      password
+      phone_number: sanitizedPhoneNumber,
+      email: sanitizedEmail,
+      password: sanitizedPassword
     };
-
-    console.log('Data to be sent:', user);
 
     try {
       const response = await apiClient.post('/auth/register', user);
@@ -49,11 +108,10 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
         alert('User registered successfully');
         onClose();
       } else {
-        const error = await response.data;
-        alert(`Error: ${error.message}`);
+        alert('Registration failed. Please try again.');
       }
     } catch (error) {
-      alert(`Error: ${error.message}`);
+      alert('Registration failed. Please try again.');
     }
   };
 
@@ -95,6 +153,7 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
+              {errors.email && <p className="error">{errors.email}</p>}
             </label>
             <label>
               Password:
@@ -120,6 +179,7 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
                 onChange={(e) => setFirstName(e.target.value)}
                 required
               />
+              {errors.firstName && <p className="error">{errors.firstName}</p>}
             </label>
             <label>
               Last Name:
@@ -130,6 +190,7 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
                 onChange={(e) => setLastName(e.target.value)}
                 required
               />
+              {errors.lastName && <p className="error">{errors.lastName}</p>}
             </label>
             <label>
               Phone Number:
@@ -140,16 +201,17 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 required
               />
+              {errors.phoneNumber && <p className="error">{errors.phoneNumber}</p>}
             </label>
             <label>
               Email Address:
-              <input
-                type="email"
+              <input type="email"
                 name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
+              {errors.email && <p className="error">{errors.email}</p>}
             </label>
             <label>
               Password:
@@ -160,6 +222,7 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              {errors.password && <p className="error">{errors.password}</p>}
             </label>
             <p className="note">E-tickets will be sent to your email address, please make sure your email address is correct.</p>
             <button type="submit">Continue</button>
