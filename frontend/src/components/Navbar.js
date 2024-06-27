@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext'; // Import useAuth hook from AuthContext
 import { Link} from 'react-router-dom';
-import LoginModal from "../pages/LoginModal"; 
+import LoginModal from "../pages/loginModal"; 
 import '../styles/css/Navbar.css';
 
 const Navbar = () => {

@@ -1,0 +1,56 @@
+@font-face {
+  font-family: 'CabinetGrostesk-bold';
+  src: url(../fonts/CabinetGrotesk/CabinetGrotesk-Bold.otf);
+}
+
+@font-face {
+  font-family: 'GeneralSans-reg';
+  src: url(../fonts/GeneralSans/GeneralSans-Regular.otf);
+}
+
+.admin-dashboard {
+  display: flex;
+}
+
+.main-content {
+  margin-left: 250px;
+  padding: 20px;
+  width: calc(100% - 250px);
+}
+
+.content {
+  background: whitesmoke;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.content h2 {
+  font-family: 'CabinetGrostesk-bold';
+  margin-top: 0;
+}
+
+.content p {
+  font-family: 'GeneralSans-reg';
+}
+
+.scrollable-list {
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-top: 20px;
+}
+
+.scrollable-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.scrollable-list li {
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.scrollable-list li:hover {
+  background-color: #f0f0f0;
+}
