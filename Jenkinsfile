@@ -21,12 +21,7 @@ pipeline {
     }
     stage('Checkout') {
       steps {
-        script {
-          def checkoutVars = checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: 'https://github.com/ICT2216-ICT3103-ICT3203-SSD-Grp18/ICT2216-ICT3103-ICT3203-Secure-Software-Development-Grp18.git', credentialsId: 'PAT_Jenkins_Jonathan']]])
-          env.GIT_URL = checkoutVars.GIT_URL
-          env.GIT_COMMIT = checkoutVars.GIT_COMMIT
-          env.GIT_BRANCH = checkoutVars.GIT_BRANCH
-        }
+        checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: 'https://github.com/ICT2216-ICT3103-ICT3203-SSD-Grp18/ICT2216-ICT3103-ICT3203-Secure-Software-Development-Grp18.git', credentialsId: 'PAT_Jenkins_Jonathan']]])
       }
     }
     stage('Dependencies') {
@@ -64,19 +59,6 @@ pipeline {
         }
         dir('frontend') {
           sh 'npm test'
-        }
-      }
-    }
-    stage('Deploy') {
-      steps {
-        sshagent(['your-ssh-credentials-id']) {
-          sh '''
-            # Deploy backend
-            scp -r ./backend/* user@your-backend-server:/path/to/backend/
-
-            # Deploy frontend
-            scp -r ./frontend/build/* user@your-frontend-server:/path/to/frontend/
-          '''
         }
       }
     }
