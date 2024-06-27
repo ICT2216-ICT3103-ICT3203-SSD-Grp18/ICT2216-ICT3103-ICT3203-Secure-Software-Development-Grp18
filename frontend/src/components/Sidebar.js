@@ -15,12 +15,13 @@ const Sidebar = ({ setCurrentView }) => {
         <ul>
           <li className="menu-item">
             <button onClick={() => setCurrentView('dashboard')} className="menu-button">
-              <i className="fas fa-home menu-icon"></i> Dashboard
+              <i className="fas fa-home menu-icon"></i> 
+              <p className='sidebar-title'>Dashboard</p>
             </button>
           </li>
           <li className="menu-item">
             <button onClick={toggleEventMenu} className="menu-button">
-              <i className="fas fa-calendar-alt menu-icon"></i> Event
+              <i className="fas fa-calendar-alt menu-icon"></i> <p className='sidebar-title'>Event</p>
             </button>
             {eventMenuOpen && (
              <ul className={`submenu ${eventMenuOpen ? 'open' : ''}`}>
@@ -31,7 +32,7 @@ const Sidebar = ({ setCurrentView }) => {
           </li>
           <li className="menu-item">
             <button onClick={() => setCurrentView('manage-users')} className="menu-button">
-              <i className="fas fa-users menu-icon"></i> Manage Users
+              <i className="fas fa-users menu-icon"></i> <p className='sidebar-title'>Manage Users</p>
             </button>
           </li>
         </ul>

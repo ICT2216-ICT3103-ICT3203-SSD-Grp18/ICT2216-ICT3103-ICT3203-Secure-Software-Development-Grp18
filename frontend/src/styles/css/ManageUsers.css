@@ -54,3 +54,13 @@
 .scrollable-list li:hover {
   background-color: #f0f0f0;
 }
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 50px;
+    padding: 20px;
+    width: calc(100% - 50px);
+  }
+
+
+}
