@@ -92,7 +92,7 @@ const ManageUsers = () => {
 
   const handleCreateUser = async () => {
     try {
-      const response = await apiClient.post('/admin/users', newUser, { withCredentials: true });
+      await apiClient.post('/admin/users', newUser, { withCredentials: true });
       fetchUsers(); // Refresh user list after creating new user
       setNewUserModalOpen(false);
       setNewUser({ name: '', email: '', phone_number: '', password: '', status: 'active', user_role: 'user', tickets_purchased: 0 });
