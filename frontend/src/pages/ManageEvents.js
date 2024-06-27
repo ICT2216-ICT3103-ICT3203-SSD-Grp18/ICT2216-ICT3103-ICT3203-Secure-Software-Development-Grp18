@@ -98,7 +98,7 @@ const ManageEvents = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <Button variant="contained" color="primary" type="submit">Search</Button>
+        <Button class="btn btn-primary" type="submit">Search</Button>
       </form>
       {loading ? <p>Loading...</p> : null}
       {error ? <p style={{ color: 'red' }}>{error}</p> : null}

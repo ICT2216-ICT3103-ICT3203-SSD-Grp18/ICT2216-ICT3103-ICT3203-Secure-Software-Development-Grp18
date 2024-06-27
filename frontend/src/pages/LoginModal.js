@@ -206,7 +206,7 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
               />
             </label>
             <p className="note">E-tickets will be sent to your email address, please make sure your email address is correct.</p>
-            <button type="submit">Continue</button>
+            <button type="submit">Sign Up</button>
           </form>
         )}
       </div>

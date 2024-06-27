@@ -114,7 +114,7 @@ const ManageUsers = () => {
         />
         <button style={{ color: 'white' }} type="submit">Search</button>
       </form>
-      <button style={{ color: 'white' }} onClick={() => setNewUserModalOpen(true)}>Create New Account</button>
+      <button class="btn btn-primary" onClick={() => setNewUserModalOpen(true)}>Create New Account</button>
       {loading ? <p>Loading...</p> : null}
       {error ? <p style={{ color: 'red' }}>{error}</p> : null}
       <div className="scrollable-list">
@@ -136,7 +136,7 @@ const ManageUsers = () => {
             <p>Tickets Purchased: {selectedUser.tickets_purchased}</p>
             <p>Status: {selectedUser.status}</p>
             <p>Role: {selectedUser.user_role}</p>
-            <Button onClick={() => handleStatusChange(selectedUser)}>
+            <Button class="btn btn-primary" onClick={() => handleStatusChange(selectedUser)}>
               {selectedUser.status === 'active' ? 'Deactivate' : 'Activate'}
             </Button>
             <Select
