@@ -1,7 +1,7 @@
 pipeline {
   agent {
-    docker {
-      image 'node:16' // Use an appropriate Node.js Docker image
+    dockerContainer {
+      image 'node:20' // Use an appropriate Node.js Docker image
       args '-u root' // Run as root user to install packages
     }
   }
