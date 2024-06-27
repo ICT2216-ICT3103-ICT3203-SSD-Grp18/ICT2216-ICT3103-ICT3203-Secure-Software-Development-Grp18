@@ -46,31 +46,11 @@ pipeline {
         archiveArtifacts artifacts: 'dependencyupdates.txt', fingerprint: true
       }
     }
-    stage('Build Backend') {
+    stage('Deploy to Web Server') {
       steps {
-        dir('backend') {
-          sh 'npm run build'
-        }
-      }
-    }
-    stage('Build Frontend') {
-      steps {
-        dir('frontend') {
-          sh 'npm run build'
-        }
-      }
-    }
-    stage('Test Backend') {
-      steps {
-        dir('backend') {
-          sh 'npm test'
-        }
-      }
-    }
-    stage('Test Frontend') {
-      steps {
-        dir('frontend') {
-          sh 'npm test'
+        sshagent(['your-ssh-credentials-id']) {
+          sh 'scp -o StrictHostKeyChecking=no -r ./backend/* jenkins@webserver:/var/www/html/backend/'
+          sh 'scp -o StrictHostKeyChecking=no -r ./frontend/* jenkins@webserver:/var/www/html/frontend/'
         }
       }
     }
