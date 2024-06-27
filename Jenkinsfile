@@ -1,12 +1,24 @@
 pipeline {
-  agent any
+  agent {
+    docker {
+      image 'node:16' // Use an appropriate Node.js Docker image
+      args '-u root' // Run as root user to install packages
+    }
+  }
+
+  parameters {
+    string(defaultValue: 'Spaces-1', description: '', name: 'SpaceId', trim: true)
+    string(defaultValue: 'ICT2216-ICT3103-ICT3203-Secure-Software-Development-Grp18', description: '', name: 'ProjectName', trim: true)
+    string(defaultValue: 'Dev', description: '', name: 'EnvironmentName', trim: true)
+    string(defaultValue: 'Octopus', description: '', name: 'ServerId', trim: true)
+  }
+
   stages {
     stage('Environment') {
       steps {
         echo "PATH = ${env.PATH}"
       }
     }
-
     stage('Checkout') {
       steps {
         script {
@@ -15,63 +27,58 @@ pipeline {
           env.GIT_COMMIT = checkoutVars.GIT_COMMIT
           env.GIT_BRANCH = checkoutVars.GIT_BRANCH
         }
-
       }
     }
-
     stage('Dependencies') {
       steps {
-        dir(path: 'backend') {
+        dir('backend') {
           sh 'npm install'
         }
-
-        dir(path: 'frontend') {
+        dir('frontend') {
           sh 'npm install'
         }
-
         sh 'npm list --all > dependencies.txt'
-        archiveArtifacts(artifacts: 'dependencies.txt', fingerprint: true)
+        archiveArtifacts artifacts: 'dependencies.txt', fingerprint: true
         sh 'npm outdated > dependencyupdates.txt || true'
-        archiveArtifacts(artifacts: 'dependencyupdates.txt', fingerprint: true)
+        archiveArtifacts artifacts: 'dependencyupdates.txt', fingerprint: true
       }
     }
-
     stage('Build Backend') {
       steps {
-        dir(path: 'backend') {
+        dir('backend') {
           sh 'npm run build'
         }
-
       }
     }
-
     stage('Build Frontend') {
       steps {
-        dir(path: 'frontend') {
+        dir('frontend') {
           sh 'npm run build'
         }
-
       }
     }
-
     stage('Test') {
       steps {
-        dir(path: 'backend') {
+        dir('backend') {
           sh 'npm test'
         }
-
-        dir(path: 'frontend') {
+        dir('frontend') {
           sh 'npm test'
         }
-
       }
     }
+    stage('Deploy') {
+      steps {
+        sshagent(['your-ssh-credentials-id']) {
+          sh '''
+            # Deploy backend
+            scp -r ./backend/* user@your-backend-server:/path/to/backend/
 
-  }
-  parameters {
-    string(defaultValue: 'Spaces-1', description: '', name: 'SpaceId', trim: true)
-    string(defaultValue: 'ICT2216-ICT3103-ICT3203-Secure-Software-Development-Grp18', description: '', name: 'ProjectName', trim: true)
-    string(defaultValue: 'Dev', description: '', name: 'EnvironmentName', trim: true)
-    string(defaultValue: 'Octopus', description: '', name: 'ServerId', trim: true)
+            # Deploy frontend
+            scp -r ./frontend/build/* user@your-frontend-server:/path/to/frontend/
+          '''
+        }
+      }
+    }
   }
 }
