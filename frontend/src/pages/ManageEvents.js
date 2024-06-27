@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import apiClient from '../axiosConfig';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Grid } from '@mui/material';
+import '../styles/css/ManageUsers.css'; // Import the CSS file here
 
 const ManageEvents = () => {
   const [events, setEvents] = useState([]);
@@ -91,7 +92,7 @@ const ManageEvents = () => {
   return (
     <div>
       <h2>Manage Events</h2>
-      <form onSubmit={handleSearch}>
+      <form className='admin-search' onSubmit={handleSearch}>
         <input
           type="text"
           placeholder="Search for events"

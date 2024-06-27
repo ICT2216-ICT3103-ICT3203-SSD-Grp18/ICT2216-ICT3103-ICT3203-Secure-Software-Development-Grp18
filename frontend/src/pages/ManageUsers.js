@@ -105,7 +105,7 @@ const ManageUsers = () => {
   return (
     <div>
       <h2>Manage Users</h2>
-      <form onSubmit={handleSearch}>
+      <form className='admin-search' onSubmit={handleSearch}>
         <input
           type="text"
           placeholder="Search by email"
@@ -115,7 +115,9 @@ const ManageUsers = () => {
         />
         <button style={{ color: 'white'}} type="submit">Search</button>
       </form>
+      <div className='admin-search'>
       <button style={{ color: 'white' }} type="submit" onClick={() => setNewUserModalOpen(true)}>Create New Account</button>
+      </div>
       {loading ? <p>Loading...</p> : null}
       {error ? <p style={{ color: 'red' }}>{error}</p> : null}
       <div className="scrollable-list">
