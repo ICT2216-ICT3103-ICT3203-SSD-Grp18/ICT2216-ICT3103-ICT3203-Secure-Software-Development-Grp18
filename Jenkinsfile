@@ -1,10 +1,5 @@
 pipeline {
-  agent {
-    docker {
-      image 'node:16' // Use an appropriate Node.js Docker image
-      args '-u root' // Run as root user to install packages
-    }
-  }
+  agent any
 
   parameters {
     string(defaultValue: 'Spaces-1', description: '', name: 'SpaceId', trim: true)
