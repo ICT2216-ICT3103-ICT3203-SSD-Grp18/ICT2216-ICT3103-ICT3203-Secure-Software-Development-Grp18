@@ -48,7 +48,7 @@ pipeline {
     }
     stage('Deploy to Web Server') {
       steps {
-        sshagent(['your-ssh-credentials-id']) {
+        sshagent(['jenkins-ssh-key']) {
           sh 'scp -o StrictHostKeyChecking=no -r ./backend/* jenkins@webserver:/var/www/html/backend/'
           sh 'scp -o StrictHostKeyChecking=no -r ./frontend/* jenkins@webserver:/var/www/html/frontend/'
         }
