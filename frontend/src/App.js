@@ -3,8 +3,6 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import EventDetailPage from './pages/EventDetailPage';
 import TicketPage from './pages/TicketPage';
-import BuyerContactInformationPage from './pages/BuyerContactInformationPage';
-import PaymentPage from './pages/PaymentPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import CompletionPage from './pages/CompletionPage';
