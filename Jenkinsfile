@@ -1,19 +1,12 @@
 pipeline {
   agent any
-
-  parameters {
-    string(defaultValue: 'Spaces-1', description: '', name: 'SpaceId', trim: true)
-    string(defaultValue: 'ICT2216-ICT3103-ICT3203-Secure-Software-Development-Grp18', description: '', name: 'ProjectName', trim: true)
-    string(defaultValue: 'Dev', description: '', name: 'EnvironmentName', trim: true)
-    string(defaultValue: 'Octopus', description: '', name: 'ServerId', trim: true)
-  }
-
   stages {
     stage('Environment') {
       steps {
         echo "PATH = ${env.PATH}"
       }
     }
+
     stage('Checkout') {
       steps {
         script {
@@ -22,45 +15,63 @@ pipeline {
           env.GIT_COMMIT = checkoutVars.GIT_COMMIT
           env.GIT_BRANCH = checkoutVars.GIT_BRANCH
         }
+
       }
     }
+
     stage('Dependencies') {
       steps {
-        dir('backend') {
+        dir(path: 'backend') {
           sh 'npm install'
         }
-        dir('frontend') {
+
+        dir(path: 'frontend') {
           sh 'npm install'
         }
+
         sh 'npm list --all > dependencies.txt'
-        archiveArtifacts artifacts: 'dependencies.txt', fingerprint: true
+        archiveArtifacts(artifacts: 'dependencies.txt', fingerprint: true)
         sh 'npm outdated > dependencyupdates.txt || true'
-        archiveArtifacts artifacts: 'dependencyupdates.txt', fingerprint: true
+        archiveArtifacts(artifacts: 'dependencyupdates.txt', fingerprint: true)
       }
     }
+
     stage('Build Backend') {
       steps {
-        dir('backend') {
+        dir(path: 'backend') {
           sh 'npm run build'
         }
+
       }
     }
+
     stage('Build Frontend') {
       steps {
-        dir('frontend') {
+        dir(path: 'frontend') {
           sh 'npm run build'
         }
+
       }
     }
+
     stage('Test') {
       steps {
-        dir('backend') {
+        dir(path: 'backend') {
           sh 'npm test'
         }
-        dir('frontend') {
+
+        dir(path: 'frontend') {
           sh 'npm test'
         }
+
       }
     }
+
+  }
+  parameters {
+    string(defaultValue: 'Spaces-1', description: '', name: 'SpaceId', trim: true)
+    string(defaultValue: 'ICT2216-ICT3103-ICT3203-Secure-Software-Development-Grp18', description: '', name: 'ProjectName', trim: true)
+    string(defaultValue: 'Dev', description: '', name: 'EnvironmentName', trim: true)
+    string(defaultValue: 'Octopus', description: '', name: 'ServerId', trim: true)
   }
 }
