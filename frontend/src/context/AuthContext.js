@@ -10,10 +10,8 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
-  const [user, setUser] = useState(null); // Corrected typo
+  const [user, setUser] = useState(null);
 
-
-  // verify authentication
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -22,15 +20,13 @@ export const AuthProvider = ({ children }) => {
           setIsLoggedIn(true);
           const userResponse = await apiClient.get('/auth/getUser', { withCredentials: true });
           setUser(userResponse.data);
-          console.log('User role:', userResponse.data.role); // Add this line to log the user role
-
         } else {
           setIsLoggedIn(false);
         }
       } catch (error) {
         setIsLoggedIn(false);
       } finally {
-        setAuthChecked(true); // Mark authentication check as complete
+        setAuthChecked(true);
       }
     };
 
@@ -39,17 +35,21 @@ export const AuthProvider = ({ children }) => {
     }
   }, [authChecked]);
 
-  const login = async (email, password) => {
+  const login = async ({ email, password, otp }) => {
     try {
-      const response = await apiClient.post('/auth/login', { email, password }, { withCredentials: true });
-      if (response.status === 200) {
+      if (otp) {
         setIsLoggedIn(true);
         const userResponse = await apiClient.get('/auth/getUser', { withCredentials: true });
         setUser(userResponse.data);
-        console.log('User role:', userResponse.data.role); // Add this line to log the user role
-
       } else {
-        throw new Error('Login failed');
+        const response = await apiClient.post('/auth/login', { email, password }, { withCredentials: true });
+        if (response.status === 200) {
+          setIsLoggedIn(true);
+          const userResponse = await apiClient.get('/auth/getUser', { withCredentials: true });
+          setUser(userResponse.data);
+        } else {
+          throw new Error('Login failed');
+        }
       }
     } catch (error) {
       throw new Error('Login failed');

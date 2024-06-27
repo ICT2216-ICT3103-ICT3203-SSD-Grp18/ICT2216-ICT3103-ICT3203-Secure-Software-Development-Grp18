@@ -1,0 +1,61 @@
+.about-us-page {
+    font-family: 'Arial', sans-serif;
+    background-color: #FAFAFA;
+    color: #333;
+}
+
+.about-us-section, 
+.mission-vision-section, 
+.what-we-offer-section, 
+.join-us-section {
+    padding: 2rem 0;
+}
+
+.about-us-section h1, 
+.mission-vision-section h2, 
+.what-we-offer-section h2, 
+.join-us-section h2 {
+    font-family: 'CabinetGrostesk-bold', Arial, sans-serif;
+    font-size: 2rem;
+    color: #4F4CEE;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.about-us-section p, 
+.mission-vision-section p, 
+.what-we-offer-section p, 
+.join-us-section p {
+    font-family: 'GeneralSans-Med', Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 1rem auto;
+}
+
+.mission-vision-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.mission, 
+.vision {
+    margin-bottom: 2rem;
+    max-width: 800px;
+}
+
+.what-we-offer-section ul {
+    list-style-type: none;
+    padding: 0;
+    text-align: center;
+}
+
+.what-we-offer-section li {
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    font-family: 'GeneralSans-Med', Arial, sans-serif;
+}
+

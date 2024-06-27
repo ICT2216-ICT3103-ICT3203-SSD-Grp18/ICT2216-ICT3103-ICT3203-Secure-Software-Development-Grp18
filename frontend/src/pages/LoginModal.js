@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/css/LoginModal.css';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../axiosConfig';
+import '../styles/css/LoginModal.css';
 
 const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
   const [email, setEmail] = useState('');
@@ -9,7 +9,9 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [otp, setOtp] = useState('');
   const [isLogin, setIsLogin] = useState(initialIsLogin);
+  const [isOtpSent, setIsOtpSent] = useState(false);
   const { login } = useAuth();
 
   useEffect(() => {
@@ -18,21 +20,42 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    console.log('Login data to be sent:', { email, password });
-
     try {
-      await login(email, password);
-      alert('Login successful');
-      onClose();
+      const response = await apiClient.post('/auth/login', { email, password });
+      if (response.data.otpRequired) {
+        setIsOtpSent(true);
+        alert('OTP sent to your email');
+      } else {
+        await login(email, password);
+        alert('Login successful');
+        onClose();
+      }
     } catch (error) {
       alert(`Error: ${error.message}`);
     }
   };
 
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await apiClient.post('/auth/verify-otp', { email, otp });
+      if (response.data.message === 'Login successful') {
+        await login({ email, otp }); // Log the user in using the OTP
+        alert('Login successful!');
+        setIsOtpSent(false);
+        onClose();
+      } else {
+        alert('Invalid OTP. Please try again.');
+        setIsOtpSent(false); // Reset to login state on failed OTP
+      }
+    } catch (error) {
+      alert(`Error: ${error.message}`);
+      setIsOtpSent(false); // Reset to login state on error
+    }
+  };
+
   const handleSignUp = async (e) => {
     e.preventDefault();
-
     const name = `${firstName} ${lastName}`;
     const user = {
       name,
@@ -40,8 +63,6 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
       email,
       password
     };
-
-    console.log('Data to be sent:', user);
 
     try {
       const response = await apiClient.post('/auth/register', user);
@@ -84,11 +105,12 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
             Sign Up
           </button>
         </div>
-        {isLogin && (
+        {isLogin && !isOtpSent && (
           <form onSubmit={handleLogin}>
             <label>
               Email Address:
               <input
+                className="auth-form-input"
                 type="email"
                 name="email"
                 value={email}
@@ -99,6 +121,7 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
             <label>
               Password:
               <input
+                className="auth-form-input"
                 type="password"
                 name="password"
                 value={password}
@@ -109,11 +132,28 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
             <button type="submit">Log In</button>
           </form>
         )}
+        {isLogin && isOtpSent && (
+          <form onSubmit={handleVerifyOtp}>
+            <label>
+              OTP:
+              <input
+                className="auth-form-input"
+                type="text"
+                name="otp"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                required
+              />
+            </label>
+            <button type="submit">Verify OTP</button>
+          </form>
+        )}
         {!isLogin && (
           <form onSubmit={handleSignUp}>
             <label>
               First Name:
               <input
+              className="auth-form-input"
                 type="text"
                 name="firstName"
                 value={firstName}
@@ -124,6 +164,7 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
             <label>
               Last Name:
               <input
+              className="auth-form-input"
                 type="text"
                 name="lastName"
                 value={lastName}
@@ -134,6 +175,7 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
             <label>
               Phone Number:
               <input
+              className="auth-form-input"
                 type="text"
                 name="phoneNumber"
                 value={phoneNumber}
@@ -144,6 +186,7 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
             <label>
               Email Address:
               <input
+              className="auth-form-input"
                 type="email"
                 name="email"
                 value={email}
@@ -154,6 +197,7 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
             <label>
               Password:
               <input
+              className="auth-form-input"
                 type="password"
                 name="password"
                 value={password}
@@ -162,7 +206,7 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
               />
             </label>
             <p className="note">E-tickets will be sent to your email address, please make sure your email address is correct.</p>
-            <button type="submit">Continue</button>
+            <button type="submit">Sign Up</button>
           </form>
         )}
       </div>

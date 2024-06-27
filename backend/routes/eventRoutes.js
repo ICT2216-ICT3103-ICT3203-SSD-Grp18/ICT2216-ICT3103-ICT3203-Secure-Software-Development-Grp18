@@ -9,7 +9,9 @@ const multer = require('multer');
 // Routes in eventController.js
 router.get('/events/upcoming', eventController.getUpcomingEvents);
 router.get('/events/browse', eventController.getBrowseConcerts);
+router.get('/events/topselling', eventController.getTopSelling);
 router.get('/events/:eventId', eventController.getEventById);
+
 
 // Routes in raffleController.js
 router.post('/raffle/enter', authenticateToken, raffleController.enterRaffle);

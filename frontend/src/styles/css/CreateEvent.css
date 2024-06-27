@@ -84,7 +84,6 @@
 
 .create-event-form input,
 .create-event-form select {
-  width: 100%; /* Ensures uniform width across all inputs */
   padding: 8px;
   margin-top: 5px; /* Spacing between label and input */
   margin-right: 50px;

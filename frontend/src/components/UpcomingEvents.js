@@ -1,6 +1,7 @@
 import React from 'react';
 import EventCard from './EventCard';
 import '../styles/css/UpcomingEvents.css';
+import { Link } from 'react-router-dom';
 
 const UpcomingEvents = ({ events, onEventClick }) => {
   const scrollRight = () => {
@@ -15,7 +16,7 @@ const UpcomingEvents = ({ events, onEventClick }) => {
     <section className="upcoming-events">
       <div className="section-header d-flex justify-content-between align-items-center">
         <h2>Upcoming Events</h2>
-        <a href="#view-all" className="view-all">View All</a>
+        <a href="#view-all" className="view-all"><Link to="/events">View All</Link></a>
       </div>
       <div className="events-container position-relative">
         <div className="events-list d-flex overflow-auto">

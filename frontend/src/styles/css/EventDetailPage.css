@@ -8,10 +8,15 @@
   src: url(../fonts/GeneralSans/GeneralSans-Medium.otf);
 }
 
-.event-detail-page {
+/*.event-detail-page {
   padding: 20px;
   max-width: 1200px;
   margin: auto;
+}*/
+.event-detail-page-content{
+  padding: 20px;
+  max-width: 1200px;
+  margin: 100px auto;
 }
 
 .event-header {
@@ -55,24 +60,26 @@
 
 .event-image {
   flex-grow: 1; /* Ensure the image container grows as needed */
-  max-width: 800px;
+  max-width: 1000px;
   width: 100%;
   height: auto; /* Ensure the image scales correctly */
   border-radius: 10px;
 }
 
 .event-content {
-  max-width: 1200px;
+  max-width: 900px; /* Ensure the width is consistent with the image */
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 40px;
+  margin: 0 auto 40px auto; /* Center align the content */
   flex-wrap: wrap;
+  text-align: left;
 }
 
 .event-main {
   flex: 2.5;
   margin-bottom: 20px;
+  margin-right: 15px;
 }
 
 .ticket-info {
@@ -120,23 +127,6 @@
   width: 100%;
 }
 
-.ticket-pricing, .admission-policy {
-  background-color: #cdcdce;
-  padding: 40px;
-}
-
-.exchange-refund-policy {
-  padding: 40px;
-}
-
-.admission-policy {
-  margin-bottom: 100px;
-}
-
-.ticket-pricing h2, .exchange-refund-policy h2, .admission-policy h2 {
-  font-size: 1.5em;
-  margin-bottom: 10px;
-}
 
 .note {
   font-weight: bold;
@@ -145,20 +135,6 @@
   color: black;
 }
 
-.ticket-pricing ul, .admission-policy ul {
-  list-style-type: disc;
-  margin-left: 20px;
-  padding-left: 0px;
-}
-
-.terms-conditions {
-  color: #4F4CEE;
-  text-decoration: none;
-}
-
-.terms-conditions:hover {
-  text-decoration: underline;
-}
 
 /* Media Queries for Responsiveness */
 @media (max-width: 768px) {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext'; // Import useAuth hook from AuthContext
-import { Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import LoginModal from "../pages/LoginModal"; 
 import '../styles/css/Navbar.css';
 
@@ -25,13 +25,13 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <div className="navbar-logo">TicketingHuat</div>
+      <div className="navbar-logo"><Link to="/" className="logo-link">TicketingHuat</Link></div>
       <div className="navbar-container">
         <div className={`navbar-menu ${menuOpen ? 'open' : ''}`}>
           <ul className="navbar-links">
             <li><Link to="/">Concerts</Link></li>
-            <li><Link to="#events">Events</Link></li>
-            <li><Link to="#conference">Conference</Link></li>
+            <li><Link to="/events">Events</Link></li>
+            <li><Link to="/aboutus">About us</Link></li>
             {user?.role === 'admin' && (
               <li><Link to="/admin">Admin Dashboard</Link></li>
             )}

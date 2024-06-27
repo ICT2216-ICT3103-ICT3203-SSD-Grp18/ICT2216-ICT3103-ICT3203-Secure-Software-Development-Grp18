@@ -27,7 +27,7 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.JWT_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {

@@ -1,0 +1,93 @@
+@font-face {
+    font-family: 'CabinetGrostesk-bold';
+    src: url(../fonts/CabinetGrotesk/CabinetGrotesk-Bold.otf);
+  }
+  
+  @font-face {
+    font-family: 'GeneralSans-Med';
+    src: url(../fonts/GeneralSans/GeneralSans-Medium.otf);
+  }
+  
+  /* Ticketing Event Details Section */
+  .ticketing-event-details {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Exchange & Refund Policy Section */
+  .ticketing-event-details .exchange-refund-policy {
+    background-color: #cdcdce;
+    padding: 50px; /* Increased padding */
+    margin-bottom: 20px;
+    border-radius: 5px;
+  }
+  
+  .ticketing-event-details .exchange-refund-policy h2 {
+    font-family: 'CabinetGrostesk-bold';
+    font-size: 1.75em; /* Increased font size */
+    margin-bottom: 15px; /* Increased margin */
+    text-align: center; /* Centered text */
+  }
+  
+  .ticketing-event-details .exchange-refund-policy ol {
+    font-family: 'GeneralSans-Med';
+    font-size: 1.1em;
+    margin-left: 20px;
+    padding-left: 0;
+    line-height: 1.6; /* Increased line height */
+  }
+  
+  .ticketing-event-details .exchange-refund-policy ol li {
+    margin-bottom: 10px; /* Added margin between list items */
+  }
+  
+  /* Admission Policy Section */
+  .ticketing-event-details .admission-policy {
+    padding: 50px; /* Increased padding */
+    margin-bottom: 20px;
+    border-radius: 5px;
+  }
+  
+  .ticketing-event-details .admission-policy h2 {
+    font-family: 'CabinetGrostesk-bold';
+    font-size: 1.75em; /* Increased font size */
+    margin-bottom: 15px; /* Increased margin */
+    text-align: center; /* Centered text */
+  }
+  
+  .ticketing-event-details .admission-policy .admission-rules {
+    font-family: 'GeneralSans-Med';
+    font-size: 1.1em;
+    line-height: 1.6; /* Increased line height */
+  }
+  
+  .ticketing-event-details .admission-policy .admission-rules p {
+    font-weight: bold; /* Bold text */
+    text-align: center; /* Centered text */
+    margin-bottom: 10px; /* Added margin */
+  }
+  
+  .ticketing-event-details .admission-policy .admission-rules ol {
+    margin-left: 20px;
+    padding-left: 0;
+  }
+  
+  .ticketing-event-details .admission-policy .admission-rules ol li {
+    margin-bottom: 10px; /* Added margin between list items */
+  }
+  
+  /* General Styling */
+  .event-detail-policies {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  @media (max-width: 530px) {
+    .ticketing-event-details .admission-policy ol {
+        font-size: 0.8em;
+      }
+      .ticketing-event-details .exchange-refund-policy ol {
+        font-size: 0.8em;
+      }
+  }
+  
