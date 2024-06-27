@@ -16,7 +16,18 @@ pipeline {
     }
     stage('Checkout') {
       steps {
-        checkout([$class: 'GitSCM', branches: [[name: '/Events']], userRemoteConfigs: [[url: 'https://github.com/ICT2216-ICT3103-ICT3203-SSD-Grp18/ICT2216-ICT3103-ICT3203-Secure-Software-Development-Grp18.git', credentialsId: 'PAT_Jenkins_Jonathan']]])
+        script {
+          // Clean workspace before starting
+          deleteDir()
+        }
+        checkout([
+          $class: 'GitSCM', 
+          branches: [[name: '*/Events']], 
+          userRemoteConfigs: [[
+            url: 'https://github.com/ICT2216-ICT3103-ICT3203-SSD-Grp18/ICT2216-ICT3103-ICT3203-Secure-Software-Development-Grp18.git', 
+            credentialsId: 'PAT_Jenkins_Jonathan'
+          ]]
+        ])
       }
     }
     stage('Install Root Dependencies') {
