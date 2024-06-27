@@ -95,10 +95,11 @@ const ManageEvents = () => {
         <input
           type="text"
           placeholder="Search for events"
+          style={{ width: '300px', height: '40px' , marginBottom: '20px', borderRadius: '5px', padding: '5px'}}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <Button class="btn btn-primary" type="submit">Search</Button>
+        <Button style={{ color: 'white' }} class="btn btn-primary" type="submit">Search</Button>
       </form>
       {loading ? <p>Loading...</p> : null}
       {error ? <p style={{ color: 'red' }}>{error}</p> : null}

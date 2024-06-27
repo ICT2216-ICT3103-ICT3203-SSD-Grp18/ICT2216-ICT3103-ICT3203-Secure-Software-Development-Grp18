@@ -110,11 +110,12 @@ const ManageUsers = () => {
           type="text"
           placeholder="Search by email"
           value={searchTerm}
+          style={{ width: '300px', height: '40px' , marginBottom: '20px', borderRadius: '5px', padding: '5px'}}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <button style={{ color: 'white' }} type="submit">Search</button>
+        <button style={{ color: 'white'}} type="submit">Search</button>
       </form>
-      <button class="btn btn-primary" onClick={() => setNewUserModalOpen(true)}>Create New Account</button>
+      <button style={{ color: 'white' }} type="submit" onClick={() => setNewUserModalOpen(true)}>Create New Account</button>
       {loading ? <p>Loading...</p> : null}
       {error ? <p style={{ color: 'red' }}>{error}</p> : null}
       <div className="scrollable-list">
@@ -136,7 +137,7 @@ const ManageUsers = () => {
             <p>Tickets Purchased: {selectedUser.tickets_purchased}</p>
             <p>Status: {selectedUser.status}</p>
             <p>Role: {selectedUser.user_role}</p>
-            <Button class="btn btn-primary" onClick={() => handleStatusChange(selectedUser)}>
+            <Button onClick={() => handleStatusChange(selectedUser)}>
               {selectedUser.status === 'active' ? 'Deactivate' : 'Activate'}
             </Button>
             <Select
