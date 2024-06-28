@@ -75,17 +75,17 @@ pipeline {
         sshagent(['jenkins-ssh-key']) {
           // Deploy root files
           sh '''
-          rsync -av --exclude="node_modules" --exclude="package-lock.json" ./ jenkins@webserver:/var/www/html/
+          rsync -av --exclude="node_modules" --exclude="package-lock.json" --no-times --no-perms ./ jenkins@webserver:/var/www/html/
           '''
 
           // Deploy backend
           sh '''
-          rsync -av --exclude="node_modules" --exclude="package-lock.json" ./backend/ jenkins@webserver:/var/www/html/backend/
+          rsync -av --exclude="node_modules" --exclude="package-lock.json" --no-times --no-perms ./backend/ jenkins@webserver:/var/www/html/backend/
           '''
 
           // Deploy frontend
           sh '''
-          rsync -av --exclude="node_modules" --exclude="package-lock.json" ./frontend/ jenkins@webserver:/var/www/html/frontend/
+          rsync -av --exclude="node_modules" --exclude="package-lock.json" --no-times --no-perms ./frontend/ jenkins@webserver:/var/www/html/frontend/
           '''
 
           // Run npm install on the web server
