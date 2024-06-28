@@ -105,10 +105,11 @@ label {
 
 button[type="submit"] {
   width: 100%;
+  font-family: 'GeneralSans-Med';
   padding: 10px;
   background-color: #4F4CEE;
   border: none;
-  color: black;
+  color: white;
   font-size: 16px;
   border-radius: 4px;
   cursor: pointer;
@@ -132,4 +133,25 @@ form {
   padding: 10px;
   border-radius: 4px;
   font-size: 0.8rem;
+}
+
+.forgot-password {
+  font-family: 'CabinetGrostesk-bold';
+  background: none;
+  border: none;
+  color: #4F4CEE;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.forgot-password:hover {
+  color: #3a3a3a;
+}
+
+.message {
+  color:#4F4CEE ;
+  font-family: 'GeneralSans-Med';
+  margin-top: 20px;
 }

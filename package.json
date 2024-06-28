@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+    "start": "concurrently \"npm run start:redis\" \"npm run start:frontend\" \"npm run start:backend\"",
     "start:frontend": "npm --prefix frontend start",
-    "start:backend": "npm --prefix backend start"
+    "start:backend": "npm --prefix backend start",
+    "start:redis": "redis-server"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
