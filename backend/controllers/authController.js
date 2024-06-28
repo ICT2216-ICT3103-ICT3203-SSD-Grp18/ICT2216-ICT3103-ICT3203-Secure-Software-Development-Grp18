@@ -1,13 +1,16 @@
 const db = require('../utils/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { sendOtp, sendPasswordResetEmail} = require('../utils/sendOTP');
 const jwtSecret = process.env.JWT_SECRET;
+const crypto = require('crypto');
+
+
+
+const otps = {}; // Temporarily store OTPs
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-
-  console.log('Login attempt with email:', email); // Log email
-  console.log('Login attempt with password:', password); // Log password
 
   try {
     if (!email || !password) {
@@ -24,7 +27,37 @@ const login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (isMatch) {
-      const token = jwt.sign({ id: user.user_id, email: user.email }, jwtSecret, { expiresIn: '30m' });
+      const otp = crypto.randomInt(100000, 999999).toString(); // Generate a 6-digit OTP
+      otps[email] = otp;
+
+      // Send OTP via email
+      await sendOtp(email, otp);
+
+      res.status(200).json({ message: 'OTP sent to your email', otpRequired: true });
+    } else {
+      res.status(401).json({ message: 'Invalid email or password' });
+    }
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+const verifyOtp = async (req, res) => {
+  
+  const { email, otp } = req.body;
+  try {
+    if (!email || !otp) {
+      return res.status(400).json({ message: 'Email and OTP are required' });
+    }
+    if (otps[email] && otps[email] === otp) {
+      console.log("we are in")
+      delete otps[email]; // Invalidate OTP after successful verification
+
+      const [rows] = await db.execute('SELECT * FROM user WHERE email = ?', [email]);
+      const user = rows[0];
+
+      const token = jwt.sign({ id: user.user_id, email: user.email, role: user.user_role }, jwtSecret, { expiresIn: '30m' });
 
       res.cookie('token', token, {
         httpOnly: true,
@@ -35,13 +68,14 @@ const login = async (req, res) => {
 
       req.session.userId = user.user_id;
       req.session.email = user.email;
-
-      res.status(200).json({ message: 'Login successful' });
+      console.log("done")
+      res.status(200).json({ message: 'Login successful', user: { id: user.user_id, email: user.email, role: user.user_role } });
     } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+      console.log("wat!!")
+      res.status(401).json({ message: 'Invalid OTP' });
     }
   } catch (error) {
-    console.error('Error during login:', error);
+    console.error('Error during OTP verification:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -49,18 +83,12 @@ const login = async (req, res) => {
 const register = async (req, res) => {
   const { name, phone_number, email, password } = req.body;
 
-  console.log('Data received:', { name, phone_number, email, password });
-
-  const defaultUserRole = 'user';
-  const defaultStatus = 'active';
-  const defaultTicketsPurchased = 0;
-
   try {
     const hashPassword = await bcrypt.hash(password, 10);
 
     const [result] = await db.execute(
       'INSERT INTO user (name, phone_number, email, password, user_role, status, tickets_purchased) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [name, phone_number, email, hashPassword, defaultUserRole, defaultStatus, defaultTicketsPurchased]
+      [name, phone_number, email, hashPassword, 'user', 'active', 0]
     );
 
     res.status(201).json({ message: 'User registered successfully', userId: result.insertId });
@@ -100,12 +128,65 @@ const checkAuth = (req, res) => {
 const getUser = (req, res) => {
   const user = req.user;
 
-  // console.log('Fetched user:', user); // Log user
-
   if (user) {
-    res.status(200).json({ email: user.email });
+    res.status(200).json({ email: user.email, role: user.role });
   } else {
     res.status(404).json({ message: 'User not found' });
   }
 };
-module.exports = { login, register, logout, checkAuth, getUser };
+
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const [rows] = await db.execute('SELECT user_id FROM user WHERE email = ?', [email]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const userId = rows[0].user_id;
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiryTime = new Date(Date.now() + 3600 * 1000); // 1 hour from now
+
+    await db.execute('UPDATE user SET reset_token = ?, reset_token_expiry = ? WHERE user_id = ?', [token, expiryTime, userId]);
+
+    // Send password reset email
+    await sendPasswordResetEmail(email, token);
+
+    res.status(200).json({ message: 'Reset link sent to email' });
+  } catch (error) {
+    console.error('Error during password reset:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    const [rows] = await db.execute('SELECT user_id, reset_token_expiry FROM user WHERE reset_token = ?', [token]);
+
+    if (rows.length === 0) {
+      return res.status(400).json({ message: 'Invalid or expired token' });
+    }
+
+    const expiryTime = new Date(rows[0].reset_token_expiry);
+
+    if (expiryTime < new Date()) {
+      return res.status(400).json({ message: 'Invalid or expired token' });
+    }
+
+    const userId = rows[0].user_id;
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await db.execute('UPDATE user SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE user_id = ?', [hashedPassword, userId]);
+
+    res.status(200).json({ message: 'Password reset successfully' });
+  } catch (error) {
+    console.error('Error during password reset:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+module.exports = { login, verifyOtp, register, logout, checkAuth, getUser, forgotPassword, resetPassword};
