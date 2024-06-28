@@ -9,19 +9,23 @@ pipeline {
   }
 
   environment {
-    BRANCH_NAME = env.GIT_BRANCH
+    BRANCH_NAME = "${env.BRANCH_NAME}"
   }
 
   stages {
     stage('Environment') {
       steps {
-        echo "PATH = ${env.PATH}"
+        script {
+          BRANCH_NAME = env.GIT_BRANCH ?: 'main'
+          echo "PATH = ${env.PATH}"
+          echo "BRANCH_NAME = ${BRANCH_NAME}"
+        }
       }
     }
     stage('Checkout') {
       steps {
         script {
-          def checkoutVars = checkout([$class: 'GitSCM', branches: [[name: "${BRANCH_NAME}"]], userRemoteConfigs: [[url: 'https://github.com/ICT2216-ICT3103-ICT3203-SSD-Grp18/ICT2216-ICT3103-ICT3203-Secure-Software-Development-Grp18.git', credentialsId: 'PAT_Jenkins_Jonathan']]])
+          def checkoutVars = checkout([$class: 'GitSCM', branches: [[name: "*/${BRANCH_NAME}"]], userRemoteConfigs: [[url: 'https://github.com/ICT2216-ICT3103-ICT3203-SSD-Grp18/ICT2216-ICT3103-ICT3203-Secure-Software-Development-Grp18.git', credentialsId: 'PAT_Jenkins_Jonathan']]])
           env.GIT_COMMIT = checkoutVars.GIT_COMMIT
         }
       }
