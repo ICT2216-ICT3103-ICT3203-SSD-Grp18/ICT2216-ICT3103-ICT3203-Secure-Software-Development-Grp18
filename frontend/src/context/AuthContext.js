@@ -10,13 +10,23 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
+  const [user, setUser] = useState(null); // Corrected typo
+
 
   // verify authentication
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const response = await apiClient.get('/auth/check', { withCredentials: true });
-        setIsLoggedIn(response.status === 200);
+        if (response.status === 200) {
+          setIsLoggedIn(true);
+          const userResponse = await apiClient.get('/auth/getUser', { withCredentials: true });
+          setUser(userResponse.data);
+          console.log('User role:', userResponse.data.role); // Add this line to log the user role
+
+        } else {
+          setIsLoggedIn(false);
+        }
       } catch (error) {
         setIsLoggedIn(false);
       } finally {
@@ -34,6 +44,10 @@ export const AuthProvider = ({ children }) => {
       const response = await apiClient.post('/auth/login', { email, password }, { withCredentials: true });
       if (response.status === 200) {
         setIsLoggedIn(true);
+        const userResponse = await apiClient.get('/auth/getUser', { withCredentials: true });
+        setUser(userResponse.data);
+        console.log('User role:', userResponse.data.role); // Add this line to log the user role
+
       } else {
         throw new Error('Login failed');
       }
@@ -46,6 +60,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await apiClient.post('/auth/logout', {}, { withCredentials: true });
       setIsLoggedIn(false);
+      setUser(null);
     } catch (error) {
       throw new Error('Logout failed');
     }
@@ -53,6 +68,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     isLoggedIn,
+    user,
     login,
     logout,
   };
