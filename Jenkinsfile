@@ -8,6 +8,10 @@ pipeline {
     string(defaultValue: 'Octopus', description: '', name: 'ServerId', trim: true)
   }
 
+  environment {
+    BRANCH_NAME = env.GIT_BRANCH
+  }
+
   stages {
     stage('Environment') {
       steps {
@@ -16,7 +20,10 @@ pipeline {
     }
     stage('Checkout') {
       steps {
-        checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: 'https://github.com/ICT2216-ICT3103-ICT3203-SSD-Grp18/ICT2216-ICT3103-ICT3203-Secure-Software-Development-Grp18.git', credentialsId: 'PAT_Jenkins_Jonathan']]])
+        script {
+          def checkoutVars = checkout([$class: 'GitSCM', branches: [[name: "${BRANCH_NAME}"]], userRemoteConfigs: [[url: 'https://github.com/ICT2216-ICT3103-ICT3203-SSD-Grp18/ICT2216-ICT3103-ICT3203-Secure-Software-Development-Grp18.git', credentialsId: 'PAT_Jenkins_Jonathan']]])
+          env.GIT_COMMIT = checkoutVars.GIT_COMMIT
+        }
       }
     }
     stage('Install Root Dependencies') {
@@ -38,6 +45,16 @@ pipeline {
         }
       }
     }
+    stage('Dependency Check') {
+      steps {
+        dependencyCheck additionalArguments: '--format XML --format HTML', odcInstallation: 'default'
+      }
+      post {
+        always {
+          dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+        }
+      }
+    }
     stage('List and Archive Dependencies') {
       steps {
         sh 'npm list --all > dependencies.txt'
@@ -47,10 +64,50 @@ pipeline {
       }
     }
     stage('Deploy to Web Server') {
+      when {
+        branch 'main'
+      }
       steps {
         sshagent(['jenkins-ssh-key']) {
-          sh 'scp -o StrictHostKeyChecking=no -r ./backend/* jenkins@webserver:/var/www/html/backend/'
-          sh 'scp -o StrictHostKeyChecking=no -r ./frontend/* jenkins@webserver:/var/www/html/frontend/'
+          // Deploy root files
+          sh '''
+          rsync -av --exclude="node_modules" --exclude="package-lock.json" ./ jenkins@webserver:/var/www/html/
+          '''
+
+          // Deploy backend
+          sh '''
+          rsync -av --exclude="node_modules" --exclude="package-lock.json" ./backend/ jenkins@webserver:/var/www/html/backend/
+          '''
+
+          // Deploy frontend
+          sh '''
+          rsync -av --exclude="node_modules" --exclude="package-lock.json" ./frontend/ jenkins@webserver:/var/www/html/frontend/
+          '''
+
+          // Run npm install on the web server
+          sh '''
+          ssh jenkins@webserver << EOF
+          cd /var/www/html && npm install
+          cd /var/www/html/backend && npm install
+          cd /var/www/html/frontend && npm install
+          EOF
+          '''
+        }
+      }
+    }
+  }
+
+  post {
+    success {
+      script {
+        if (BRANCH_NAME != 'main') {
+          withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+            sh """
+              curl -H "Authorization: token $GITHUB_TOKEN" -X POST \
+              -d '{"title":"Merge ${BRANCH_NAME}","head":"${BRANCH_NAME}","base":"main"}' \
+              https://api.github.com/repos/ICT2216-ICT3103-ICT3203-SSD-Grp18/ICT2216-ICT3103-ICT3203-Secure-Software-Development-Grp18/pulls
+            """
+          }
         }
       }
     }
