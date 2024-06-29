@@ -10,6 +10,7 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const { authenticateToken } = require('./middleware/authMiddleware');
 require('./jobs/raffleCronJob'); 
+const rateLimit = require('express-rate-limit'); // Add this line
 
 dotenv.config();
 
@@ -40,6 +41,16 @@ app.use(session({
     maxAge: 30 * 60 * 1000 // 30 minutes
   }
 }));
+
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  message: 'Too many requests from this IP, please try again later.',
+});
+
+// Apply the rate limiter to all requests
+app.use(limiter);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

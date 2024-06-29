@@ -1,12 +1,11 @@
 const db = require('../utils/db');
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { sendOtp, sendPasswordResetEmail } = require('../utils/sendOTP');
 const { body, validationResult } = require('express-validator');
 const DOMPurify = require('dompurify');
 const { JSDOM } = require('jsdom');
-const jwtSecret = process.env.JWT_SECRET;
 const crypto = require('crypto');
+const jwtSecret = process.env.JWT_SECRET;
 
 const otps = {}; // Temporarily store OTPs
 
@@ -18,6 +17,28 @@ const sanitizeInput = (input) => {
     return purify.sanitize(input.trim());
   }
   return input;
+};
+
+const hashPassword = async (password) => {
+  const salt = crypto.randomBytes(32).toString('hex');
+  const hash = await new Promise((resolve, reject) => {
+    crypto.pbkdf2(password, salt, 100000, 64, 'sha512', (err, derivedKey) => {
+      if (err) reject(err);
+      resolve(derivedKey.toString('hex'));
+    });
+  });
+  return `${salt}:${hash}`;
+};
+
+const verifyPassword = async (password, storedHash) => {
+  const [salt, key] = storedHash.split(':');
+  const hash = await new Promise((resolve, reject) => {
+    crypto.pbkdf2(password, salt, 100000, 64, 'sha512', (err, derivedKey) => {
+      if (err) reject(err);
+      resolve(derivedKey.toString('hex'));
+    });
+  });
+  return hash === key;
 };
 
 const login = [
@@ -48,9 +69,16 @@ const login = [
       }
 
       const user = rows[0];
-      const isMatch = await bcrypt.compare(password, user.password);
+
+      if (user.lock_until && new Date(user.lock_until) > new Date()) {
+        return res.status(403).json({ message: 'Account locked. Try again later.' });
+      }
+
+      const isMatch = await verifyPassword(password, user.password);
 
       if (isMatch) {
+        await db.execute('UPDATE user SET login_attempts = 0, lock_until = NULL WHERE email = ?', [email]);
+
         const otp = crypto.randomInt(100000, 999999).toString(); // Generate a 6-digit OTP
         otps[email] = otp;
 
@@ -59,6 +87,15 @@ const login = [
 
         return res.status(200).json({ message: 'OTP sent to your email', otpRequired: true });
       } else {
+        await db.execute('UPDATE user SET login_attempts = login_attempts + 1 WHERE email = ?', [email]);
+        const [updatedUser] = await db.execute('SELECT * FROM user WHERE email = ?', [email]);
+
+        if (updatedUser[0].login_attempts >= 5) {
+          const lockUntil = new Date(Date.now() + 5 * 60 * 1000); // Lock for 5 minutes
+          await db.execute('UPDATE user SET lock_until = ? WHERE email = ?', [lockUntil, email]);
+          return res.status(403).json({ message: 'Account locked. Try again later.' });
+        }
+
         return res.status(401).json({ message: 'Invalid email or password' });
       }
     } catch (error) {
@@ -101,11 +138,11 @@ const register = [
     const defaultTicketsPurchased = 0;
 
     try {
-      const hashPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await hashPassword(password);
 
       const [result] = await db.execute(
         'INSERT INTO user (name, phone_number, email, password, user_role, status, tickets_purchased) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [name, phone_number, email, hashPassword, defaultUserRole, defaultStatus, defaultTicketsPurchased]
+        [name, phone_number, email, hashedPassword, defaultUserRole, defaultStatus, defaultTicketsPurchased]
       );
 
       res.status(201).json({ message: 'User registered successfully', userId: result.insertId });
@@ -179,33 +216,48 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-const resetPassword = async (req, res) => {
-  const { token, newPassword } = req.body;
+const resetPassword = [
+  body('token').notEmpty().withMessage('Token is required').customSanitizer(sanitizeInput),
+  body('newPassword')
+    .isLength({ min: 8, max: 12 })
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/)
+    .withMessage('Password must be 8-12 characters long and include a mix of uppercase letters, lowercase letters, numbers, and special characters')
+    .customSanitizer(sanitizeInput),
 
-  try {
-    const [rows] = await db.execute('SELECT user_id, reset_token_expiry FROM user WHERE reset_token = ?', [token]);
-
-    if (rows.length === 0) {
-      return res.status(400).json({ message: 'Invalid or expired token' });
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    const expiryTime = new Date(rows[0].reset_token_expiry);
+    const { token, newPassword } = req.body;
 
-    if (expiryTime < new Date()) {
-      return res.status(400).json({ message: 'Invalid or expired token' });
+    try {
+      const [rows] = await db.execute('SELECT user_id, reset_token_expiry FROM user WHERE reset_token = ?', [token]);
+
+      if (rows.length === 0) {
+        return res.status(400).json({ message: 'Invalid or expired token' });
+      }
+
+      const expiryTime = new Date(rows[0].reset_token_expiry);
+
+      if (expiryTime < new Date()) {
+        return res.status(400).json({ message: 'Invalid or expired token' });
+      }
+
+      const userId = rows[0].user_id;
+      const hashedPassword = await hashPassword(newPassword);
+
+      await db.execute('UPDATE user SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE user_id = ?', [hashedPassword, userId]);
+
+      res.status(200).json({ message: 'Password reset successfully' });
+    } catch (error) {
+      console.error('Error during password reset:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
     }
-
-    const userId = rows[0].user_id;
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    await db.execute('UPDATE user SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE user_id = ?', [hashedPassword, userId]);
-
-    res.status(200).json({ message: 'Password reset successfully' });
-  } catch (error) {
-    console.error('Error during password reset:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
   }
-};
+];
+
 
 const verifyOtp = async (req, res) => {
   const { email, otp } = req.body;
@@ -239,7 +291,5 @@ const verifyOtp = async (req, res) => {
     return res.status(500).json({ status: 500, message: 'Server error', error: error.message });
   }
 };
-
-
 
 module.exports = { login, verifyOtp, register, logout, checkAuth, getUser, forgotPassword, resetPassword };

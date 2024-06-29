@@ -151,7 +151,14 @@ form {
 }
 
 .message {
-  color:#4F4CEE ;
+  color: #4F4CEE;
   font-family: 'GeneralSans-Med';
   margin-top: 20px;
+}
+
+/* Additional styles for ResetPasswordPage */
+.error {
+  color: red;
+  font-family: 'GeneralSans-Med';
+  margin-top: 10px;
 }
