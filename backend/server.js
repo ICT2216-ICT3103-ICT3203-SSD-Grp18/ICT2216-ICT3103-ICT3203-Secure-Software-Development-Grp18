@@ -17,12 +17,9 @@ const app = express();
 const PORT = process.env.PORT || 5500;
 
 const corsOptions = {
-  origin: 'http://localhost:3000', // Your frontend's origin
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000', // Use environment variable for origin or default to localhost
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
-
-
-  origin: process.env.CORS_ORIGIN, // Use environment variable for origin
   credentials: true, // Enable credentials (cookies, authorization headers, etc.)
 };
 

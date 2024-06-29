@@ -3,9 +3,7 @@ import apiClient from '../axiosConfig';
 
 const AuthContext = createContext();
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -37,24 +35,28 @@ export const AuthProvider = ({ children }) => {
 
   const login = async ({ email, password, otp }) => {
     try {
+      let response;
       if (otp) {
+        response = await apiClient.post('/auth/verify-otp', { email, otp }, { withCredentials: true });
+      } else {
+        response = await apiClient.post('/auth/login', { email, password }, { withCredentials: true });
+        if (response.data.otpRequired) {
+          return { otpRequired: true };
+        }
+      }
+      if (response && response.status === 200) {
         setIsLoggedIn(true);
         const userResponse = await apiClient.get('/auth/getUser', { withCredentials: true });
         setUser(userResponse.data);
+        return { status: 200 };
       } else {
-        const response = await apiClient.post('/auth/login', { email, password }, { withCredentials: true });
-        if (response.status === 200) {
-          setIsLoggedIn(true);
-          const userResponse = await apiClient.get('/auth/getUser', { withCredentials: true });
-          setUser(userResponse.data);
-        } else {
-          throw new Error('Login failed');
-        }
+        throw new Error('Login failed');
       }
     } catch (error) {
       throw new Error('Login failed');
     }
   };
+  
 
   const logout = async () => {
     try {

@@ -16,12 +16,12 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
   const { login } = useAuth();
   const [isResetPassword, setIsResetPassword] = useState(false);
   const [message, setMessage] = useState('');
+  const [isOtpSent, setIsOtpSent] = useState(false);
 
   useEffect(() => {
     setIsLogin(initialIsLogin);
   }, [initialIsLogin]);
 
-  // sanitize and trim spaces
   const sanitizeInput = (input) => {
     return DOMPurify.sanitize(input.trim());
   };
@@ -55,9 +55,14 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
     }
 
     try {
-      await login(sanitizedEmail, sanitizedPassword);
-      alert('Login successful');
-      onClose();
+      const result = await login({ email: sanitizedEmail, password: sanitizedPassword });
+      if (result.otpRequired) {
+        setIsOtpSent(true);
+        alert('OTP sent to your email');
+      } else {
+        alert('Login successful');
+        onClose();
+      }
     } catch (error) {
       alert('Login failed. Please check your credentials and try again.');
     }
@@ -66,9 +71,8 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     try {
-      const response = await apiClient.post('/auth/verify-otp', { email, otp });
-      if (response.data.message === 'Login successful') {
-        await login({ email, otp });
+      const response = await login({ email, otp });
+      if (response && response.status === 200) {
         alert('Login successful!');
         setIsOtpSent(false);
         onClose();
@@ -266,7 +270,8 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
             </label>
             <label>
               Email Address:
-              <input type="email"
+              <input
+                type="email"
                 name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
