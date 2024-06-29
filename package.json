@@ -6,13 +6,16 @@
     "start": "concurrently \"npm run start:redis\" \"npm run start:frontend\" \"npm run start:backend\"",
     "start:frontend": "npm --prefix frontend start",
     "start:backend": "npm --prefix backend start",
-    "start:redis": "redis-server"
+    "test": "jest"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "jest": "^27.4.7",
+    "babel-jest": "^27.4.7"
   },
   "dependencies": {
-    "express-session": "^1.18.0",
+    "axios": "^1.7.2",
     "mysql2": "^3.10.1"
-  }
+  },
+  "test": "react-scripts test --transformIgnorePatterns 'node_modules/(?!axios)/'"
 }

@@ -7,6 +7,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const cors = require('cors');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
 const { authenticateToken } = require('./middleware/authMiddleware');
 require('./jobs/raffleCronJob'); 
 
@@ -17,11 +18,16 @@ const PORT = process.env.PORT || 5500;
 
 const corsOptions = {
   origin: 'http://localhost:3000', // Your frontend's origin
-  credentials: true, // Include cookies with requests
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+
+
+  origin: process.env.CORS_ORIGIN, // Use environment variable for origin
+  credentials: true, // Enable credentials (cookies, authorization headers, etc.)
 };
 
+app.use(helmet()); // Use helmet for setting various HTTP headers
+app.use(bodyParser.json());
 app.use(cors(corsOptions));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
