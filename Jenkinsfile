@@ -61,7 +61,7 @@ pipeline {
                       -f 'ALL'
                       --prettyPrint
                       --nvdApiKey `cat nvd_api_key.txt`
-                      """, odcInstallation: 'Dependency-Check'
+                      """, odcInstallation: 'OWASP-Dependency-Check'
           sh 'rm nvd_api_key.txt'
         }
         dependencyCheckPublisher pattern: 'dependency-check-report.xml'
