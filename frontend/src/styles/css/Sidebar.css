@@ -100,10 +100,40 @@
 }
 
 .menu-item.open .submenu,
-.submenu.open { /* Ensuring this class can directly apply regardless of parent */
-  max-height: 200px; /* Adjust based on the number of submenu items */
+.submenu.open {
+  max-height: 200px;
 }
+.sidebar-title{
+  margin-top: 1.2rem;
+  margin-bottom: 1.1rem;
+}
+/* Media Queries for Responsive Sidebar */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px; /* Thinner sidebar */
+  }
 
+  .sidebar h2 {
+    display: none; /* Hide the Navigation title */
+  }
+
+  .sidebar nav ul li .menu-button {
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .menu-icon {
+    margin: 0; /* Center the icons */
+  }
+
+  .sidebar-title{
+    display: none; /* Hide the text */
+  }
+
+  .submenu {
+    display: none; /* Hide submenu on small screens */
+  }
+}
 
 @keyframes slideIn {
   from {

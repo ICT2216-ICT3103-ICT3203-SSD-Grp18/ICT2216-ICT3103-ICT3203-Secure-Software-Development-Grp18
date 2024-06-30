@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import apiClient from '../axiosConfig';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Grid } from '@mui/material';
+import '../styles/css/ManageUsers.css'; // Import the CSS file here
 
 const ManageEvents = () => {
   const [events, setEvents] = useState([]);
@@ -91,14 +92,15 @@ const ManageEvents = () => {
   return (
     <div>
       <h2>Manage Events</h2>
-      <form onSubmit={handleSearch}>
+      <form className='admin-search' onSubmit={handleSearch}>
         <input
           type="text"
           placeholder="Search for events"
+          style={{ width: '300px', height: '40px' , marginBottom: '20px', borderRadius: '5px', padding: '5px'}}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <Button class="btn btn-primary" type="submit">Search</Button>
+        <Button style={{ color: 'white' }} class="btn btn-primary" type="submit">Search</Button>
       </form>
       {loading ? <p>Loading...</p> : null}
       {error ? <p style={{ color: 'red' }}>{error}</p> : null}

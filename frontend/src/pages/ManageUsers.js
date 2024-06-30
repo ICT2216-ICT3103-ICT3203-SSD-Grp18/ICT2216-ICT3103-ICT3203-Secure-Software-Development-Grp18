@@ -92,7 +92,7 @@ const ManageUsers = () => {
 
   const handleCreateUser = async () => {
     try {
-      const response = await apiClient.post('/admin/users', newUser, { withCredentials: true });
+      await apiClient.post('/admin/users', newUser, { withCredentials: true });
       fetchUsers(); // Refresh user list after creating new user
       setNewUserModalOpen(false);
       setNewUser({ name: '', email: '', phone_number: '', password: '', status: 'active', user_role: 'user', tickets_purchased: 0 });
@@ -105,16 +105,19 @@ const ManageUsers = () => {
   return (
     <div>
       <h2>Manage Users</h2>
-      <form onSubmit={handleSearch}>
+      <form className='admin-search' onSubmit={handleSearch}>
         <input
           type="text"
           placeholder="Search by email"
           value={searchTerm}
+          style={{ width: '300px', height: '40px' , marginBottom: '20px', borderRadius: '5px', padding: '5px'}}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <button style={{ color: 'white' }} type="submit">Search</button>
+        <button style={{ color: 'white'}} type="submit">Search</button>
       </form>
-      <button class="btn btn-primary" onClick={() => setNewUserModalOpen(true)}>Create New Account</button>
+      <div className='admin-search'>
+      <button style={{ color: 'white' }} type="submit" onClick={() => setNewUserModalOpen(true)}>Create New Account</button>
+      </div>
       {loading ? <p>Loading...</p> : null}
       {error ? <p style={{ color: 'red' }}>{error}</p> : null}
       <div className="scrollable-list">
@@ -136,7 +139,7 @@ const ManageUsers = () => {
             <p>Tickets Purchased: {selectedUser.tickets_purchased}</p>
             <p>Status: {selectedUser.status}</p>
             <p>Role: {selectedUser.user_role}</p>
-            <Button class="btn btn-primary" onClick={() => handleStatusChange(selectedUser)}>
+            <Button onClick={() => handleStatusChange(selectedUser)}>
               {selectedUser.status === 'active' ? 'Deactivate' : 'Activate'}
             </Button>
             <Select
