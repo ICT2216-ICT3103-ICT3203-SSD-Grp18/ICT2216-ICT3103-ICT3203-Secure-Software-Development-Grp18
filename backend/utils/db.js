@@ -1,6 +1,10 @@
 const mysql = require('mysql2');
 const dotenv = require('dotenv');
+const iconv = require('iconv-lite');
+const encodings = require('iconv-lite/encodings');
 
+// Explicitly set the encoders to iconv-lite
+iconv.encodings = encodings;
 
 // Load environment variables from .env file
 dotenv.config();
@@ -13,7 +17,13 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  charset: 'utf8mb4', // Ensure this charset is compatible with your database
+  authPlugins: { // Ensure you use the correct authentication plugin
+    mysql_clear_password: () => (pluginData) => {
+      return pluginData.password;
+    },
+  },
 });
 
 pool.getConnection((err, connection) => {

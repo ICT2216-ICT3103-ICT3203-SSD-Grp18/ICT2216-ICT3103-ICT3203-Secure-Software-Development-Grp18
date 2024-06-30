@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../axiosConfig';
-import '../styles/css/LoginModal.css';
+import validator from 'validator';
+import DOMPurify from 'dompurify';
 
 const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
   const [email, setEmail] = useState('');
@@ -11,57 +12,119 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState('');
   const [isLogin, setIsLogin] = useState(initialIsLogin);
-  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [errors, setErrors] = useState({});
   const { login } = useAuth();
+  const [isResetPassword, setIsResetPassword] = useState(false);
+  const [message, setMessage] = useState('');
+  const [isOtpSent, setIsOtpSent] = useState(false);
 
   useEffect(() => {
     setIsLogin(initialIsLogin);
   }, [initialIsLogin]);
 
+  const sanitizeInput = (input) => {
+    return DOMPurify.sanitize(input.trim());
+  };
+
+  const validateEmail = (email) => {
+    return validator.isEmail(email);
+  };
+
+  const validatePhoneNumber = (phoneNumber) => {
+    return validator.isMobilePhone(phoneNumber, 'en-SG');
+  };
+
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,12}$/;
+    return passwordRegex.test(password);
+  };
+
+  const validateName = (name) => {
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    return nameRegex.test(name);
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
+    const sanitizedEmail = sanitizeInput(email);
+    const sanitizedPassword = sanitizeInput(password);
+
+    if (!validateEmail(sanitizedEmail)) {
+      setErrors({ email: 'Please enter a valid email address.' });
+      return;
+    }
+
     try {
-      const response = await apiClient.post('/auth/login', { email, password });
-      if (response.data.otpRequired) {
+      const result = await login({ email: sanitizedEmail, password: sanitizedPassword });
+      if (result.otpRequired) {
         setIsOtpSent(true);
         alert('OTP sent to your email');
       } else {
-        await login(email, password);
         alert('Login successful');
         onClose();
       }
     } catch (error) {
-      alert(`Error: ${error.message}`);
+      alert('Login failed. Please check your credentials and try again.');
     }
   };
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     try {
-      const response = await apiClient.post('/auth/verify-otp', { email, otp });
-      if (response.data.message === 'Login successful') {
-        await login({ email, otp }); // Log the user in using the OTP
+      const response = await login({ email, otp });
+      if (response && response.status === 200) {
         alert('Login successful!');
         setIsOtpSent(false);
         onClose();
       } else {
         alert('Invalid OTP. Please try again.');
-        setIsOtpSent(false); // Reset to login state on failed OTP
+        setIsOtpSent(false);
       }
     } catch (error) {
       alert(`Error: ${error.message}`);
-      setIsOtpSent(false); // Reset to login state on error
+      setIsOtpSent(false);
     }
   };
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    const name = `${firstName} ${lastName}`;
+    const sanitizedFirstName = sanitizeInput(firstName);
+    const sanitizedLastName = sanitizeInput(lastName);
+    const sanitizedPhoneNumber = sanitizeInput(phoneNumber);
+    const sanitizedEmail = sanitizeInput(email);
+    const sanitizedPassword = sanitizeInput(password);
+
+    const newErrors = {};
+
+    if (!validateEmail(sanitizedEmail)) {
+      newErrors.email = 'Please enter a valid email address.';
+    }
+    if (!validatePhoneNumber(sanitizedPhoneNumber)) {
+      newErrors.phoneNumber = 'Please enter a valid phone number.';
+    }
+    if (!validatePassword(sanitizedPassword)) {
+      newErrors.password = 'Password must be 8-12 characters long and include a mix of uppercase letters, lowercase letters, numbers, and special characters.';
+    }
+    if (!validateName(sanitizedFirstName)) {
+      newErrors.firstName = 'Please enter a valid first name.';
+    }
+    if (!validateName(sanitizedLastName)) {
+      newErrors.lastName = 'Please enter a valid last name.';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
+
+    const name = `${sanitizedFirstName} ${sanitizedLastName}`;
     const user = {
       name,
-      phone_number: phoneNumber,
-      email,
-      password
+      phone_number: sanitizedPhoneNumber,
+      email: sanitizedEmail,
+      password: sanitizedPassword
     };
 
     try {
@@ -70,11 +133,24 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
         alert('User registered successfully');
         onClose();
       } else {
-        const error = await response.data;
-        alert(`Error: ${error.message}`);
+        alert('Registration failed. Please try again.');
       }
     } catch (error) {
-      alert(`Error: ${error.message}`);
+      alert('Registration failed. Please try again.');
+    }
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await apiClient.post('/auth/forgot-password', { email });
+      if (response.status === 200) {
+        setMessage('Password reset email sent. Please check your email.');
+      } else {
+        setMessage('Error sending password reset email');
+      }
+    } catch (error) {
+      setMessage(`Error: ${error.message}`);
     }
   };
 
@@ -105,32 +181,37 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
             Sign Up
           </button>
         </div>
-        {isLogin && !isOtpSent && (
-          <form onSubmit={handleLogin}>
-            <label>
-              Email Address:
-              <input
-                className="auth-form-input"
-                type="email"
-                name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </label>
-            <label>
-              Password:
-              <input
-                className="auth-form-input"
-                type="password"
-                name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </label>
-            <button type="submit">Log In</button>
-          </form>
+        {isLogin && !isOtpSent && !isResetPassword && (
+          <>
+            <form onSubmit={handleLogin}>
+              <label>
+                Email Address:
+                <input
+                  className="auth-form-input"
+                  type="email"
+                  name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </label>
+              <label>
+                Password:
+                <input
+                  className="auth-form-input"
+                  type="password"
+                  name="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </label>
+              <button type="submit">Log In</button>
+            </form>
+            <button className="forgot-password" onClick={() => setIsResetPassword(true)}>
+              Forgot Password?
+            </button>
+          </>
         )}
         {isLogin && isOtpSent && (
           <form onSubmit={handleVerifyOtp}>
@@ -144,6 +225,7 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
                 onChange={(e) => setOtp(e.target.value)}
                 required
               />
+              {errors.email && <p className="error">{errors.email}</p>}
             </label>
             <button type="submit">Verify OTP</button>
           </form>
@@ -153,40 +235,74 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
             <label>
               First Name:
               <input
-              className="auth-form-input"
+                className="auth-form-input"
                 type="text"
                 name="firstName"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 required
               />
+              {errors.firstName && <p className="error">{errors.firstName}</p>}
             </label>
             <label>
               Last Name:
               <input
-              className="auth-form-input"
+                className="auth-form-input"
                 type="text"
                 name="lastName"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 required
               />
+              {errors.lastName && <p className="error">{errors.lastName}</p>}
             </label>
             <label>
               Phone Number:
               <input
-              className="auth-form-input"
+                className="auth-form-input"
                 type="text"
                 name="phoneNumber"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 required
               />
+              {errors.phoneNumber && <p className="error">{errors.phoneNumber}</p>}
             </label>
             <label>
               Email Address:
               <input
-              className="auth-form-input"
+                type="email"
+                name="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              {errors.email && <p className="error">{errors.email}</p>}
+            </label>
+            <label>
+              Password:
+              <input
+                className="auth-form-input"
+                type="password"
+                name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              {errors.password && <p className="error">{errors.password}</p>}
+            </label>
+            <p className="note">
+              E-tickets will be sent to your email address, please make sure your email address is correct.
+            </p>
+            <button type="submit">Sign Up</button>
+          </form>
+        )}
+        {isResetPassword && (
+          <form onSubmit={handleForgotPassword}>
+            <label>
+              Email Address:
+              <input
+                className="auth-form-input"
                 type="email"
                 name="email"
                 value={email}
@@ -194,21 +310,10 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
                 required
               />
             </label>
-            <label>
-              Password:
-              <input
-              className="auth-form-input"
-                type="password"
-                name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </label>
-            <p className="note">E-tickets will be sent to your email address, please make sure your email address is correct.</p>
-            <button type="submit">Sign Up</button>
+            <button type="submit">Send Reset Email</button>
           </form>
         )}
+        {message && <p className="message">{message}</p>}
       </div>
     </div>
   );
