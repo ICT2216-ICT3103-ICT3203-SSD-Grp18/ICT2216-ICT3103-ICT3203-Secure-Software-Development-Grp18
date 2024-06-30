@@ -12,12 +12,6 @@ pipeline {
     BRANCH_NAME = "${env.BRANCH_NAME}"
   }
 
-  options {
-    // Enable caching for OWASP Dependency-Check tool
-    cache(cacheItem('owasp-dependency-check-tool', 'owasp-dependency-check-tool-cache'))
-    cache(cacheItem('owasp-dependency-check-results', 'owasp-dependency-check-results-cache'))
-  }
-
   stages {
     stage('Environment') {
       steps {
@@ -57,23 +51,23 @@ pipeline {
     }
     stage('Download OWASP Dependency-Check Tool') {
       steps {
-        // Cache the OWASP Dependency-Check tool
-        cache(cacheItem('owasp-dependency-check-tool', 'owasp-dependency-check-tool-cache')) {
-          script {
-            if (!fileExists('owasp-dependency-check-tool-cache/dependency-check.sh')) {
-              sh 'mkdir -p owasp-dependency-check-tool-cache'
-              sh 'curl -L https://github.com/jeremylong/DependencyCheck/releases/download/v9.2.0/dependency-check-9.2.0-release.zip -o dependency-check.zip'
-              sh 'unzip dependency-check.zip -d owasp-dependency-check-tool-cache'
-              sh 'rm dependency-check.zip'
-            }
+        script {
+          if (!fileExists('owasp-dependency-check-tool-cache/dependency-check.sh')) {
+            sh 'mkdir -p owasp-dependency-check-tool-cache'
+            sh 'curl -L https://github.com/jeremylong/DependencyCheck/releases/download/v9.2.0/dependency-check-9.2.0-release.zip -o dependency-check.zip'
+            sh 'unzip dependency-check.zip -d owasp-dependency-check-tool-cache'
+            sh 'rm dependency-check.zip'
+            stash includes: 'owasp-dependency-check-tool-cache/**', name: 'dependency-check-tool'
+          } else {
+            unstash 'dependency-check-tool'
           }
         }
       }
     }
     stage('OWASP Dependency-Check Vulnerabilities') {
       steps {
-        // Use the cached tool for analysis
-        cache(cacheItem('owasp-dependency-check-results', 'owasp-dependency-check-results-cache')) {
+        script {
+          unstash 'dependency-check-tool'
           sh '''
             owasp-dependency-check-tool-cache/dependency-check/bin/dependency-check.sh \
               --project "My Project" \
@@ -82,8 +76,9 @@ pipeline {
               --format "ALL" \
               --prettyPrint
           '''
-          dependencyCheckPublisher pattern: 'owasp-dependency-check-results-cache/dependency-check-report.xml'
+          stash includes: 'owasp-dependency-check-results-cache/**', name: 'dependency-check-results'
         }
+        dependencyCheckPublisher pattern: 'owasp-dependency-check-results-cache/dependency-check-report.xml'
       }
     }
     stage('List and Archive Dependencies') {
