@@ -60,9 +60,8 @@ pipeline {
                       -s './'
                       -f 'ALL'
                       --prettyPrint
-                      --cveUrlBase https://nvd.nist.gov/feeds/xml/cve/2.0/nvdcve-2.0-
                       --nvdApiKey `cat nvd_api_key.txt`
-                      """, odcInstallation: 'OWASP-Dependency-Check'
+                      """, odcInstallation: 'Dependency-Check'
           sh 'rm nvd_api_key.txt'
         }
         dependencyCheckPublisher pattern: 'dependency-check-report.xml'
@@ -82,6 +81,13 @@ pipeline {
       }
       steps {
         sshagent(['jenkins-ssh-key']) {
+          // Ensure rsync is installed
+          sh '''
+          if ! command -v rsync &> /dev/null
+          then
+            apt-get update && apt-get install -y rsync
+          fi
+          '''
           // Deploy root files
           sh '''
           rsync -av --exclude="node_modules" --exclude="package-lock.json" --no-times --no-perms ./ jenkins@webserver:/var/www/html/
