@@ -51,7 +51,7 @@ pipeline {
     }
     stage('Dependency Check') {
       steps {
-        dependencyCheck additionalArguments: '--format XML --format HTML', odcInstallation: 'OWASP-Dependency-Check'
+        dependencyCheck additionalArguments: '--format XML --format HTML', odcInstallation: 'OWASP-Dependency-Check', nvdApiKey: "${NVD_API_KEY}"
       }
       post {
         always {
