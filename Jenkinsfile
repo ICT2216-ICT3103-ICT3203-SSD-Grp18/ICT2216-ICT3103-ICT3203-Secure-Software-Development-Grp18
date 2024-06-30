@@ -52,14 +52,18 @@ pipeline {
     stage('OWASP Dependency-Check Vulnerabilities') {
       steps {
         withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
+          sh '''
+            echo $NVD_API_KEY > nvd_api_key.txt
+          '''
           dependencyCheck additionalArguments: """
                       -o './'
                       -s './'
                       -f 'ALL'
                       --prettyPrint
                       --cveUrlBase https://nvd.nist.gov/feeds/xml/cve/2.0/nvdcve-2.0-
-                      --nvdApiKey $NVD_API_KEY
-                      """, odcInstallation: 'OWASP Dependency-Check'
+                      --nvdApiKey `cat nvd_api_key.txt`
+                      """, odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
+          sh 'rm nvd_api_key.txt'
         }
         dependencyCheckPublisher pattern: 'dependency-check-report.xml'
       }
