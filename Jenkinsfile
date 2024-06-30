@@ -60,8 +60,7 @@ pipeline {
                     -s './'
                     -f 'ALL'
                     --prettyPrint
-                    """, nvdCredentialsId: 'nvd-api-key'
-                      odcInstallation: 'OWASP-Dependency-Check'
+                    """, odcInstallation: 'OWASP-Dependency-Check', nvdCredentialsId: 'nvd-api-key'
         dependencyCheckPublisher pattern: 'dependency-check-report.xml'
       }
     }
