@@ -59,7 +59,7 @@ pipeline {
                       --prettyPrint
                       --cveUrlBase https://nvd.nist.gov/feeds/xml/cve/2.0/nvdcve-2.0-
                       --nvdApiKey $NVD_API_KEY'''
-                      , odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
+                      , odcInstallation: 'OWASP Dependency-Check'
         }
         dependencyCheckPublisher pattern: 'dependency-check-report.xml'
       }
