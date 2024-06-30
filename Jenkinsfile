@@ -51,14 +51,16 @@ pipeline {
     }
     stage('OWASP Dependency-Check Vulnerabilities') {
       steps {
-        dependencyCheck additionalArguments: '''
-                    -o './'
-                    -s './'
-                    -f 'ALL'
-                    --prettyPrint'''
-                    , odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
-                    , nvdCredentialsId: 'nvd-api-key'
-        
+        withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
+          dependencyCheck additionalArguments: '''
+                      -o './'
+                      -s './'
+                      -f 'ALL'
+                      --prettyPrint
+                      --cveUrlBase https://nvd.nist.gov/feeds/xml/cve/2.0/nvdcve-2.0-
+                      --nvdApiKey $NVD_API_KEY'''
+                      , odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
+        }
         dependencyCheckPublisher pattern: 'dependency-check-report.xml'
       }
     }
