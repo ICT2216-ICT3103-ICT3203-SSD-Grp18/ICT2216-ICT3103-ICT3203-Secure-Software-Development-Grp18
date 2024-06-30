@@ -68,12 +68,13 @@ pipeline {
       steps {
         script {
           unstash 'dependency-check-tool'
+          sh 'mkdir -p owasp-dependency-check-results-cache'
           sh '''
             owasp-dependency-check-tool-cache/dependency-check/bin/dependency-check.sh \
               --project "My Project" \
               --scan ./ \
               --out owasp-dependency-check-results-cache \
-              --format "ALL" \
+              --format ALL \
               --prettyPrint
           '''
           stash includes: 'owasp-dependency-check-results-cache/**', name: 'dependency-check-results'
