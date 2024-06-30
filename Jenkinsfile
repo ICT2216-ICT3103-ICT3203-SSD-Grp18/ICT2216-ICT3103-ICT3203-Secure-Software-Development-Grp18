@@ -49,37 +49,17 @@ pipeline {
         }
       }
     }
-    stage('Download OWASP Dependency-Check Tool') {
-      steps {
-        script {
-          if (!fileExists('owasp-dependency-check-tool-cache/dependency-check.sh')) {
-            sh 'mkdir -p owasp-dependency-check-tool-cache'
-            sh 'curl -L https://github.com/jeremylong/DependencyCheck/releases/download/v9.2.0/dependency-check-9.2.0-release.zip -o dependency-check.zip'
-            sh 'unzip dependency-check.zip -d owasp-dependency-check-tool-cache'
-            sh 'rm dependency-check.zip'
-            stash includes: 'owasp-dependency-check-tool-cache/**', name: 'dependency-check-tool'
-          } else {
-            unstash 'dependency-check-tool'
-          }
-        }
-      }
-    }
     stage('OWASP Dependency-Check Vulnerabilities') {
       steps {
-        script {
-          unstash 'dependency-check-tool'
-          sh 'mkdir -p owasp-dependency-check-results-cache'
-          sh '''
-            owasp-dependency-check-tool-cache/dependency-check/bin/dependency-check.sh \
-              --project "My Project" \
-              --scan ./ \
-              --out owasp-dependency-check-results-cache \
-              --format ALL \
-              --prettyPrint
-          '''
-          stash includes: 'owasp-dependency-check-results-cache/**', name: 'dependency-check-results'
-        }
-        dependencyCheckPublisher pattern: 'owasp-dependency-check-results-cache/dependency-check-report.xml'
+        dependencyCheck additionalArguments: '''
+                    -o './'
+                    -s './'
+                    -f 'ALL'
+                    --prettyPrint'''
+                    , odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
+                    , nvdCredentialsId: 'nvd-api-key'
+        
+        dependencyCheckPublisher pattern: 'dependency-check-report.xml'
       }
     }
     stage('List and Archive Dependencies') {
