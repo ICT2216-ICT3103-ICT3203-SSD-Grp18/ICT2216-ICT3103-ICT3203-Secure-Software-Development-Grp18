@@ -30,40 +30,37 @@ pipeline {
         }
       }
     }
-    stage('Install Root Dependencies') {
-      steps {
-        sh 'npm install'
-      }
-    }
-    stage('Install Backend Dependencies') {
-      steps {
-        dir('backend') {
-          sh 'npm install'
+    stage('Install Dependencies') {
+      parallel {
+        stage('Install Root Dependencies') {
+          steps {
+            sh 'npm install'
+          }
         }
-      }
-    }
-    stage('Install Frontend Dependencies') {
-      steps {
-        dir('frontend') {
-          sh 'npm install'
+        stage('Install Backend Dependencies') {
+          steps {
+            dir('backend') {
+              sh 'npm install'
+            }
+          }
+        }
+        stage('Install Frontend Dependencies') {
+          steps {
+            dir('frontend') {
+              sh 'npm install'
+            }
+          }
         }
       }
     }
     stage('OWASP Dependency-Check Vulnerabilities') {
       steps {
-        withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
-          sh '''
-            echo $NVD_API_KEY > nvd_api_key.txt
-          '''
-          dependencyCheck additionalArguments: """
-                      -o './'
-                      -s './'
-                      -f 'ALL'
-                      --prettyPrint
-                      --nvdApiKey `cat nvd_api_key.txt`
-                      """, odcInstallation: 'OWASP-Dependency-Check'
-          sh 'rm nvd_api_key.txt'
-        }
+        dependencyCheck additionalArguments: """
+                    -o './'
+                    -s './'
+                    -f 'ALL'
+                    --prettyPrint
+                    """, odcInstallation: 'OWASP-Dependency-Check'
         dependencyCheckPublisher pattern: 'dependency-check-report.xml'
       }
     }
