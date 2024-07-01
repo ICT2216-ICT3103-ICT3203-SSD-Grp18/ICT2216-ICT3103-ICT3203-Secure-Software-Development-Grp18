@@ -1,14 +1,12 @@
 import React from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
+// import { loadStripe } from '@stripe/stripe-js';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import CheckoutForm from '../components/CheckoutForm';
 import BuyButtonComponent from '../components/BuyButtonComponent'; // Import the BuyButtonComponent
 import '../styles/css/PaymentPage.css';
 
 // Replace 'your-publishable-key-here' with your actual Stripe publishable key
-const stripePromise = loadStripe('pk_test_51PVI05CUt9oD7CwsdbYaXxSbAJr5PdleGxgHG9afJFVlLTgdCnw9IJev590E3QZ7Orc94qXf8kORs6ezCHN22hkK00kAWXJCmJ');
+//const stripePromise = loadStripe('pk_test_51PVI05CUt9oD7CwsdbYaXxSbAJr5PdleGxgHG9afJFVlLTgdCnw9IJev590E3QZ7Orc94qXf8kORs6ezCHN22hkK00kAWXJCmJ');
 
 const PaymentPage = () => {
   return (
@@ -24,11 +22,8 @@ const PaymentPage = () => {
             </button>
             <h2>Payment Method</h2>
           </div>
-          {/* <Elements stripe={stripePromise}>
-            <CheckoutForm />
-          </Elements> */}
-          <BuyButtonComponent
-          />
+          {/* Integrate BuyButtonComponent here */}
+          <BuyButtonComponent />
         </div>
         <div className="event-summary">
           <h3>Event Details</h3>
