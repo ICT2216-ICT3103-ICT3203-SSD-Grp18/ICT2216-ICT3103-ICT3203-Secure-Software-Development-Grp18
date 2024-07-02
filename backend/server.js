@@ -10,7 +10,7 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const { authenticateToken } = require('./middleware/authMiddleware');
 require('./jobs/raffleCronJob'); 
-const rateLimit = require('express-rate-limit'); // Add this line
+const rateLimit = require('express-rate-limit');
 
 dotenv.config();
 

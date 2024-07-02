@@ -25,17 +25,14 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response.status === 403) {
+    if (error.response && error.response.status === 403) {
       // Clear the cookies
-      document.cookie = 'token=; Max-Age=0'; 
-      
-      // Update the isLoggedIn state to false
-      if (typeof window.updateLoginStatus === 'function') {
-        window.updateLoginStatus(false);
-      }
+      document.cookie = 'token=; Max-Age=0';
 
-      // Redirect to the login page or landing page
-      window.location.href = '/';
+      // Expose a mechanism to handle session invalidation
+      if (typeof error.config.onSessionInvalidated === 'function') {
+        error.config.onSessionInvalidated();
+      }
     }
     return Promise.reject(error);
   }
