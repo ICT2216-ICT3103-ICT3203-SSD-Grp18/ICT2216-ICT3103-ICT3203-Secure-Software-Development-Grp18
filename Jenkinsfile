@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'ubuntu:latest'
-            args '-v /var/jenkins_home/.cache:/root/.cache'
+            args '-v /tmp/.cache:/root/.cache' // Using /tmp to avoid read-only file system error
         }
     }
 
@@ -18,6 +18,11 @@ pipeline {
     }
 
     stages {
+        stage('Pre-check containers') {
+            steps {
+                sh 'docker ps'
+            }
+        }
         stage('Setup') {
             steps {
                 sh '''
@@ -75,8 +80,8 @@ pipeline {
         stage('OWASP Dependency-Check Vulnerabilities') {
             steps {
                 sh '''
-                mkdir -p /root/.cache/dependency-check
-                docker run --rm -v $(pwd):/src -v /root/.cache/dependency-check:/usr/share/dependency-check/data owasp/dependency-check \
+                mkdir -p /tmp/.cache/dependency-check
+                docker run --rm -v $(pwd):/src -v /tmp/.cache/dependency-check:/usr/share/dependency-check/data owasp/dependency-check \
                   --project "My Project" --scan /src --out /src --format ALL
                 '''
                 archiveArtifacts artifacts: 'dependency-check-report.*', fingerprint: true
@@ -129,9 +134,17 @@ pipeline {
                 }
             }
         }
+        stage('Post-check containers') {
+            steps {
+                sh 'docker ps'
+            }
+        }
     }
 
     post {
+        always {
+            sh 'docker ps -a'
+        }
         success {
             script {
                 if (BRANCH_NAME != 'main') {
