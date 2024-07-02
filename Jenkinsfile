@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        dockerContainer {
+        docker {
             image 'ubuntu:latest'
             args '-v /var/jenkins_home/.cache:/root/.cache'
         }
