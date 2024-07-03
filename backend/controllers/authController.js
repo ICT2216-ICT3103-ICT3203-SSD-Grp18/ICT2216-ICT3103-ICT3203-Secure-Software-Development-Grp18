@@ -204,20 +204,19 @@ const forgotPassword = async (req, res) => {
   try {
     const [rows] = await db.execute('SELECT user_id FROM user WHERE email = ?', [email]);
 
-    if (rows.length === 0) {
-      return res.status(404).json({ message: 'User not found' });
+    if (rows.length > 0) {
+      const userId = rows[0].user_id;
+      const token = crypto.randomBytes(32).toString('hex');
+      const expiryTime = new Date(Date.now() + 3600 * 1000); // 1 hour from now
+
+      await db.execute('UPDATE user SET reset_token = ?, reset_token_expiry = ? WHERE user_id = ?', [token, expiryTime, userId]);
+
+      // Send password reset email
+      await sendPasswordResetEmail(email, token);
     }
 
-    const userId = rows[0].user_id;
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiryTime = new Date(Date.now() + 3600 * 1000); // 1 hour from now
+    res.status(202).json({ message: 'Password reset email sent. Please check your email.' });
 
-    await db.execute('UPDATE user SET reset_token = ?, reset_token_expiry = ? WHERE user_id = ?', [token, expiryTime, userId]);
-
-    // Send password reset email
-    await sendPasswordResetEmail(email, token);
-
-    res.status(200).json({ message: 'Reset link sent to email' });
   } catch (error) {
     console.error('Error during password reset:', error);
     res.status(500).json({ message: 'Server error', error: error.message });

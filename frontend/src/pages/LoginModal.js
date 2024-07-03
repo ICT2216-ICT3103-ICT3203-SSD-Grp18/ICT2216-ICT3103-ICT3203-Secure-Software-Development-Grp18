@@ -144,13 +144,9 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
     e.preventDefault();
     try {
       const response = await apiClient.post('/auth/forgot-password', { email });
-      if (response.status === 200) {
-        setMessage('Password reset email sent. Please check your email.');
-      } else {
-        setMessage('Error sending password reset email');
-      }
+      setMessage('Password reset email sent. Please check your email.');
     } catch (error) {
-      setMessage(`Error: ${error.message}`);
+      setMessage('Password reset email sent. Please check your email.');
     }
   };
 
