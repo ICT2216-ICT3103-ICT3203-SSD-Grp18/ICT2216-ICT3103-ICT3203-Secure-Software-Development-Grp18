@@ -41,6 +41,13 @@ const verifyPassword = async (password, storedHash) => {
   return hash === key;
 };
 
+const generateOtpWithExpiry = () => {
+  const otp = crypto.randomInt(100000, 999999).toString();
+  //i set to 5 mins
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000); 
+  return { otp, expiresAt };
+};
+
 const login = [
   body('email').isEmail().withMessage('Invalid email').customSanitizer(sanitizeInput),
   body('password')
@@ -80,11 +87,10 @@ const login = [
         // reset login attempt
         await db.execute('UPDATE user SET login_attempts = 0, lock_until = NULL WHERE email = ?', [email]);
 
-        const otp = crypto.randomInt(100000, 999999).toString(); // Generate a 6-digit OTP
-        otps[email] = otp;
-
-        // Send OTP via email
-        await sendOtp(email, otp);
+        const { otp, expiresAt } = generateOtpWithExpiry();
+        otps[email] = { otp, expiresAt };
+        
+        await sendOtp(email, otp); 
 
         return res.status(200).json({ message: 'OTP sent to your email', otpRequired: true });
       } else {
@@ -279,8 +285,17 @@ const verifyOtp = async (req, res) => {
     if (!email || !otp) {
       return res.status(400).json({ status: 400, message: 'Email and OTP are required' });
     }
-    if (otps[email] && otps[email] === otp) {
-      delete otps[email]; // Invalidate OTP after successful verification
+
+    const storedOtpData = otps[email];
+    if (storedOtpData && storedOtpData.otp === otp) {
+      if (new Date() > storedOtpData.expiresAt) {
+
+        // Invalidate expired OTP
+        delete otps[email]; 
+        return res.status(401).json({ status: 401, message: 'OTP has expired' });
+      }
+      // Invalidate OTP after successful verification
+      delete otps[email]; 
 
       const [rows] = await db.execute('SELECT * FROM user WHERE email = ?', [email]);
       const user = rows[0];
@@ -324,5 +339,6 @@ const verifyOtp = async (req, res) => {
     return res.status(500).json({ status: 500, message: 'Server error', error: error.message });
   }
 };
+
 
 module.exports = { login, verifyOtp, register, logout, checkAuth, getUser, forgotPassword, resetPassword };
