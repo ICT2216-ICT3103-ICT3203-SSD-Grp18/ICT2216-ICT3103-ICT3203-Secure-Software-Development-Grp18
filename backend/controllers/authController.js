@@ -139,6 +139,13 @@ const register = [
     const defaultTicketsPurchased = 0;
 
     try {
+
+      // Check if email already exists
+      const [existingUser] = await db.execute('SELECT email FROM user WHERE email = ?', [email]);
+      if (existingUser.length > 0) {
+        return res.status(409).json({ message: 'Email already exists' });
+      }
+      
       const hashedPassword = await hashPassword(password);
 
       const [result] = await db.execute(

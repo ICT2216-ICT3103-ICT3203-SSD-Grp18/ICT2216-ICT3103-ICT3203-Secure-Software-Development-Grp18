@@ -136,7 +136,11 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
         alert('Registration failed. Please try again.');
       }
     } catch (error) {
-      alert('Registration failed. Please try again.');
+      if (error.response && error.response.status === 409) {
+        setErrors({ email: 'This email address is already registered. Please use a different email.' });
+      } else {
+        alert('Registration failed. Please try again.');
+      }
     }
   };
 
