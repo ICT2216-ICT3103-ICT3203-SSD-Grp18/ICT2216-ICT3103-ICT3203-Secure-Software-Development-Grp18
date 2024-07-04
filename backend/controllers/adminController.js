@@ -1,26 +1,86 @@
 const db = require('../utils/db');
-const bcrypt = require('bcrypt');
+const { body, validationResult } = require('express-validator');
+const sanitizeHtml = require('sanitize-html');
+const he = require('he');
+const crypto = require('crypto');
+
 // -----------------------------------------------------------------------------------------
-const register = async (req, res) => {
-  const { name, phone_number, email, password, user_role } = req.body;
-
-  const defaultStatus = 'active';
-  const defaultTicketsPurchased = 0;
-
-  try {
-    const hashPassword = await bcrypt.hash(password, 10);
-
-    const [result] = await db.execute(
-      'INSERT INTO user (name, phone_number, email, password, user_role, status, tickets_purchased) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [name, phone_number, email, hashPassword, user_role, defaultStatus, defaultTicketsPurchased]
-    );
-
-    res.status(201).json({ message: 'User registered successfully', userId: result.insertId });
-  } catch (error) {
-    console.error('Error inserting user:', error);
-    res.status(500).json({ message: 'Server error', error });
+// Sanitize input function
+const sanitizeInput = (input) => {
+  if (typeof input === 'string') {
+    const sanitized = sanitizeHtml(input.trim(), {
+      allowedTags: [],
+      allowedAttributes: {}
+    });
+    return he.encode(sanitized);
   }
+  return input;
 };
+
+const hashPassword = async (password) => {
+  const salt = crypto.randomBytes(32).toString('hex');
+  const hash = await new Promise((resolve, reject) => {
+    crypto.pbkdf2(password, salt, 100000, 64, 'sha512', (err, derivedKey) => {
+      if (err) reject(err);
+      resolve(derivedKey.toString('hex'));
+    });
+  });
+  return `${salt}:${hash}`;
+};
+
+const register = [
+  body('name')
+    .isLength({ min: 1 })
+    .matches(/^[a-zA-Z\s]+$/)
+    .withMessage('Name is required and cannot contain special characters')
+    .customSanitizer(sanitizeInput),
+  body('phone_number')
+    .isMobilePhone()
+    .withMessage('Invalid phone number')
+    .customSanitizer(sanitizeInput),
+  body('email')
+    .isEmail()
+    .withMessage('Invalid email')
+    .customSanitizer(sanitizeInput),
+  body('password')
+    .isLength({ min: 8, max: 12 })
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/)
+    .withMessage('Password must be 8-12 characters long and include a mix of uppercase letters, lowercase letters, numbers, and special characters')
+    .customSanitizer(sanitizeInput),
+
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { name, phone_number, email, password, user_role } = req.body;
+
+    const defaultStatus = 'active';
+    const defaultTicketsPurchased = 0;
+
+    try {
+
+      // Check if email already exists
+      const [existingUser] = await db.execute('SELECT email FROM user WHERE email = ?', [email]);
+      if (existingUser.length > 0) {
+        return res.status(409).json({ message: 'Email already exists' });
+      }
+      
+      const hashedPassword = await hashPassword(password);
+
+      const [result] = await db.execute(
+        'INSERT INTO user (name, phone_number, email, password, user_role, status, tickets_purchased) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [name, phone_number, email, hashedPassword, user_role, defaultStatus, defaultTicketsPurchased]
+      );
+
+      res.status(201).json({ message: 'User registered successfully', userId: result.insertId });
+    } catch (error) {
+      console.error('Error inserting user:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  }
+];
 
 // -----------------------------------------------------------------------------------------
 
@@ -131,8 +191,6 @@ const deleteEvent = async (req, res) => {
   }
 };
 
-
-
 const getEvents = async (req, res) => {
   try {
     const [events] = await db.execute('SELECT * FROM events');
@@ -202,10 +260,6 @@ const updateUserStatus = async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
-
-
-
-
 
 // New function to update user role
 const updateUserRole = async (req, res) => {

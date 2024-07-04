@@ -2,20 +2,19 @@ const db = require('../utils/db');
 const jwt = require('jsonwebtoken');
 const { sendOtp, sendPasswordResetEmail } = require('../utils/sendOTP');
 const { body, validationResult } = require('express-validator');
-const DOMPurify = require('dompurify');
-const { JSDOM } = require('jsdom');
+const sanitizeHtml = require('sanitize-html');
 const crypto = require('crypto');
 const jwtSecret = process.env.JWT_SECRET;
 const he = require('he');
 
 const otps = {}; // Temporarily store OTPs
 
-const window = new JSDOM('').window;
-const purify = DOMPurify(window);
-
 const sanitizeInput = (input) => {
   if (typeof input === 'string') {
-    const sanitized = purify.sanitize(input.trim());
+    const sanitized = sanitizeHtml(input.trim(), {
+      allowedTags: [],
+      allowedAttributes: {}
+    });
     return he.encode(sanitized);
   }
   return input;
