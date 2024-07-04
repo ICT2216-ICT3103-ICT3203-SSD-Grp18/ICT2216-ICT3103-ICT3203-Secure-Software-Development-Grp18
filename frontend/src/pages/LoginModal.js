@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import apiClient from '../axiosConfig';
 import validator from 'validator';
 import DOMPurify from 'dompurify';
+import he from 'he';
 
 const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
   const [email, setEmail] = useState('');
@@ -41,7 +42,8 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
   }, [otpExpireTime]);
 
   const sanitizeInput = (input) => {
-    return DOMPurify.sanitize(input.trim());
+    const sanitized = DOMPurify.sanitize(input.trim());
+    return he.encode(sanitized);
   };
 
   const validateEmail = (email) => {

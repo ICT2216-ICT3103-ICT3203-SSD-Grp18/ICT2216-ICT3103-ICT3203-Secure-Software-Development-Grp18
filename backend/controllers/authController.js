@@ -6,6 +6,7 @@ const DOMPurify = require('dompurify');
 const { JSDOM } = require('jsdom');
 const crypto = require('crypto');
 const jwtSecret = process.env.JWT_SECRET;
+const he = require('he');
 
 const otps = {}; // Temporarily store OTPs
 
@@ -14,7 +15,8 @@ const purify = DOMPurify(window);
 
 const sanitizeInput = (input) => {
   if (typeof input === 'string') {
-    return purify.sanitize(input.trim());
+    const sanitized = purify.sanitize(input.trim());
+    return he.encode(sanitized);
   }
   return input;
 };
