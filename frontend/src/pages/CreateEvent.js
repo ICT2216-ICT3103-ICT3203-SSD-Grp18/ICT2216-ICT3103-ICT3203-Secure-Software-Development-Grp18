@@ -50,6 +50,11 @@ const validateRaffleDate = (raffleStart, raffleEnd, eventDate) => {
   return start <= end && start < event && end < event;
 };
 
+const validateLocation = (location) => {
+  const validLocations = ['National Stadium', 'Expo', 'Star Vista', 'Indoor Stadium'];
+  return validLocations.includes(location);
+};
+
 const CreateEvent = () => {
   const [eventData, setEventData] = useState({
     event_name: '',
@@ -82,7 +87,7 @@ const CreateEvent = () => {
 
     // Validate and set errors
     let error = '';
-    if (name === 'event_name' || name === 'organiser') {
+    if (name === 'event_name' || name === 'organiser' || name === 'description') {
       if (!validateText(sanitizedValue)) {
         error = 'Invalid input. Only letters and spaces are allowed.';
       }
@@ -100,6 +105,8 @@ const CreateEvent = () => {
       error = 'Date must be tomorrow or later.';
     } else if (name === 'start_time' && !validateStartTime(sanitizedValue)) {
       error = 'Start time must be between 7 AM and 12 AM.';
+    } else if (name === 'location' && !validateLocation(sanitizedValue)) {
+      error = 'Invalid location. Must be National Stadium, Expo, Star Vista, or Indoor Stadium.';
     }
 
     // Validate raffle dates
@@ -138,11 +145,12 @@ const CreateEvent = () => {
       event_name, description, organiser,
       ticket_availability, price_vip, price_cat1,
       price_cat2, price_cat3, price_cat4, price_cat5,
-      date, raffle_start_date, raffle_end_date, start_time, image
+      date, raffle_start_date, raffle_end_date, start_time, image, location
     } = eventData;
 
     const formValid =
       validateText(event_name) &&
+      validateText(description) &&
       validateText(organiser) &&
       description.length > 0 &&
       validateTicketAvailability(ticket_availability) &&
@@ -154,6 +162,7 @@ const CreateEvent = () => {
       validatePrice(price_cat5) &&
       validateDate(date) &&
       validateStartTime(start_time) &&
+      validateLocation(location) &&
       validateRaffleDate(raffle_start_date, raffle_end_date, date) &&
       validateUpload(image);
 
