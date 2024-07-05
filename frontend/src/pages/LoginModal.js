@@ -79,7 +79,7 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
       if (result.otpRequired) {
         setIsOtpSent(true);
 
-        // i set OTP expiration time from now
+        // set OTP expiration time from now
         setOtpExpireTime(Date.now() + 5 * 60 * 1000); 
         alert('OTP sent to your email');
       } else {

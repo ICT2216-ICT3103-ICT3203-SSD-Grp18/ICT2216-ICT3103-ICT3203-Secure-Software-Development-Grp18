@@ -9,9 +9,19 @@ const apiClient = axios.create({
   withCredentials: true, // Include cookies with requests
 });
 
-// Request interceptor to add common headers if needed
+// Request interceptor to add CSRF token
 apiClient.interceptors.request.use(
-  (config) => {
+  async (config) => {
+    if (['post', 'put', 'delete'].includes(config.method)) {
+      try {
+        const csrfResponse = await axios.get('http://localhost:5500/api/csrf-token', { withCredentials: true });
+        const csrfToken = csrfResponse.data.csrfToken;
+        config.headers['CSRF-Token'] = csrfToken;
+      } catch (error) {
+        console.error('Error fetching CSRF token', error);
+        throw error;
+      }
+    }
     return config;
   },
   (error) => {
