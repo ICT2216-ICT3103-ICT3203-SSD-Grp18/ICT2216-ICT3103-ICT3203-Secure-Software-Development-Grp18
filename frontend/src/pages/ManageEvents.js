@@ -45,8 +45,9 @@ const ManageEvents = () => {
   };
 
   const handleEventClick = (event) => {
+    const { image, ...eventDataWithoutImage } = event; // Destructure to exclude image data
     const formattedEvent = {
-      ...event,
+      ...eventDataWithoutImage,
       date: event.date ? new Date(event.date).toISOString().split('T')[0] : '',
       raffle_start_date: event.raffle_start_date ? new Date(event.raffle_start_date).toISOString().slice(0, 19) : '',
       raffle_end_date: event.raffle_end_date ? new Date(event.raffle_end_date).toISOString().slice(0, 19) : '',
@@ -54,6 +55,7 @@ const ManageEvents = () => {
     setSelectedEvent(formattedEvent);
     setModalIsOpen(true);
   };
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

@@ -18,7 +18,7 @@ router.post('/users', authenticateToken, isAdminDashboardUser, csrfProtection, r
 
 // Event Staff Routes
 router.post('/events', authenticateToken, isAdminDashboardUser, csrfProtection, upload.single('image'), createEvent);
-router.put('/events/:id', authenticateToken, isAdminDashboardUser, csrfProtection, upload.single('image'), updateEvent);
+router.put('/events/:id', authenticateToken, isAdminDashboardUser, csrfProtection, upload.none(), updateEvent);
 router.delete('/events/:id', authenticateToken, isAdminDashboardUser, csrfProtection, deleteEvent);
 
 // Customer Support Routes
