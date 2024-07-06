@@ -110,10 +110,10 @@ pipeline {
                     if [ -d /var/www/html ]; then
                         cd /var/www/html && npm install
                     fi
-                    if [ -d /var/www/html/backend]; then
+                    if [ -d /var/www/html/backend ]; then
                         cd /var/www/html/backend && npm install
                     fi
-                    if [ -d /var/www/html/frontend]; then
+                    if [ -d /var/www/html/frontend ]; then
                         cd /var/www/html/frontend && npm install
                     fi
                     if [ -d /var/www/html ]; then
@@ -138,6 +138,13 @@ pipeline {
                     }
                 }
             }
+        }
+    }
+    post {
+        failure {
+            mail to: 'your-email@example.com',
+                 subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
+                 body: "Something is wrong with ${env.BUILD_URL}"
         }
     }
 }
