@@ -1,6 +1,6 @@
 const express = require('express');
 const { authenticateToken } = require('../middleware/authMiddleware');
-const { login, verifyOtp, register, logout, checkAuth, getUser, forgotPassword, resetPassword} = require('../controllers/authController');
+const { login, verifyOtp, register, logout, checkAuth, getUser, forgotPassword, resetPassword, extendSession} = require('../controllers/authController');
 const csrfProtection = require('csurf')({ cookie: true });
 
 const router = express.Router();
@@ -13,5 +13,7 @@ router.get('/check', csrfProtection, authenticateToken, checkAuth);
 router.get('/getUser', csrfProtection, authenticateToken, getUser);
 router.post('/forgot-password', csrfProtection, forgotPassword);
 router.post('/reset-password', csrfProtection, resetPassword);
+router.post('/extend-session', authenticateToken, extendSession);
+
 
 module.exports = router;

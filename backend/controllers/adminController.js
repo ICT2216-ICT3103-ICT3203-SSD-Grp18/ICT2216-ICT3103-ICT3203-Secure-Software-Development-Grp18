@@ -311,4 +311,4 @@ const getMetrics = async (req, res) => {
   }
 };
 
-module.exports = { register, getMetrics, createEvent, updateEvent, deleteEvent, searchEvents,getEvents, getUsers, searchUsers, updateUserStatus, updateUserRole, updateUser, deleteUser };
+module.exports = { register, getMetrics, createEvent, updateEvent, deleteEvent, searchEvents, getEvents, getUsers, searchUsers, updateUserStatus, updateUserRole, updateUser, deleteUser };

@@ -190,15 +190,14 @@ const checkAuth = (req, res) => {
   const token = req.cookies.token;
 
   if (!token) {
-    return res.status(200).json({ message: 'No token, user is not logged in' });
+    return res.status(200).json({ active: false, message: 'No token, user is not logged in' });
   }
 
   jwt.verify(token, jwtSecret, (err, user) => {
     if (err) {
-      return res.status(403).json({ message: 'Token is not valid' });
+      return res.status(403).json({ active: false, message: 'Token is not valid' });
     }
-
-    res.status(200).json({ message: 'Authorized' });
+    res.status(200).json({ active: true, message: 'Authorized' });
   });
 };
 
@@ -341,5 +340,49 @@ const verifyOtp = async (req, res) => {
   }
 };
 
+const extendSession = (req, res) => {
+  const token = req.cookies.token;
 
-module.exports = { login, verifyOtp, register, logout, checkAuth, getUser, forgotPassword, resetPassword };
+  if (!token) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
+  jwt.verify(token, jwtSecret, async (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: 'Token is not valid' });
+    }
+
+    // Regenerate the session
+    req.session.regenerate(async (err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Failed to regenerate session' });
+      }
+
+      // Store user information in the session
+      req.session.userId = user.id;
+      req.session.email = user.email;
+
+      // Store the session ID and expiry in the database if needed
+      const sessionToken = req.sessionID;
+      const sessionExpiry = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+      // Generate a new JWT
+      const newToken = jwt.sign(
+        { id: user.id, email: user.email, role: user.role, sessionToken },
+        jwtSecret,
+        { expiresIn: '30m' }
+      );
+
+      res.cookie('token', newToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict',
+        maxAge: 30 * 60 * 1000, // 30 minutes
+      });
+
+      return res.status(200).json({ success: true, message: 'Session extended', token: newToken });
+    });
+  });
+};
+
+module.exports = { login, verifyOtp, register, logout, checkAuth, getUser, forgotPassword, resetPassword, extendSession };

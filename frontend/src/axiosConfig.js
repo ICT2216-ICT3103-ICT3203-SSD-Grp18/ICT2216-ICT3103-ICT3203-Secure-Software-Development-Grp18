@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// Create an Axios instance
 const apiClient = axios.create({
   baseURL: 'http://localhost:5500/api', // Your API base URL
   headers: {
@@ -31,15 +30,10 @@ apiClient.interceptors.request.use(
 
 // Response interceptor to handle errors globally
 apiClient.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
     if (error.response && error.response.status === 403) {
-      // Clear the cookies
       document.cookie = 'token=; Max-Age=0';
-
-      // Expose a mechanism to handle session invalidation
       if (typeof error.config.onSessionInvalidated === 'function') {
         error.config.onSessionInvalidated();
       }

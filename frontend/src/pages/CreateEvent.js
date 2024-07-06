@@ -101,7 +101,7 @@ const CreateEvent = () => {
       }
     } else if (name === 'description' && sanitizedValue.length === 0) {
       error = 'Description cannot be empty.';
-    } else if (name === 'date' && !validateDate(sanitizedValue)) {
+    } else if ((name === 'date' || name === 'raffle_start_date' || name === 'raffle_end_date') && !validateDate(sanitizedValue)) {
       error = 'Date must be tomorrow or later.';
     } else if (name === 'start_time' && !validateStartTime(sanitizedValue)) {
       error = 'Start time must be between 7 AM and 12 AM.';
