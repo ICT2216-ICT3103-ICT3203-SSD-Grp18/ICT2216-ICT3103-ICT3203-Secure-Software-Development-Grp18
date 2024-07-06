@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
 import apiClient from '../axiosConfig';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Select, MenuItem } from '@mui/material';
 import validator from 'validator';
@@ -8,7 +7,6 @@ import he from 'he';
 import '../styles/css/ManageUsers.css'; // Import the CSS file here
 
 const ManageUsers = () => {
-  const { user: currentUser } = useAuth(); // Access the current logged-in user
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
@@ -215,11 +213,9 @@ const ManageUsers = () => {
         />
         <button style={{ color: 'white' }} type="submit">Search</button>
       </form>
-      {currentUser.role !== 'cus_support' && (
-        <div className='admin-search'>
-          <button style={{ color: 'white' }} type="submit" onClick={() => setNewUserModalOpen(true)}>Create New Account</button>
-        </div>
-      )}
+      <div className='admin-search'>
+      <button style={{ color: 'white' }} type="submit" onClick={() => setNewUserModalOpen(true)}>Create New Account</button>
+      </div>
       {loading ? <p>Loading...</p> : null}
       {error ? <p style={{ color: 'red' }}>{error}</p> : null}
       <div className="scrollable-list">
@@ -241,23 +237,17 @@ const ManageUsers = () => {
             <p>Tickets Purchased: {selectedUser.tickets_purchased}</p>
             <p>Status: {selectedUser.status}</p>
             <p>Role: {selectedUser.user_role}</p>
-            {currentUser.role !== 'cus_support' && (
-              <>
-                <Button onClick={() => handleStatusChange(selectedUser)}>
-                  {selectedUser.status === 'active' ? 'Deactivate' : 'Activate'}
-                </Button>
-                <Select
-                  value={selectedUser.user_role}
-                  onChange={(e) => handleRoleChange(selectedUser, e.target.value)}
-                  fullWidth
-                >
-                  <MenuItem value="user">User</MenuItem>
-                  <MenuItem value="admin">Admin</MenuItem>
-                  <MenuItem value="event">Event Staff</MenuItem>
-                  <MenuItem value="cus_support">Customer Support</MenuItem>
-                </Select>
-              </>
-            )}
+            <Button onClick={() => handleStatusChange(selectedUser)}>
+              {selectedUser.status === 'active' ? 'Deactivate' : 'Activate'}
+            </Button>
+            <Select
+              value={selectedUser.user_role}
+              onChange={(e) => handleRoleChange(selectedUser, e.target.value)}
+              fullWidth
+            >
+              <MenuItem value="user">User</MenuItem>
+              <MenuItem value="admin">Admin</MenuItem>
+            </Select>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Close</Button>
@@ -335,8 +325,6 @@ const ManageUsers = () => {
             >
               <MenuItem value="user">User</MenuItem>
               <MenuItem value="admin">Admin</MenuItem>
-              <MenuItem value="event">Event Staff</MenuItem>
-              <MenuItem value="cus_support">Customer Support</MenuItem>
             </Select>
           </DialogContent>
           <DialogActions>
