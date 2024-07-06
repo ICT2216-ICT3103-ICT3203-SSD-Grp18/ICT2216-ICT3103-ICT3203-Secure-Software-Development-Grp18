@@ -76,12 +76,6 @@ pipeline {
         }
         stage('List and Archive Dependencies') {
             steps {
-                script {
-                    def npmListResult = sh(script: 'npm list --all', returnStatus: true)
-                    if (npmListResult != 0) {
-                        echo "npm list --all failed, continuing with pipeline."
-                    }
-                }
                 sh 'npm list --all > dependencies.txt || true'
                 archiveArtifacts artifacts: 'dependencies.txt', fingerprint: true
                 sh 'npm outdated > dependencyupdates.txt || true'
