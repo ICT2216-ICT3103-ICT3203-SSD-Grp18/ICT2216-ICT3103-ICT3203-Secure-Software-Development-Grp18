@@ -13,8 +13,7 @@ import AboutUs from './pages/AboutUsPage';
 import EventPage from './pages/EventsPage';
 import LoginModal from './pages/LoginModal'; 
 import ResetPasswordPage from './pages/ResetPasswordPage'; 
-import BuyerContactInformationPage from './pages/BuyerContactInformationPage';
-import PaymentPage from './pages/PaymentPage';
+
 
 
 
@@ -33,8 +32,7 @@ const App = () => {
             <Route path="/aboutus" element={<AboutUs />} />
             <Route path="/events" element={<EventPage />} />
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} /> // Use element instead of component
-            <Route path="/buyer-info" element={<BuyerContactInformationPage />} />
-            <Route path="/payment" element={<PaymentPage />} />
+
           </Routes>
         </div>
       </Router>
