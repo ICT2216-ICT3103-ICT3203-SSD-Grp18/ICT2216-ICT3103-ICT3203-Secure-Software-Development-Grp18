@@ -1,9 +1,6 @@
 pipeline {
     agent {
-        docker {
-            image 'your-docker-registry/your-image-name:tag'
-            args '-u root:root' // Run as root to ensure permissions
-        }
+        label 'jenkins_node_agent'
     }
 
     parameters {
