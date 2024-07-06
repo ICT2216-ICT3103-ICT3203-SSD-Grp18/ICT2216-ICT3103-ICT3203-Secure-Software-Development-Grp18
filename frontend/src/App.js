@@ -13,6 +13,16 @@ import AboutUs from './pages/AboutUsPage';
 import EventPage from './pages/EventsPage';
 import LoginModal from './pages/LoginModal'; 
 import ResetPasswordPage from './pages/ResetPasswordPage'; 
+<<<<<<< Updated upstream
+=======
+import BuyerContactInformationPage from './pages/BuyerContactInformationPage';
+import PaymentPage from './pages/PaymentPage';
+import SuccessPage from './pages/SuccessPage';
+import CancelPage from './pages/CancelPage';
+
+
+
+>>>>>>> Stashed changes
 
 const App = () => {
   return (
@@ -28,7 +38,14 @@ const App = () => {
             <Route path="/aboutus" element={<AboutUs />} />
             <Route path="/events" element={<EventPage />} />
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} /> // Use element instead of component
+<<<<<<< Updated upstream
 
+=======
+            <Route path="/buyer-info/:userId/:eventId" element={<BuyerContactInformationPage />} />
+            <Route path="/payment/:userId/:eventId" element={<PaymentPage />} />
+            <Route path="/success" element={<SuccessPage />} />
+            <Route path="/cancel" element={<CancelPage />} />
+>>>>>>> Stashed changes
           </Routes>
         </div>
       </Router>
