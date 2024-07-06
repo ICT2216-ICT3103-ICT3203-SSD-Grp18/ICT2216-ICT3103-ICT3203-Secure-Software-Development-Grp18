@@ -123,7 +123,7 @@ pipeline {
         success {
             script {
                 if (BRANCH_NAME != 'main') {
-                    withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                    withCredentials([string(credentialsId: 'PAT_Jenkins', variable: 'GITHUB_TOKEN')]) {
                         sh """
                         curl -H "Authorization: token $GITHUB_TOKEN" -X POST \
                         -d '{"title":"Merge ${BRANCH_NAME}","head":"${BRANCH_NAME}","base":"main"}' \
