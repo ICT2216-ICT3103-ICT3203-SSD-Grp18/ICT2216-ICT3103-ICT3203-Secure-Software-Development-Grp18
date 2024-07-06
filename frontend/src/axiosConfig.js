@@ -9,9 +9,19 @@ const apiClient = axios.create({
   withCredentials: true, // Include cookies with requests
 });
 
-// Request interceptor to add common headers if needed
+// Request interceptor to add CSRF token
 apiClient.interceptors.request.use(
-  (config) => {
+  async (config) => {
+    if (['post', 'put', 'delete'].includes(config.method)) {
+      try {
+        const csrfResponse = await axios.get('http://localhost:5500/api/csrf-token', { withCredentials: true });
+        const csrfToken = csrfResponse.data.csrfToken;
+        config.headers['CSRF-Token'] = csrfToken;
+      } catch (error) {
+        console.error('Error fetching CSRF token', error);
+        throw error;
+      }
+    }
     return config;
   },
   (error) => {
@@ -25,17 +35,14 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response.status === 403) {
+    if (error.response && error.response.status === 403) {
       // Clear the cookies
-      document.cookie = 'token=; Max-Age=0'; 
-      
-      // Update the isLoggedIn state to false
-      if (typeof window.updateLoginStatus === 'function') {
-        window.updateLoginStatus(false);
-      }
+      document.cookie = 'token=; Max-Age=0';
 
-      // Redirect to the login page or landing page
-      window.location.href = '/';
+      // Expose a mechanism to handle session invalidation
+      if (typeof error.config.onSessionInvalidated === 'function') {
+        error.config.onSessionInvalidated();
+      }
     }
     return Promise.reject(error);
   }

@@ -2,19 +2,20 @@ const db = require('../utils/db');
 const jwt = require('jsonwebtoken');
 const { sendOtp, sendPasswordResetEmail } = require('../utils/sendOTP');
 const { body, validationResult } = require('express-validator');
-const DOMPurify = require('dompurify');
-const { JSDOM } = require('jsdom');
+const sanitizeHtml = require('sanitize-html');
 const crypto = require('crypto');
 const jwtSecret = process.env.JWT_SECRET;
+const he = require('he');
 
 const otps = {}; // Temporarily store OTPs
 
-const window = new JSDOM('').window;
-const purify = DOMPurify(window);
-
 const sanitizeInput = (input) => {
   if (typeof input === 'string') {
-    return purify.sanitize(input.trim());
+    const sanitized = sanitizeHtml(input.trim(), {
+      allowedTags: [],
+      allowedAttributes: {}
+    });
+    return he.encode(sanitized);
   }
   return input;
 };
@@ -39,6 +40,13 @@ const verifyPassword = async (password, storedHash) => {
     });
   });
   return hash === key;
+};
+
+const generateOtpWithExpiry = () => {
+  const otp = crypto.randomInt(100000, 999999).toString();
+  //i set to 5 mins
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000); 
+  return { otp, expiresAt };
 };
 
 const login = [
@@ -77,13 +85,13 @@ const login = [
       const isMatch = await verifyPassword(password, user.password);
 
       if (isMatch) {
+        // reset login attempt
         await db.execute('UPDATE user SET login_attempts = 0, lock_until = NULL WHERE email = ?', [email]);
 
-        const otp = crypto.randomInt(100000, 999999).toString(); // Generate a 6-digit OTP
-        otps[email] = otp;
-
-        // Send OTP via email
-        await sendOtp(email, otp);
+        const { otp, expiresAt } = generateOtpWithExpiry();
+        otps[email] = { otp, expiresAt };
+        
+        await sendOtp(email, otp); 
 
         return res.status(200).json({ message: 'OTP sent to your email', otpRequired: true });
       } else {
@@ -138,6 +146,13 @@ const register = [
     const defaultTicketsPurchased = 0;
 
     try {
+
+      // Check if email already exists
+      const [existingUser] = await db.execute('SELECT email FROM user WHERE email = ?', [email]);
+      if (existingUser.length > 0) {
+        return res.status(409).json({ message: 'Email already exists' });
+      }
+      
       const hashedPassword = await hashPassword(password);
 
       const [result] = await db.execute(
@@ -153,15 +168,22 @@ const register = [
   }
 ];
 
-const logout = (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({ message: 'Failed to log out' });
-    }
-    res.clearCookie('connect.sid');
-    res.clearCookie('token');
-    res.status(200).json({ message: 'Logout successful' });
-  });
+const logout = async (req, res) => {
+  try {
+    console.log(req.session.userId)
+    await db.execute('UPDATE user SET session_token = NULL, session_expiry = NULL WHERE user_id = ?', [req.session.userId]);
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Failed to log out' });
+      }
+      res.clearCookie('connect.sid');
+      res.clearCookie('token');
+      res.status(200).json({ message: 'Logout successful' });
+    });
+  } catch (error) {
+    console.error('Error during logout:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
 };
 
 const checkAuth = (req, res) => {
@@ -196,20 +218,19 @@ const forgotPassword = async (req, res) => {
   try {
     const [rows] = await db.execute('SELECT user_id FROM user WHERE email = ?', [email]);
 
-    if (rows.length === 0) {
-      return res.status(404).json({ message: 'User not found' });
+    if (rows.length > 0) {
+      const userId = rows[0].user_id;
+      const token = crypto.randomBytes(32).toString('hex');
+      const expiryTime = new Date(Date.now() + 3600 * 1000); // 1 hour from now
+
+      await db.execute('UPDATE user SET reset_token = ?, reset_token_expiry = ? WHERE user_id = ?', [token, expiryTime, userId]);
+
+      // Send password reset email
+      await sendPasswordResetEmail(email, token);
     }
 
-    const userId = rows[0].user_id;
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiryTime = new Date(Date.now() + 3600 * 1000); // 1 hour from now
+    res.status(202).json({ message: 'Password reset email sent. Please check your email.' });
 
-    await db.execute('UPDATE user SET reset_token = ?, reset_token_expiry = ? WHERE user_id = ?', [token, expiryTime, userId]);
-
-    // Send password reset email
-    await sendPasswordResetEmail(email, token);
-
-    res.status(200).json({ message: 'Reset link sent to email' });
   } catch (error) {
     console.error('Error during password reset:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -265,24 +286,52 @@ const verifyOtp = async (req, res) => {
     if (!email || !otp) {
       return res.status(400).json({ status: 400, message: 'Email and OTP are required' });
     }
-    if (otps[email] && otps[email] === otp) {
-      delete otps[email]; // Invalidate OTP after successful verification
+
+    const storedOtpData = otps[email];
+    if (storedOtpData && storedOtpData.otp === otp) {
+      if (new Date() > storedOtpData.expiresAt) {
+
+        // Invalidate expired OTP
+        delete otps[email]; 
+        return res.status(401).json({ status: 401, message: 'OTP has expired' });
+      }
+      // Invalidate OTP after successful verification
+      delete otps[email]; 
 
       const [rows] = await db.execute('SELECT * FROM user WHERE email = ?', [email]);
       const user = rows[0];
 
-      const token = jwt.sign({ id: user.user_id, email: user.email, role: user.user_role }, jwtSecret, { expiresIn: '30m' });
+      // Invalidate any existing sessions
+      await db.execute('UPDATE user SET session_token = NULL, session_expiry = NULL WHERE email = ?', [email]);
 
-      res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'Strict',
-        maxAge: 30 * 60 * 1000 // 30 minutes
+      // Regenerate the session
+      req.session.regenerate(async (err) => {
+        if (err) {
+          return res.status(500).json({ status: 500, message: 'Failed to regenerate session' });
+        }
+
+        // Store user information in the session
+        req.session.userId = user.user_id;
+        req.session.email = user.email;
+
+        // Store the session ID and expiry in the database
+        const sessionToken = req.sessionID;
+        const sessionExpiry = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+        await db.execute('UPDATE user SET session_token = ?, session_expiry = ? WHERE email = ?', [sessionToken, sessionExpiry, email]);
+
+        // Generate JWT
+        const token = jwt.sign({ id: user.user_id, email: user.email, role: user.user_role, sessionToken }, jwtSecret, { expiresIn: '30m' });
+
+        res.cookie('token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'Strict',
+          maxAge: 30 * 60 * 1000, // 30 minutes
+        });
+
+        return res.status(200).json({ status: 200, message: 'Login successful', user: { id: user.user_id, email: user.email, role: user.user_role } });
       });
-
-      req.session.userId = user.user_id;
-      req.session.email = user.email;
-      return res.status(200).json({ status: 200, message: 'Login successful', user: { id: user.user_id, email: user.email, role: user.user_role } });
     } else {
       return res.status(401).json({ status: 401, message: 'Invalid OTP' });
     }
@@ -291,5 +340,6 @@ const verifyOtp = async (req, res) => {
     return res.status(500).json({ status: 500, message: 'Server error', error: error.message });
   }
 };
+
 
 module.exports = { login, verifyOtp, register, logout, checkAuth, getUser, forgotPassword, resetPassword };

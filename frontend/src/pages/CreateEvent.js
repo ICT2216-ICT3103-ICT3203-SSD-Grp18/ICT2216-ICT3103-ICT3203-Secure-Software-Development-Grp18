@@ -1,6 +1,59 @@
 import React, { useState } from 'react';
 import '../styles/css/CreateEvent.css';
 import apiClient from '../axiosConfig';
+import DOMPurify from 'dompurify';
+import he from 'he';
+
+// Sanitization function
+const sanitizeInput = (input) => {
+  const sanitized = DOMPurify.sanitize(input.trim());
+  return he.encode(sanitized);
+};
+
+// Validation functions
+const validateText = (text) => {
+  const textRegex = /^[a-zA-Z\s]+$/;
+  return textRegex.test(text);
+};
+
+const validatePrice = (price) => {
+  return Number.isInteger(Number(price)) && price >= 0 && price <= 1000;
+};
+
+const validateTicketAvailability = (availability) => {
+  return Number.isInteger(Number(availability)) && availability >= 0 && availability <= 500;
+};
+
+const validateUpload = (file) => {
+  if (!file) return false;
+  const validTypes = ['image/jpeg', 'image/png'];
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  return validTypes.includes(file.type) && file.size <= maxSize;
+};
+
+const validateDate = (date) => {
+  const today = new Date();
+  const selectedDate = new Date(date);
+  return selectedDate > today;
+};
+
+const validateStartTime = (time) => {
+  const [hours, minutes] = time.split(':').map(Number);
+  return (hours >= 7 && hours < 24) || (hours === 0 && minutes === 0);
+};
+
+const validateRaffleDate = (raffleStart, raffleEnd, eventDate) => {
+  const start = new Date(raffleStart);
+  const end = new Date(raffleEnd);
+  const event = new Date(eventDate);
+  if (!raffleStart || !raffleEnd || !eventDate) return true; // Skip validation if any date is missing
+  return start <= end && start < event && end < event;
+};
+
+const validateLocation = (location) => {
+  const validLocations = ['National Stadium', 'Expo', 'Star Vista', 'Indoor Stadium'];
+  return validLocations.includes(location);
+};
 
 const CreateEvent = () => {
   const [eventData, setEventData] = useState({
@@ -19,14 +72,59 @@ const CreateEvent = () => {
     price_cat5: '',
     raffle_start_date: '',
     raffle_end_date: '',
-    image: null, 
+    image: null,
   });
+
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    const sanitizedValue = sanitizeInput(value);
     setEventData(prevState => ({
       ...prevState,
-      [name]: value,
+      [name]: sanitizedValue,
+    }));
+
+    // Validate and set errors
+    let error = '';
+    if (name === 'event_name' || name === 'organiser' || name === 'description') {
+      if (!validateText(sanitizedValue)) {
+        error = 'Invalid input. Only letters and spaces are allowed.';
+      }
+    } else if (name.startsWith('price_')) {
+      if (!validatePrice(sanitizedValue)) {
+        error = 'Invalid price. Must be a whole number between 0 and 1000.';
+      }
+    } else if (name === 'ticket_availability') {
+      if (!validateTicketAvailability(sanitizedValue)) {
+        error = 'Invalid availability. Must be a whole number between 0 and 500.';
+      }
+    } else if (name === 'description' && sanitizedValue.length === 0) {
+      error = 'Description cannot be empty.';
+    } else if (name === 'date' && !validateDate(sanitizedValue)) {
+      error = 'Date must be tomorrow or later.';
+    } else if (name === 'start_time' && !validateStartTime(sanitizedValue)) {
+      error = 'Start time must be between 7 AM and 12 AM.';
+    } else if (name === 'location' && !validateLocation(sanitizedValue)) {
+      error = 'Invalid location. Must be National Stadium, Expo, Star Vista, or Indoor Stadium.';
+    }
+
+    // Validate raffle dates
+    if (name === 'raffle_start_date' || name === 'raffle_end_date' || name === 'date') {
+      const { raffle_start_date, raffle_end_date, date } = eventData;
+      const raffleDatesValid = validateRaffleDate(
+        name === 'raffle_start_date' ? sanitizedValue : raffle_start_date,
+        name === 'raffle_end_date' ? sanitizedValue : raffle_end_date,
+        name === 'date' ? sanitizedValue : date
+      );
+      if (!raffleDatesValid) {
+        error = 'Raffle dates must be before the event date, and raffle end date cannot be before raffle start date.';
+      }
+    }
+
+    setErrors(prevState => ({
+      ...prevState,
+      [name]: error,
     }));
   };
 
@@ -36,10 +134,48 @@ const CreateEvent = () => {
       ...prevState,
       image: file,
     }));
+    setErrors(prevState => ({
+      ...prevState,
+      image: validateUpload(file) ? '' : 'Please upload a valid image file (JPEG/PNG) and size <= 5MB.',
+    }));
+  };
+
+  const validateForm = () => {
+    const {
+      event_name, description, organiser,
+      ticket_availability, price_vip, price_cat1,
+      price_cat2, price_cat3, price_cat4, price_cat5,
+      date, raffle_start_date, raffle_end_date, start_time, image, location
+    } = eventData;
+
+    const formValid =
+      validateText(event_name) &&
+      validateText(description) &&
+      validateText(organiser) &&
+      description.length > 0 &&
+      validateTicketAvailability(ticket_availability) &&
+      validatePrice(price_vip) &&
+      validatePrice(price_cat1) &&
+      validatePrice(price_cat2) &&
+      validatePrice(price_cat3) &&
+      validatePrice(price_cat4) &&
+      validatePrice(price_cat5) &&
+      validateDate(date) &&
+      validateStartTime(start_time) &&
+      validateLocation(location) &&
+      validateRaffleDate(raffle_start_date, raffle_end_date, date) &&
+      validateUpload(image);
+
+    return formValid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) {
+      alert('Please ensure all inputs are valid and filled out correctly.');
+      return;
+    }
+
     const formData = new FormData();
     Object.keys(eventData).forEach(key => {
       formData.append(key, eventData[key]);
@@ -71,6 +207,7 @@ const CreateEvent = () => {
           raffle_end_date: '',
           image: null,
         });
+        setErrors({});
       }
     } catch (error) {
       console.error('Error creating event:', error);
@@ -88,24 +225,29 @@ const CreateEvent = () => {
           <label>
             Event Name:
             <input type="text" name="event_name" value={eventData.event_name} onChange={handleChange} required />
+            {errors.event_name && <span className="error">{errors.event_name}</span>}
           </label>
           <label>
             Organizer:
             <input type="text" name="organiser" value={eventData.organiser} onChange={handleChange} required />
+            {errors.organiser && <span className="error">{errors.organiser}</span>}
           </label>
         </div>
         <label className="full-width-textarea">
           Description:
           <textarea name="description" value={eventData.description} onChange={handleChange} required />
+          {errors.description && <span className="error">{errors.description}</span>}
         </label>
         <div className="form-row">
           <label>
             Date:
             <input type="date" name="date" value={eventData.date} onChange={handleChange} required />
+            {errors.date && <span className="error">{errors.date}</span>}
           </label>
           <label>
             Start Time:
             <input type="time" name="start_time" value={eventData.start_time} onChange={handleChange} required />
+            {errors.start_time && <span className="error">{errors.start_time}</span>}
           </label>
         </div>
         <label className="full-width">
@@ -116,54 +258,65 @@ const CreateEvent = () => {
             <option value="Star Vista">Star Vista</option>
             <option value="Expo">Expo</option>
           </select>
+          {errors.location && <span className="error">{errors.location}</span>}
         </label>
         <div className="form-row">
           <label>
             Ticket Availability:
             <input type="number" name="ticket_availability" value={eventData.ticket_availability} onChange={handleChange} required />
+            {errors.ticket_availability && <span className="error">{errors.ticket_availability}</span>}
           </label>
           <label>
             Price VIP:
             <input type="number" name="price_vip" value={eventData.price_vip} onChange={handleChange} required />
+            {errors.price_vip && <span className="error">{errors.price_vip}</span>}
           </label>
         </div>
         <div className="form-row">
           <label>
             Price Cat1:
             <input type="number" name="price_cat1" value={eventData.price_cat1} onChange={handleChange} required />
+            {errors.price_cat1 && <span className="error">{errors.price_cat1}</span>}
           </label>
           <label>
             Price Cat2:
             <input type="number" name="price_cat2" value={eventData.price_cat2} onChange={handleChange} required />
+            {errors.price_cat2 && <span className="error">{errors.price_cat2}</span>}
           </label>
         </div>
         <div className="form-row">
           <label>
             Price Cat3:
             <input type="number" name="price_cat3" value={eventData.price_cat3} onChange={handleChange} required />
+            {errors.price_cat3 && <span className="error">{errors.price_cat3}</span>}
           </label>
           <label>
             Price Cat4:
             <input type="number" name="price_cat4" value={eventData.price_cat4} onChange={handleChange} required />
+            {errors.price_cat4 && <span className="error">{errors.price_cat4}</span>}
           </label>
         </div>
         <label className="full-width">
           Price Cat5:
           <input type="number" name="price_cat5" value={eventData.price_cat5} onChange={handleChange} required />
+          {errors.price_cat5 && <span className="error">{errors.price_cat5}</span>}
         </label>
         <div className="form-row">
           <label>
             Raffle Start Date:
             <input type="date" name="raffle_start_date" value={eventData.raffle_start_date} onChange={handleChange} />
+            {errors.raffle_start_date && <span className="error">{errors.raffle_start_date}</span>}
           </label>
           <label>
             Raffle End Date:
             <input type="date" name="raffle_end_date" value={eventData.raffle_end_date} onChange={handleChange} />
+            {errors.raffle_end_date && <span className="error">{errors.raffle_end_date}</span>}
           </label>
         </div>
         <label>
           Event Image:
           <input type="file" name="image" onChange={handleImageChange} required />
+          {errors.image && <span className="error">{errors.image}</span>}
         </label>
         <button type="submit">Create Event</button>
       </form>
