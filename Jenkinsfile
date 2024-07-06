@@ -1,9 +1,6 @@
 pipeline {
     agent {
-        docker {
-            image 'ubuntu:latest'
-            args '-v /tmp/.cache:/root/.cache' // Using /tmp to avoid read-only file system error
-        }
+        label 'jenkins_node_agent'
     }
 
     parameters {
@@ -18,22 +15,15 @@ pipeline {
     }
 
     stages {
-        stage('Pre-check containers') {
-            steps {
-                sh 'docker ps'
-            }
-        }
         stage('Setup') {
             steps {
                 sh '''
-                apt-get update -y
-                apt-get upgrade -y
-                apt-get full-upgrade -y
-                apt-get autoremove -y
-                apt-get install -y nodejs npm curl gnupg
-                curl -sL https://deb.nodesource.com/setup_14.x | bash -
-                apt-get install -y nodejs
-                npm install -g npm@latest
+                apt update -y
+                apt upgrade -y
+                apt full-upgrade -y
+                apt autoremove -y
+                apt install -y nodejs
+                apt install -y npm
                 '''
             }
         }
@@ -49,9 +39,14 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    def checkoutVars = checkout([$class: 'GitSCM', branches: [[name: "*/${BRANCH_NAME}"]], userRemoteConfigs: [[url: 'https://github.com/ICT2216-ICT3103-ICT3203-SSD-Grp18/ICT2216-ICT3103-ICT3203-Secure-Software-Development-Grp18.git', credentialsId: 'PAT_Jenkins_Jonathan']]])
+                    def checkoutVars = checkout([$class: 'GitSCM', branches: [[name: "*/${BRANCH_NAME}"]], userRemoteConfigs: [[url: 'https://github.com/ICT2216-ICT3103-ICT3203-SSD-Grp18/Ticketing_Huat_Test.git', credentialsId: 'PAT_Jenkins']]])
                     env.GIT_COMMIT = checkoutVars.GIT_COMMIT
                 }
+            }
+        }
+        stage('clean Dependencies') {
+            steps {
+                sh 'rm -rf node_modules package-lock.json'
             }
         }
         stage('Install Dependencies') {
@@ -79,12 +74,12 @@ pipeline {
         }
         stage('OWASP Dependency-Check Vulnerabilities') {
             steps {
-                sh '''
-                mkdir -p /tmp/.cache/dependency-check
-                docker run --rm -v $(pwd):/src -v /tmp/.cache/dependency-check:/usr/share/dependency-check/data owasp/dependency-check \
-                  --project "My Project" --scan /src --out /src --format ALL
-                '''
-                archiveArtifacts artifacts: 'dependency-check-report.*', fingerprint: true
+                dependencyCheck(additionalArguments: '--format XML --format HTML', odcInstallation: 'OWASP-Dependency-Check', nvdCredentialsId: 'nvd-api-key')
+            }
+            post {
+                always {
+                    dependencyCheckPublisher(pattern: '**/dependency-check-report.xml')
+                }
             }
         }
         stage('List and Archive Dependencies') {
@@ -100,7 +95,7 @@ pipeline {
                 branch 'main'
             }
             steps {
-                sshagent(['jenkins-ssh-key']) {
+                sshagent(['jenkins_ssh_agent']) {
                     // Ensure rsync is installed
                     sh '''
                     if ! command -v rsync &> /dev/null
@@ -108,43 +103,41 @@ pipeline {
                         apt-get update && apt-get install -y rsync
                     fi
                     '''
-                    // Deploy root files
+        
+                    // Add web server to known_hosts
                     sh '''
-                    rsync -av --exclude="node_modules" --exclude="package-lock.json" --no-times --no-perms ./ jenkins@webserver:/var/www/html/
+                    ssh-keyscan -H webserver >> ~/.ssh/known_hosts
                     '''
-
-                    // Deploy backend
+        
+                    // Deploy package.json and directories
                     sh '''
-                    rsync -av --exclude="node_modules" --exclude="package-lock.json" --no-times --no-perms ./backend/ jenkins@webserver:/var/www/html/backend/
+                    rsync -av --exclude="node_modules" --exclude="package-lock.json" --no-times --no-perms package.json jenkins@webserver:/var/www/html/
+                    rsync -av --exclude="node_modules" --exclude="package-lock.json" --no-times --no-perms backend/ jenkins@webserver:/var/www/html/backend/
+                    rsync -av --exclude="node_modules" --exclude="package-lock.json" --no-times --no-perms frontend/ jenkins@webserver:/var/www/html/frontend/
                     '''
-
-                    // Deploy frontend
+        
+                    // Install dependencies and start the application using pm2 on the web server
                     sh '''
-                    rsync -av --exclude="node_modules" --exclude="package-lock.json" --no-times --no-perms ./frontend/ jenkins@webserver:/var/www/html/frontend/
-                    '''
-
-                    // Run npm install on the web server
-                    sh '''
-                    ssh jenkins@webserver << EOF
-                    cd /var/www/html && npm install
-                    cd /var/www/html/backend && npm install
-                    cd /var/www/html/frontend && npm install
-                    EOF
+                    ssh jenkins@webserver "
+                    if [ -d /var/www/html ]; then
+                        cd /var/www/html && npm install
+                    fi
+                    if [ -d /var/www/html/backend ]; then
+                        cd /var/www/html/backend && npm install
+                    fi
+                    if [ -d /var/www/html/frontend ]; then
+                        cd /var/www/html/frontend && npm install
+                    fi
+                    if [ -d /var/www/html ]; then
+                        cd /var/www/html && npx pm2 start npm --name app -- start
+                    fi
+                    "
                     '''
                 }
             }
         }
-        stage('Post-check containers') {
-            steps {
-                sh 'docker ps'
-            }
-        }
     }
-
     post {
-        always {
-            sh 'docker ps -a'
-        }
         success {
             script {
                 if (BRANCH_NAME != 'main') {
@@ -152,7 +145,7 @@ pipeline {
                         sh """
                         curl -H "Authorization: token $GITHUB_TOKEN" -X POST \
                         -d '{"title":"Merge ${BRANCH_NAME}","head":"${BRANCH_NAME}","base":"main"}' \
-                        https://api.github.com/repos/ICT2216-ICT3103-ICT3203-SSD-Grp18/ICT2216-ICT3103-ICT3203-Secure-Software-Development-Grp18/pulls
+                        https://api.github.com/repos/ICT2216-ICT3103-ICT3203-SSD-Grp18/Ticketing_Huat_Test/pulls
                         """
                     }
                 }
