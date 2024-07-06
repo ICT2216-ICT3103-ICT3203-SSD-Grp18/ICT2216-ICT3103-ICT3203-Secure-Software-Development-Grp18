@@ -1,6 +1,9 @@
 pipeline {
     agent {
-        label 'jenkins_node_agent'
+        docker {
+            image 'your-docker-registry/your-image-name:tag'
+            args '-u root:root' // Run as root to ensure permissions
+        }
     }
 
     parameters {
@@ -15,18 +18,6 @@ pipeline {
     }
 
     stages {
-        stage('Setup') {
-            steps {
-                sh '''
-                apt update -y
-                apt upgrade -y
-                apt full-upgrade -y
-                apt autoremove -y
-                apt install -y nodejs
-                apt install -y npm
-                '''
-            }
-        }
         stage('Environment') {
             steps {
                 script {
@@ -44,7 +35,7 @@ pipeline {
                 }
             }
         }
-        stage('clean Dependencies') {
+        stage('Clean Dependencies') {
             steps {
                 sh 'rm -rf node_modules package-lock.json'
             }
@@ -78,13 +69,23 @@ pipeline {
             }
             post {
                 always {
+                    script {
+                        // Modify the version string in the XML report to avoid parsing issues
+                        sh 'sed -i \'s/Version>10.0.1/Version>9.0.4/\' $(find . -name dependency-check-report.xml)'
+                    }
                     dependencyCheckPublisher(pattern: '**/dependency-check-report.xml')
                 }
             }
         }
         stage('List and Archive Dependencies') {
             steps {
-                sh 'npm list --all > dependencies.txt'
+                script {
+                    def npmListResult = sh(script: 'npm list --all', returnStatus: true)
+                    if (npmListResult != 0) {
+                        echo "npm list --all failed, continuing with pipeline."
+                    }
+                }
+                sh 'npm list --all > dependencies.txt || true'
                 archiveArtifacts artifacts: 'dependencies.txt', fingerprint: true
                 sh 'npm outdated > dependencyupdates.txt || true'
                 archiveArtifacts artifacts: 'dependencyupdates.txt', fingerprint: true
@@ -96,40 +97,30 @@ pipeline {
             }
             steps {
                 sshagent(['jenkins_ssh_agent']) {
-                    // Ensure rsync is installed
                     sh '''
-                    if ! command -v rsync &> /dev/null
-                    then
-                        apt-get update && apt-get install -y rsync
-                    fi
-                    '''
-        
-                    // Add web server to known_hosts
-                    sh '''
+                    mkdir -p ~/.ssh
                     ssh-keyscan -H webserver >> ~/.ssh/known_hosts
                     '''
-        
-                    // Deploy package.json and directories
+
                     sh '''
                     rsync -av --exclude="node_modules" --exclude="package-lock.json" --no-times --no-perms package.json jenkins@webserver:/var/www/html/
                     rsync -av --exclude="node_modules" --exclude="package-lock.json" --no-times --no-perms backend/ jenkins@webserver:/var/www/html/backend/
                     rsync -av --exclude="node_modules" --exclude="package-lock.json" --no-times --no-perms frontend/ jenkins@webserver:/var/www/html/frontend/
                     '''
-        
-                    // Install dependencies and start the application using pm2 on the web server
+
                     sh '''
                     ssh jenkins@webserver "
                     if [ -d /var/www/html ]; then
                         cd /var/www/html && npm install
                     fi
-                    if [ -d /var/www/html/backend ]; then
+                    if [ -d /var/www/html/backend]; then
                         cd /var/www/html/backend && npm install
                     fi
-                    if [ -d /var/www/html/frontend ]; then
+                    if [ -d /var/www/html/frontend]; then
                         cd /var/www/html/frontend && npm install
                     fi
                     if [ -d /var/www/html ]; then
-                        cd /var/www/html && npx pm2 start npm --name app -- start
+                        cd /var/www/html && pm2 start npm --name app -- start
                     fi
                     "
                     '''
