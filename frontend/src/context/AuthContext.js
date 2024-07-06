@@ -13,8 +13,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await apiClient.get('/auth/check', { withCredentials: true });
-        if (response.status === 200) {
+        const response = await apiClient.get('/auth/check-auth', { withCredentials: true });
+        if (response.data.active) {
           setIsLoggedIn(true);
           const userResponse = await apiClient.get('/auth/getUser', { withCredentials: true });
           setUser(userResponse.data);
@@ -33,13 +33,25 @@ export const AuthProvider = ({ children }) => {
     }
   }, [authChecked]);
 
+  const handleSessionInvalidation = () => {
+    setIsLoggedIn(false);
+    setUser(null);
+    window.location.href = '/';
+  };
+
   const login = async ({ email, password, otp }) => {
     try {
       let response;
       if (otp) {
-        response = await apiClient.post('/auth/verify-otp', { email, otp }, { withCredentials: true });
+        response = await apiClient.post('/auth/verify-otp', { email, otp }, {
+          withCredentials: true,
+          onSessionInvalidated: handleSessionInvalidation
+        });
       } else {
-        response = await apiClient.post('/auth/login', { email, password }, { withCredentials: true });
+        response = await apiClient.post('/auth/login', { email, password }, {
+          withCredentials: true,
+          onSessionInvalidated: handleSessionInvalidation
+        });
         if (response.data.otpRequired) {
           return { otpRequired: true };
         }
@@ -56,11 +68,13 @@ export const AuthProvider = ({ children }) => {
       throw new Error('Login failed');
     }
   };
-  
 
   const logout = async () => {
     try {
-      await apiClient.post('/auth/logout', {}, { withCredentials: true });
+      await apiClient.post('/auth/logout', {}, {
+        withCredentials: true,
+        onSessionInvalidated: handleSessionInvalidation
+      });
       setIsLoggedIn(false);
       setUser(null);
     } catch (error) {

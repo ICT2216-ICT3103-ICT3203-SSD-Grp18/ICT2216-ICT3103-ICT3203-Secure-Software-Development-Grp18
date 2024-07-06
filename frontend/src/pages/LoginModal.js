@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import apiClient from '../axiosConfig';
 import validator from 'validator';
 import DOMPurify from 'dompurify';
+import he from 'he';
 
 const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
   const [email, setEmail] = useState('');
@@ -17,13 +18,32 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
   const [isResetPassword, setIsResetPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [isOtpSent, setIsOtpSent] = useState(false);
+  const [otpExpireTime, setOtpExpireTime] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(null);
 
   useEffect(() => {
     setIsLogin(initialIsLogin);
   }, [initialIsLogin]);
 
+  useEffect(() => {
+    let timer;
+    if (otpExpireTime) {
+      timer = setInterval(() => {
+        const timeLeft = Math.max(0, otpExpireTime - Date.now());
+        setTimeLeft(timeLeft);
+        if (timeLeft === 0) {
+          clearInterval(timer);
+          setIsOtpSent(false);
+          alert('OTP expired. Please request a new one.');
+        }
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [otpExpireTime]);
+
   const sanitizeInput = (input) => {
-    return DOMPurify.sanitize(input.trim());
+    const sanitized = DOMPurify.sanitize(input.trim());
+    return he.encode(sanitized);
   };
 
   const validateEmail = (email) => {
@@ -58,6 +78,9 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
       const result = await login({ email: sanitizedEmail, password: sanitizedPassword });
       if (result.otpRequired) {
         setIsOtpSent(true);
+
+        // set OTP expiration time from now
+        setOtpExpireTime(Date.now() + 5 * 60 * 1000); 
         alert('OTP sent to your email');
       } else {
         alert('Login successful');
@@ -136,7 +159,11 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
         alert('Registration failed. Please try again.');
       }
     } catch (error) {
-      alert('Registration failed. Please try again.');
+      if (error.response && error.response.status === 409) {
+        setErrors({ email: 'This email address is already registered. Please use a different email.' });
+      } else {
+        alert('Registration failed. Please try again.');
+      }
     }
   };
 
@@ -144,13 +171,9 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
     e.preventDefault();
     try {
       const response = await apiClient.post('/auth/forgot-password', { email });
-      if (response.status === 200) {
-        setMessage('Password reset email sent. Please check your email.');
-      } else {
-        setMessage('Error sending password reset email');
-      }
+      setMessage('Password reset email sent. Please check your email.');
     } catch (error) {
-      setMessage(`Error: ${error.message}`);
+      setMessage('Password reset email sent. Please check your email.');
     }
   };
 
@@ -227,6 +250,9 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
               />
               {errors.email && <p className="error">{errors.email}</p>}
             </label>
+            {timeLeft !== null && (
+              <p className="note">Time left to enter OTP: {Math.floor(timeLeft / 1000)} seconds</p>
+            )}
             <button type="submit">Verify OTP</button>
           </form>
         )}

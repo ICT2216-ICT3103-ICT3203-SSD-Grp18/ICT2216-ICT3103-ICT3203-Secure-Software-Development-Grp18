@@ -10,7 +10,8 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const { authenticateToken } = require('./middleware/authMiddleware');
 require('./jobs/raffleCronJob'); 
-const rateLimit = require('express-rate-limit'); // Add this line
+const rateLimit = require('express-rate-limit');
+const csurf = require('csurf');
 
 dotenv.config();
 
@@ -20,7 +21,7 @@ const PORT = process.env.PORT || 5500;
 const corsOptions = {
   origin: process.env.CORS_ORIGIN || 'http://localhost:3000', // Use environment variable for origin or default to localhost
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+  allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization, CSRF-Token',
   credentials: true, // Enable credentials (cookies, authorization headers, etc.)
 };
 
@@ -42,6 +43,15 @@ app.use(session({
   }
 }));
 
+// CSRF Protection
+const csrfProtection = csurf({
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'Strict',
+  }
+});
+app.use(csrfProtection);
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -54,6 +64,11 @@ app.use(limiter);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
+});
+
+// CSRF token route
+app.get('/api/csrf-token', (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
 });
 
 app.use('/api/auth', authRoutes);
