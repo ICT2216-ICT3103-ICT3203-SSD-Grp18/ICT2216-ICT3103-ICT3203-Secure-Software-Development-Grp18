@@ -121,7 +121,7 @@ pipeline {
                         cd /var/www/html/frontend && npm install
                     fi
                     if [ -d /var/www/html ]; then
-                        cd /var/www/html && pm2 start npm --name app -- start
+                        cd /var/www/html && pm2 delete 0 && pm2 start npm --name app -- start
                     fi
                     "
                     '''
