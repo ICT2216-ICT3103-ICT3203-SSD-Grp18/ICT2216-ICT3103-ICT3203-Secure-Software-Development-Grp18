@@ -82,6 +82,16 @@ pipeline {
                 archiveArtifacts artifacts: 'dependencyupdates.txt', fingerprint: true
             }
         }
+        stage('Build Frontend') {
+            steps {
+                dir('frontend') {
+                    sh '''
+                    # Set CI to false to not treat warnings as errors
+                    CI=false npm run build
+                    '''
+                }
+            }
+        }
         stage('Deploy to Web Server') {
             when {
                 branch 'main'
