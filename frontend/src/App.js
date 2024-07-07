@@ -15,6 +15,8 @@ import LoginModal from './pages/LoginModal';
 import ResetPasswordPage from './pages/ResetPasswordPage'; 
 import BuyerContactInformationPage from './pages/BuyerContactInformationPage';
 import PaymentPage from './pages/PaymentPage';
+import SuccessPage from './pages/SuccessPage';
+import CancelPage from './pages/CancelPage';
 
 
 
@@ -33,8 +35,10 @@ const App = () => {
             <Route path="/aboutus" element={<AboutUs />} />
             <Route path="/events" element={<EventPage />} />
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} /> // Use element instead of component
-            <Route path="/buyer-info" element={<BuyerContactInformationPage />} />
-            <Route path="/payment" element={<PaymentPage />} />
+            <Route path="/buyer-info/:userId/:eventId" element={<BuyerContactInformationPage />} />
+            <Route path="/payment/:userId/:eventId" element={<PaymentPage />} />
+            <Route path="/success" element={<SuccessPage />} />
+            <Route path="/cancel" element={<CancelPage />} />
           </Routes>
         </div>
       </Router>
