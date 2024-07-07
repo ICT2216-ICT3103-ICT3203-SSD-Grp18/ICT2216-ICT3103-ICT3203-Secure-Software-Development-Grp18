@@ -11,13 +11,10 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import AdminDashboard from './pages/AdminDashboard';
 import AboutUs from './pages/AboutUsPage';
 import EventPage from './pages/EventsPage';
-import LoginModal from './pages/LoginModal';
-import ResetPasswordPage from './pages/ResetPasswordPage';
 import SessionManager from './SessionManager';
 import LoginModal from './pages/LoginModal'; 
 import ResetPasswordPage from './pages/ResetPasswordPage'; 
 import BuyerContactInformationPage from './pages/BuyerContactInformationPage';
-import PaymentPage from './pages/PaymentPage';
 import SuccessPage from './pages/SuccessPage';
 import CancelPage from './pages/CancelPage';
 
@@ -40,7 +37,6 @@ const App = () => {
             <Route path="/events" element={<EventPage />} />
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} /> // Use element instead of component
             <Route path="/buyer-info/:userId/:eventId" element={<BuyerContactInformationPage />} />
-            <Route path="/payment/:userId/:eventId" element={<PaymentPage />} />
             <Route path="/success" element={<SuccessPage />} />
             <Route path="/cancel" element={<CancelPage />} />
           </Routes>
