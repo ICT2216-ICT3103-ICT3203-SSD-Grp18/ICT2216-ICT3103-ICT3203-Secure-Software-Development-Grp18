@@ -27,7 +27,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    def checkoutVars = checkout([$class: 'GitSCM', branches: [[name: "*/${BRANCH_NAME}"]], userRemoteConfigs: [[url: 'https://github.com/ICT2216-ICT3103-ICT3203-SSD-Grp18/Ticketing_Huat_Test.git', credentialsId: 'PAT_Jenkins']]])
+                    def checkoutVars = checkout([$class: 'GitSCM', branches: [[name: "*/${BRANCH_NAME}"]], userRemoteConfigs: [[url: 'https://github.com/ICT2216-ICT3103-ICT3203-SSD-Grp18/Ticketing_Huat.git', credentialsId: 'PAT_Jenkins']]])
                     env.GIT_COMMIT = checkoutVars.GIT_COMMIT
                 }
             }
@@ -127,7 +127,7 @@ pipeline {
                         sh """
                         curl -H "Authorization: token $GITHUB_TOKEN" -X POST \
                         -d '{"title":"Merge ${BRANCH_NAME}","head":"${BRANCH_NAME}","base":"main"}' \
-                        https://api.github.com/repos/ICT2216-ICT3103-ICT3203-SSD-Grp18/Ticketing_Huat_Test/pulls
+                        https://api.github.com/repos/ICT2216-ICT3103-ICT3203-SSD-Grp18/Ticketing_Huat/pulls
                         """
                     }
                 }
