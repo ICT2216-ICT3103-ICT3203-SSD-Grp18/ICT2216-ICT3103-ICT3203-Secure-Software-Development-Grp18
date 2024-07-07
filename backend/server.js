@@ -20,7 +20,7 @@ const app = express();
 const PORT = process.env.PORT || 5500;
 
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000', // Use environment variable for origin or default to localhost
+  origin: process.env.CORS_ORIGIN || 'https://ticketinghuat.ninja', // Use environment variable for origin or default to localhost
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization, CSRF-Token',
   credentials: true, // Enable credentials (cookies, authorization headers, etc.)

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5500/api', // Your API base URL
+  baseURL: 'https://ticketinghuat.ninja/api', // Your API base URL
   headers: {
     'Content-Type': 'application/json',
   },
@@ -13,7 +13,7 @@ apiClient.interceptors.request.use(
   async (config) => {
     if (['post', 'put', 'delete'].includes(config.method)) {
       try {
-        const csrfResponse = await axios.get('http://localhost:5500/api/csrf-token', { withCredentials: true });
+        const csrfResponse = await axios.get('https://ticketinghuat.ninja/api/csrf-token', { withCredentials: true });
         const csrfToken = csrfResponse.data.csrfToken;
         config.headers['CSRF-Token'] = csrfToken;
       } catch (error) {

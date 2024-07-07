@@ -47,7 +47,7 @@ const sendNotification = async (userId, eventDetails, numOfSeats, categories) =>
             <p><strong>Categories:</strong> ${categories}</p>
           </div>
           <p style="text-align: center; margin-top: 20px;">
-            <a href="http://localhost:3000/buyer-info/${userId}/${event_id}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #4F4CEE; text-decoration: none; border-radius: 5px;">Proceed to Checkout</a>
+            <a href="https://ticketinghuat.ninja/buyer-info/${userId}/${event_id}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #4F4CEE; text-decoration: none; border-radius: 5px;">Proceed to Checkout</a>
           </p>
         </div>
       `;
