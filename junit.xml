@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="8" failures="0" errors="0" time="5.828">
+  <testsuite name="ResetPasswordPage" errors="0" failures="0" skipped="0" timestamp="2024-07-07T14:37:35" time="2.289" tests="4">
+    <testcase classname="ResetPasswordPage renders ResetPasswordPage component" name="ResetPasswordPage renders ResetPasswordPage component" time="0.09">
+    </testcase>
+    <testcase classname="ResetPasswordPage displays error message when passwords do not match" name="ResetPasswordPage displays error message when passwords do not match" time="0.045">
+    </testcase>
+    <testcase classname="ResetPasswordPage displays success message on successful password reset" name="ResetPasswordPage displays success message on successful password reset" time="0.036">
+    </testcase>
+    <testcase classname="ResetPasswordPage displays error message on failed password reset" name="ResetPasswordPage displays error message on failed password reset" time="0.024">
+    </testcase>
+  </testsuite>
+  <testsuite name="sendOtp" errors="0" failures="0" skipped="0" timestamp="2024-07-07T14:37:35" time="3.442" tests="2">
+    <testcase classname="sendOtp should send OTP email" name="sendOtp should send OTP email" time="1.008">
+    </testcase>
+    <testcase classname="sendPasswordResetEmail should send password reset email" name="sendPasswordResetEmail should send password reset email" time="1.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="LoginModal Component" errors="0" failures="0" skipped="0" timestamp="2024-07-07T14:37:35" time="4.331" tests="2">
+    <testcase classname="LoginModal Component handles login submission with valid data" name="LoginModal Component handles login submission with valid data" time="0.13">
+    </testcase>
+    <testcase classname="LoginModal Component handles sign up submission with valid data" name="LoginModal Component handles sign up submission with valid data" time="0.041">
+    </testcase>
+  </testsuite>
+</testsuites>

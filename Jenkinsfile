@@ -74,6 +74,22 @@ pipeline {
                 }
             }
         }
+        stage('Run Unit Tests') {
+            steps {
+                sh 'npm test'
+                sh 'ls -la' // Debug step to verify the report file
+            }
+        }
+        stage('Archive Test Results') {
+            steps {
+                junit 'junit.xml'
+            }
+        }
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
+            }
+        }
         stage('List and Archive Dependencies') {
             steps {
                 sh 'npm list --all > dependencies.txt || true'
@@ -121,7 +137,7 @@ pipeline {
                         cd /var/www/html/frontend && npm install
                     fi
                     if [ -d /var/www/html ]; then
-                        cd /var/www/html && pm2 start npm --name app -- start
+                        cd /var/www/html && pm2 delete 0 && pm2 start npm --name app -- start
                     fi
                     "
                     '''
