@@ -12,6 +12,7 @@ const { authenticateToken } = require('./middleware/authMiddleware');
 require('./jobs/raffleCronJob'); 
 const rateLimit = require('express-rate-limit');
 const csurf = require('csurf');
+const orderRoutes = require('./routes/orderRoutes');
 
 dotenv.config();
 
@@ -74,6 +75,8 @@ app.get('/api/csrf-token', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api', eventRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api', orderRoutes);
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

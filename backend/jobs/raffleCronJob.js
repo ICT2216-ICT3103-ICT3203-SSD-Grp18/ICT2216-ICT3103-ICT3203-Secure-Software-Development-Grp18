@@ -28,8 +28,24 @@ const pickWinner = async (eventId) => {
       return;
     }
 
-    // Send notification to the winner
-    await sendNotification(winnerEntry.user_id, `Congratulations! You have won the raffle for event ID: ${eventId}.`);
+    // Fetch the event details
+    const [event] = await db.query('SELECT event_id, event_name, description, date, start_time, location FROM events WHERE event_id = ?', [eventId]);
+    if (event.length === 0) {
+      console.log(`Event with ID: ${eventId} not found.`);
+      return;
+    }
+
+    console.log('Fetched event data:', event[0]);
+
+    // Ensure event_id is present
+    if (!event[0].event_id) {
+      throw new Error('Event ID is undefined');
+    }
+
+    const { event_name, description, date, start_time, location } = event[0];
+
+    // Send notification to the winner with event details, number of tickets, and category
+    await sendNotification(winnerEntry.user_id, event[0], winnerEntry.num_of_seats, winnerEntry.category);
 
     console.log(`Winner notified: Entry ID ${winnerEntry.entry_id}, User ID ${winnerEntry.user_id}`);
   } catch (error) {

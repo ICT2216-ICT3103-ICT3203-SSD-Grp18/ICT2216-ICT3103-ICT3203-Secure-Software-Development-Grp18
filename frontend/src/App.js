@@ -14,6 +14,15 @@ import EventPage from './pages/EventsPage';
 import LoginModal from './pages/LoginModal';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import SessionManager from './SessionManager';
+import LoginModal from './pages/LoginModal'; 
+import ResetPasswordPage from './pages/ResetPasswordPage'; 
+import BuyerContactInformationPage from './pages/BuyerContactInformationPage';
+import PaymentPage from './pages/PaymentPage';
+import SuccessPage from './pages/SuccessPage';
+import CancelPage from './pages/CancelPage';
+
+
+
 
 const App = () => {
   return (
@@ -29,7 +38,11 @@ const App = () => {
             <Route path="/admin/*" element={<AdminDashboard />} />
             <Route path="/aboutus" element={<AboutUs />} />
             <Route path="/events" element={<EventPage />} />
-            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} /> // Use element instead of component
+            <Route path="/buyer-info/:userId/:eventId" element={<BuyerContactInformationPage />} />
+            <Route path="/payment/:userId/:eventId" element={<PaymentPage />} />
+            <Route path="/success" element={<SuccessPage />} />
+            <Route path="/cancel" element={<CancelPage />} />
           </Routes>
         </div>
       </Router>
