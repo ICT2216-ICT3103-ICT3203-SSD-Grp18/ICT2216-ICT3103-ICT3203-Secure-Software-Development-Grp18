@@ -38,7 +38,8 @@
     "nodemailer": "^6.9.14",
     "sanitize-html": "^2.13.0",
     "sequelize": "^6.37.3",
-    "sequelize-cli": "^6.6.2"
+    "sequelize-cli": "^6.6.2",
+    "stripe": "^16.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.7",

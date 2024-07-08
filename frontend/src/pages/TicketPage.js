@@ -9,8 +9,7 @@ const TicketPage = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
   const [event, setEvent] = useState(null);
-  const [categories, setCategories] = useState([]);
-  const [ticketCount, setTicketCount] = useState([]);
+  const [ticketCount, setTicketCount] = useState(0);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const { isLoggedIn } = useAuth();
@@ -26,8 +25,6 @@ const TicketPage = () => {
         const data = response.data;
         console.log('Event details fetched:', data);
         setEvent(data);
-        setCategories(data.categories || []);
-        setTicketCount((data.categories || []).map(() => 0));
         setLoading(false);
       } catch (error) {
         console.error('Error fetching event details:', error);
@@ -38,33 +35,11 @@ const TicketPage = () => {
     fetchEventDetails();
   }, [eventId]);
 
-  const incrementTicket = (index) => {
-    console.log(`Incrementing ticket count for category index: ${index}`);
-    const newTicketCount = [...ticketCount];
-    const selectedCategories = newTicketCount.filter(count => count > 0).length;
-
-    if (newTicketCount[index] === 2 || (selectedCategories > 0 && newTicketCount[index] === 0)) {
-      setError('You can only select max 2 tickets from the same category');
-    } else {
-      setError('');
-      newTicketCount[index]++;
-      setTicketCount(newTicketCount);
-    }
-    console.log('Updated ticket count:', newTicketCount);
+  const handleTicketChange = (e) => {
+    const value = parseInt(e.target.value, 10);
+    setTicketCount(value);
+    console.log('Updated ticket quantity:', value);
   };
-
-  const decrementTicket = (index) => {
-    console.log(`Decrementing ticket count for category index: ${index}`);
-    const newTicketCount = [...ticketCount];
-    if (newTicketCount[index] > 0) {
-      newTicketCount[index]--;
-      setTicketCount(newTicketCount);
-      setError('');
-    }
-    console.log('Updated ticket count:', newTicketCount);
-  };
-
-  const hasSelectedTickets = ticketCount.some(count => count > 0);
 
   const handleSubmit = async () => {
     if (!isLoggedIn) {
@@ -75,7 +50,7 @@ const TicketPage = () => {
     try {
       // Check if user has already entered the raffle
       const checkEntryResponse = await apiClient.get(`/raffle/hasEntered?eventId=${eventId}`, { withCredentials: true });
-  
+      //console.log(eventId, ticketQuantity)
       if (checkEntryResponse.data.hasEntered) {
         alert('You have already entered the raffle for this event');
         navigate(`/ticket/${eventId}`);
@@ -128,17 +103,16 @@ const TicketPage = () => {
         </div>
 
         <div className="ticket-options">
-          {categories.map((category, index) => (
-            <div key={category.id} className={`ticket-category ${ticketCount[index] > 0 ? 'selected' : ''}`}>
-              <h2>{category.name}</h2>
-              <p>SGD {category.price.toFixed(2)}</p>
-              <div className="ticket-quantity">
-                <button onClick={() => decrementTicket(index)}>-</button>
-                <span>{ticketCount[index]}</span>
-                <button onClick={() => incrementTicket(index)}>+</button>
-              </div>
-            </div>
-          ))}
+          <h2>Select Ticket Quantity</h2>
+          <div className="ticket-quantity">
+            <select value={ticketCount} onChange={handleTicketChange}>
+              <option value={0}>0</option>
+              <option value={1}>1</option>
+              <option value={2}>2</option>
+              <option value={3}>3</option>
+              <option value={4}>4</option>
+            </select>
+          </div>
         </div>
 
         {error && <div className='ticket-error-msg'>
@@ -146,25 +120,21 @@ const TicketPage = () => {
         </div>}
         
         <div className="footer-ticket-page">
-          {hasSelectedTickets ? (
+          {ticketCount > 0 ? (
             <div className="summary">
               <div className="summary-row">
                 <p>Qty</p>
-                <p>Type</p>
                 <p>Price Total (SGD)</p>
               </div>
-              {categories.map((category, index) => ticketCount[index] > 0 && (
-                <div key={category.id} className="summary-row">
-                  <p>{ticketCount[index]}</p>
-                  <p>{category.name}</p>
-                  <p>SGD {(ticketCount[index] * category.price).toFixed(2)}</p>
-                </div>
-              ))}
+              <div className="summary-row">
+                <p>{ticketCount}</p>
+                <p>SGD {(ticketCount * event.ticket_price).toFixed(2)}</p>
+              </div>
             </div>
           ) : (
             <p className='choose-quantity'>Choose your tickets and quantity.</p>
           )}
-          {hasSelectedTickets && <button className="purchase-button" onClick={handleSubmit}>Enter Raffle</button>}
+          {ticketCount > 0 && <button className="purchase-button" onClick={handleSubmit}>Enter Raffle</button>}
         </div>
       </div>
     </>

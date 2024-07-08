@@ -26,7 +26,7 @@ const enterRaffle = async (req, res) => {
         }
 
         // Calculate the total number of tickets the user wants to enter
-        const totalTickets = ticketCount.reduce((total, count) => total + count, 0);
+        const totalTickets = Array.isArray(ticketCount) ? ticketCount.reduce((total, count) => total + count, 0) : 0;
 
         // Check if there are enough tickets available
         if (ticket_availability < totalTickets) {
@@ -67,6 +67,6 @@ const hasUserEnteredRaffle = async (req, res) => {
 };
 
 module.exports = {
-  enterRaffle, 
-  hasUserEnteredRaffle
+    enterRaffle, 
+    hasUserEnteredRaffle
 };
