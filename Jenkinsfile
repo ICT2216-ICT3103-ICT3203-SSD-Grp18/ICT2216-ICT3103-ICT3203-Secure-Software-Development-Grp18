@@ -64,21 +64,20 @@ pipeline {
                 }
             }
         }
-        // Commented out the OWASP stage for now
-        // stage('OWASP Dependency-Check Vulnerabilities') {
-        //     steps {
-        //         dependencyCheck(additionalArguments: '--format XML --format HTML', odcInstallation: 'OWASP-Dependency-Check', nvdCredentialsId: 'nvd-api-key')
-        //     }
-        //     post {
-        //         always {
-        //             script {
-        //                 // Modify the version string in the XML report to avoid parsing issues
-        //                 sh 'sed -i \'s/Version>10.0.1/Version>9.0.4/\' $(find . -name dependency-check-report.xml)'
-        //             }
-        //             dependencyCheckPublisher(pattern: '**/dependency-check-report.xml')
-        //         }
-        //     }
-        // }
+        stage('OWASP Dependency-Check Vulnerabilities') {
+            steps {
+                dependencyCheck(additionalArguments: '--format XML --format HTML', odcInstallation: 'OWASP-Dependency-Check', nvdCredentialsId: 'nvd-api-key')
+            }
+            post {
+                always {
+                    script {
+                        // Modify the version string in the XML report to avoid parsing issues
+                        sh 'sed -i \'s/Version>10.0.1/Version>9.0.4/\' $(find . -name dependency-check-report.xml)'
+                    }
+                    dependencyCheckPublisher(pattern: '**/dependency-check-report.xml')
+                }
+            }
+        }
         stage('Run Unit Tests') {
             steps {
                 dir('backend') {
