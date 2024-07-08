@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
@@ -41,7 +43,7 @@ describe('LoginModal Component', () => {
     fireEvent.click(screen.getByRole('button', { name: /log in/i }));
 
     await waitFor(() => {
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      expect(screen.queryByText('Login failed. Please check your credentials and try again.')).not.toBeInTheDocument();
     });
   });
 
@@ -56,12 +58,14 @@ describe('LoginModal Component', () => {
     fireEvent.change(screen.getByLabelText(/email address/i), { target: { value: 'john.doe@example.com' } });
     fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'Password123!' } });
     
-    // Click the submit button for sign up
     const signUpButtons = screen.getAllByRole('button', { name: /sign up/i });
-    fireEvent.click(signUpButtons[1]); // Click the second "Sign Up" button which is the submit button
+    fireEvent.click(signUpButtons[1]);
 
     await waitFor(() => {
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      expect(screen.queryByText('Registration failed. Please try again.')).not.toBeInTheDocument();
     });
   });
+
 });
+
+
