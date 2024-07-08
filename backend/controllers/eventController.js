@@ -55,6 +55,8 @@ const getTopSelling = async (req, res) => {
     `, [today]);
     const formattedEvents = formatEvents(events);
     res.json(formattedEvents);
+    console.log("hello")
+    console.log(res)
   } catch (error) {
     console.error('Error fetching events with lowest ticket availability:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -79,12 +81,23 @@ const getEventById = async (req, res) => {
     // to convert price to float
     const parsePrice = (priceStr) => {
       if (typeof priceStr !== 'string') {
-        priceStr = String(priceStr);
+          priceStr = String(priceStr);
       }
       return parseFloat(priceStr.replace(/[^0-9.]/g, ''));
-    };
+  };
+  
 
-    res.json(event);
+    // prices to map in ticketPage.js
+    const categories = [
+      { id: 1, name: 'VIP (Standing)', price: parsePrice(event.price_vip) },
+      { id: 2, name: 'CAT 1', price: parsePrice(event.price_cat1) },
+      { id: 3, name: 'CAT 2', price: parsePrice(event.price_cat2) },
+      { id: 4, name: 'CAT 3', price: parsePrice(event.price_cat3) },
+      { id: 5, name: 'CAT 4', price: parsePrice(event.price_cat4) },
+      { id: 6, name: 'CAT 5', price: parsePrice(event.price_cat5) }
+    ];
+
+    res.json({ ...event, categories });
 
   } catch (error) {
     console.error('Error fetching event by ID:', error);

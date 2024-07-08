@@ -64,7 +64,12 @@ const CreateEvent = () => {
     location: 'National Stadium',
     organiser: '',
     ticket_availability: '',
-    ticket_price: '',
+    price_vip: '',
+    price_cat1: '',
+    price_cat2: '',
+    price_cat3: '',
+    price_cat4: '',
+    price_cat5: '',
     raffle_start_date: '',
     raffle_end_date: '',
     image: null,
@@ -86,7 +91,7 @@ const CreateEvent = () => {
       if (!validateText(sanitizedValue)) {
         error = 'Invalid input. Only letters and spaces are allowed.';
       }
-    } else if (name === 'ticket_price') {
+    } else if (name.startsWith('price_')) {
       if (!validatePrice(sanitizedValue)) {
         error = 'Invalid price. Must be a whole number between 0 and 1000.';
       }
@@ -138,7 +143,8 @@ const CreateEvent = () => {
   const validateForm = () => {
     const {
       event_name, description, organiser,
-      ticket_availability, ticket_price,
+      ticket_availability, price_vip, price_cat1,
+      price_cat2, price_cat3, price_cat4, price_cat5,
       date, raffle_start_date, raffle_end_date, start_time, image, location
     } = eventData;
 
@@ -148,7 +154,12 @@ const CreateEvent = () => {
       validateText(organiser) &&
       description.length > 0 &&
       validateTicketAvailability(ticket_availability) &&
-      validatePrice(ticket_price) &&
+      validatePrice(price_vip) &&
+      validatePrice(price_cat1) &&
+      validatePrice(price_cat2) &&
+      validatePrice(price_cat3) &&
+      validatePrice(price_cat4) &&
+      validatePrice(price_cat5) &&
       validateDate(date) &&
       validateStartTime(start_time) &&
       validateLocation(location) &&
@@ -186,7 +197,12 @@ const CreateEvent = () => {
           location: 'National Stadium',
           organiser: '',
           ticket_availability: '',
-          ticket_price: '',
+          price_vip: '',
+          price_cat1: '',
+          price_cat2: '',
+          price_cat3: '',
+          price_cat4: '',
+          price_cat5: '',
           raffle_start_date: '',
           raffle_end_date: '',
           image: null,
@@ -251,11 +267,40 @@ const CreateEvent = () => {
             {errors.ticket_availability && <span className="error">{errors.ticket_availability}</span>}
           </label>
           <label>
-            Ticket Price:
-            <input type="number" name="ticket_price" value={eventData.ticket_price} onChange={handleChange} required />
-            {errors.ticket_price && <span className="error">{errors.ticket_price}</span>}
+            Price VIP:
+            <input type="number" name="price_vip" value={eventData.price_vip} onChange={handleChange} required />
+            {errors.price_vip && <span className="error">{errors.price_vip}</span>}
           </label>
         </div>
+        <div className="form-row">
+          <label>
+            Price Cat1:
+            <input type="number" name="price_cat1" value={eventData.price_cat1} onChange={handleChange} required />
+            {errors.price_cat1 && <span className="error">{errors.price_cat1}</span>}
+          </label>
+          <label>
+            Price Cat2:
+            <input type="number" name="price_cat2" value={eventData.price_cat2} onChange={handleChange} required />
+            {errors.price_cat2 && <span className="error">{errors.price_cat2}</span>}
+          </label>
+        </div>
+        <div className="form-row">
+          <label>
+            Price Cat3:
+            <input type="number" name="price_cat3" value={eventData.price_cat3} onChange={handleChange} required />
+            {errors.price_cat3 && <span className="error">{errors.price_cat3}</span>}
+          </label>
+          <label>
+            Price Cat4:
+            <input type="number" name="price_cat4" value={eventData.price_cat4} onChange={handleChange} required />
+            {errors.price_cat4 && <span className="error">{errors.price_cat4}</span>}
+          </label>
+        </div>
+        <label className="full-width">
+          Price Cat5:
+          <input type="number" name="price_cat5" value={eventData.price_cat5} onChange={handleChange} required />
+          {errors.price_cat5 && <span className="error">{errors.price_cat5}</span>}
+        </label>
         <div className="form-row">
           <label>
             Raffle Start Date:

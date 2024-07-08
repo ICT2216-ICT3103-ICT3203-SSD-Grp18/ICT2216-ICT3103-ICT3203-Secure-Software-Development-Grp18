@@ -16,7 +16,8 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import BuyerContactInformationPage from './pages/BuyerContactInformationPage';
 import SuccessPage from './pages/SuccessPage';
 import CancelPage from './pages/CancelPage';
-import MyTickets from './pages/MyTickets';
+
+
 
 
 const App = () => {
@@ -33,11 +34,10 @@ const App = () => {
             <Route path="/admin/*" element={<AdminDashboard />} />
             <Route path="/aboutus" element={<AboutUs />} />
             <Route path="/events" element={<EventPage />} />
-            <Route path="/reset-password/:token" element={<ResetPasswordPage />} /> 
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} /> // Use element instead of component
             <Route path="/buyer-info/:userId/:eventId" element={<BuyerContactInformationPage />} />
             <Route path="/success" element={<SuccessPage />} />
             <Route path="/cancel" element={<CancelPage />} />
-            <Route path="/mytickets" element={<MyTickets />} /> {/* Add the MyTickets route */}
           </Routes>
         </div>
       </Router>

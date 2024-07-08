@@ -91,7 +91,12 @@ const createEvent = [
   body('location').optional().customSanitizer(sanitizeInput),
   body('organiser').optional().customSanitizer(sanitizeInput),
   body('ticket_availability').isInt({ min: 0 }).withMessage('Invalid ticket availability').customSanitizer(sanitizeInput),
-  body('ticket_price').isFloat({ min: 0 }).withMessage('Invalid ticket price').customSanitizer(sanitizeInput),
+  body('price_vip').isFloat({ min: 0 }).withMessage('Invalid VIP price').customSanitizer(sanitizeInput),
+  body('price_cat1').isFloat({ min: 0 }).withMessage('Invalid category 1 price').customSanitizer(sanitizeInput),
+  body('price_cat2').isFloat({ min: 0 }).withMessage('Invalid category 2 price').customSanitizer(sanitizeInput),
+  body('price_cat3').isFloat({ min: 0 }).withMessage('Invalid category 3 price').customSanitizer(sanitizeInput),
+  body('price_cat4').isFloat({ min: 0 }).withMessage('Invalid category 4 price').customSanitizer(sanitizeInput),
+  body('price_cat5').isFloat({ min: 0 }).withMessage('Invalid category 5 price').customSanitizer(sanitizeInput),
   body('raffle_start_date').isISO8601().optional().withMessage('Invalid raffle start date').customSanitizer(sanitizeInput),
   body('raffle_end_date').isISO8601().optional().withMessage('Invalid raffle end date').customSanitizer(sanitizeInput),
 
@@ -109,7 +114,12 @@ const createEvent = [
       location,
       organiser,
       ticket_availability,
-      ticket_price,
+      price_vip,
+      price_cat1,
+      price_cat2,
+      price_cat3,
+      price_cat4,
+      price_cat5,
       raffle_start_date,
       raffle_end_date,
     } = req.body;
@@ -118,7 +128,7 @@ const createEvent = [
 
     try {
       const [result] = await db.execute(
-        'INSERT INTO events (event_name, description, date, start_time, location, organiser, ticket_availability, ticket_price, raffle_start_date, raffle_end_date, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO events (event_name, description, date, start_time, location, organiser, ticket_availability, price_vip, price_cat1, price_cat2, price_cat3, price_cat4, price_cat5, raffle_start_date, raffle_end_date, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           event_name,
           description,
@@ -127,7 +137,12 @@ const createEvent = [
           location,
           organiser,
           ticket_availability,
-          ticket_price,
+          price_vip,
+          price_cat1,
+          price_cat2,
+          price_cat3,
+          price_cat4,
+          price_cat5,
           raffle_start_date,
           raffle_end_date,
           image
@@ -148,7 +163,12 @@ const updateEvent = [
   body('location').optional().customSanitizer(sanitizeInput),
   body('organiser').optional().customSanitizer(sanitizeInput),
   body('ticket_availability').optional().isInt({ min: 0 }).withMessage('Invalid ticket availability').customSanitizer(sanitizeInput),
-  body('ticket_price').optional().isFloat({ min: 0 }).withMessage('Invalid ticket price').customSanitizer(sanitizeInput),
+  body('price_vip').optional().isFloat({ min: 0 }).withMessage('Invalid VIP price').customSanitizer(sanitizeInput),
+  body('price_cat1').optional().isFloat({ min: 0 }).withMessage('Invalid category 1 price').customSanitizer(sanitizeInput),
+  body('price_cat2').optional().isFloat({ min: 0 }).withMessage('Invalid category 2 price').customSanitizer(sanitizeInput),
+  body('price_cat3').optional().isFloat({ min: 0 }).withMessage('Invalid category 3 price').customSanitizer(sanitizeInput),
+  body('price_cat4').optional().isFloat({ min: 0 }).withMessage('Invalid category 4 price').customSanitizer(sanitizeInput),
+  body('price_cat5').optional().isFloat({ min: 0 }).withMessage('Invalid category 5 price').customSanitizer(sanitizeInput),
   body('raffle_start_date').optional().isISO8601().withMessage('Invalid raffle start date').customSanitizer(sanitizeInput),
   body('raffle_end_date').optional().isISO8601().withMessage('Invalid raffle end date').customSanitizer(sanitizeInput),
 
@@ -162,14 +182,19 @@ const updateEvent = [
       location,
       organiser,
       ticket_availability,
-      ticket_price,
+      price_vip,
+      price_cat1,
+      price_cat2,
+      price_cat3,
+      price_cat4,
+      price_cat5,
       raffle_start_date,
       raffle_end_date,
     } = req.body;
 
     try {
       await db.execute(
-        'UPDATE events SET event_name = ?, description = ?, date = ?, start_time = ?, location = ?, organiser = ?, ticket_availability = ?, ticket_price = ?, raffle_start_date = ?, raffle_end_date = ? WHERE event_id = ?',
+        'UPDATE events SET event_name = ?, description = ?, date = ?, start_time = ?, location = ?, organiser = ?, ticket_availability = ?, price_vip = ?, price_cat1 = ?, price_cat2 = ?, price_cat3 = ?, price_cat4 = ?, price_cat5 = ?, raffle_start_date = ?, raffle_end_date = ? WHERE event_id = ?',
         [
           event_name,
           description,
@@ -178,7 +203,12 @@ const updateEvent = [
           location,
           organiser,
           ticket_availability,
-          ticket_price,
+          price_vip,
+          price_cat1,
+          price_cat2,
+          price_cat3,
+          price_cat4,
+          price_cat5,
           raffle_start_date,
           raffle_end_date,
           id
@@ -342,4 +372,3 @@ module.exports = {
   updateUser,
   deleteUser
 };
-
