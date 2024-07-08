@@ -76,13 +76,14 @@ pipeline {
         }
         stage('Run Unit Tests') {
             steps {
-                sh 'npm test'
-                sh 'ls -la' // Debug step to verify the report file
+                dir('backend') {
+                    sh 'npx jest --detectOpenHandles'
+                }
             }
         }
         stage('Archive Test Results') {
             steps {
-                junit 'junit.xml'
+                junit 'backend/junit.xml'
             }
         }
         stage('Archive Artifacts') {
