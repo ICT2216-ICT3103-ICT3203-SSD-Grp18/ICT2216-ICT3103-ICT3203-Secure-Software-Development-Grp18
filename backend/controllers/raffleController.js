@@ -9,14 +9,15 @@ const enterRaffle = async (req, res) => {
     console.log('ticketCount:', ticketCount); // Log ticketCount
 
     try {
-        // Fetch event details to get raffle start date
-        const [event] = await db.query('SELECT raffle_start_date FROM events WHERE event_id = ?', [eventId]);
+        // Fetch event details to get raffle start date and ticket availability
+        const [event] = await db.query('SELECT raffle_start_date, ticket_availability FROM events WHERE event_id = ?', [eventId]);
 
         if (event.length === 0) {
             return res.status(404).json({ message: 'Event not found' });
         }
 
-        const raffleStartDate = new Date(event[0].raffle_start_date);
+        const { raffle_start_date, ticket_availability } = event[0];
+        const raffleStartDate = new Date(raffle_start_date);
         const currentDate = new Date();
 
         // Check if the raffle start date has passed
@@ -24,19 +25,24 @@ const enterRaffle = async (req, res) => {
             return res.status(400).json({ message: 'Raffle has not started yet' });
         }
 
-        // Format ticket categories
-        const formattedTicketCount = ticketCount.map((count, index) => ({
-            name: `CAT ${index + 1}`,
-            count,
-        })).filter(category => category.count > 0);
+        // Calculate the total number of tickets the user wants to enter
+        const totalTickets = ticketCount.reduce((total, count) => total + count, 0);
+
+        // Check if there are enough tickets available
+        if (ticket_availability < totalTickets) {
+            return res.status(400).json({ message: 'Not enough tickets available for this event' });
+        }
 
         // Insert a new raffle entry
-        const [result] = await db.execute('INSERT INTO raffle_entries (event_id, user_id, num_of_seats, category) VALUES (?, ?, ?, ?)', [
+        const [result] = await db.execute('INSERT INTO raffle_entries (event_id, user_id, num_of_seats) VALUES (?, ?, ?)', [
             eventId,
             userId,
-            ticketCount.reduce((total, count) => total + count, 0), // Total number of tickets
-            JSON.stringify(formattedTicketCount), // Store formatted ticket counts as JSON string
+            totalTickets, // Total number of tickets
         ]);
+
+        // Update ticket availability
+        const newTicketAvailability = ticket_availability - totalTickets;
+        await db.execute('UPDATE events SET ticket_availability = ? WHERE event_id = ?', [newTicketAvailability, eventId]);
 
         res.status(201).json({ message: 'Raffle entry successful.', entryId: result.insertId });
     } catch (error) {
