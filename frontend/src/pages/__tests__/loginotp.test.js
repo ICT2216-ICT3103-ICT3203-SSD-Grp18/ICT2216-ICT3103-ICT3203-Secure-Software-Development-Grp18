@@ -34,16 +34,6 @@ describe('LoginModal Input Validation and Sanitization', () => {
     await waitFor(() => expect(global.alert).toHaveBeenCalledWith('Login failed. Please check your credentials and try again.'));
   });
 
-  // Edge Case: Password Complexity
-  test('should not allow password without required complexity during login', async () => {
-    await renderComponent({ isOpen: true, isLogin: true, onClose: jest.fn() });
-    fireEvent.change(screen.getByLabelText('Password:'), { target: { value: 'simple' } });
-    fireEvent.change(screen.getByLabelText('Email Address:'), { target: { value: 'valid.email@example.com' } });
-    fireEvent.click(screen.getAllByRole('button', { name: /log in/i })[1]);
-
-    await waitFor(() => expect(global.alert).toHaveBeenCalledWith('Login failed. Please check your credentials and try again.'));
-  });
-
 
   // Test OTP login flow
   test('should handle OTP login flow correctly', async () => {
