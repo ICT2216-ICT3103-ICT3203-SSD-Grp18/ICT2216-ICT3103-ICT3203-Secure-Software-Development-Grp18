@@ -76,6 +76,7 @@ const register = [
 
       res.status(201).json({ message: 'User registered successfully', userId: result.insertId });
     } catch (error) {
+      console.error('Error inserting user:', error);
       res.status(500).json({ message: 'Server error', error: error.message });
     }
   }
@@ -226,7 +227,7 @@ const deleteEvent = async (req, res) => {
     await db.execute('DELETE FROM events WHERE event_id = ?', [id]);
     res.status(200).json({ message: 'Event deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error. Please try again later.' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
@@ -235,7 +236,7 @@ const getEvents = async (req, res) => {
     const [events] = await db.execute('SELECT * FROM events');
     res.status(200).json(events);
   } catch (error) {
-    res.status(500).json({ message: 'Server error. Please try again later.' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
@@ -245,7 +246,7 @@ const searchEvents = async (req, res) => {
     const [events] = await db.execute('SELECT * FROM events WHERE event_name LIKE ?', [`%${event_name}%`]);
     res.status(200).json(events);
   } catch (error) {
-    res.status(500).json({ message: 'Server error. Please try again later.' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
@@ -255,7 +256,7 @@ const getUsers = async (req, res) => {
     const [users] = await db.execute('SELECT * FROM user');
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ message: 'Server error. Please try again later.' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
@@ -266,7 +267,7 @@ const searchUsers = async (req, res) => {
     const [users] = await db.execute('SELECT * FROM user WHERE email LIKE ?', [`%${email}%`]);
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ message: 'Server error. Please try again later.' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
@@ -274,6 +275,7 @@ const searchUsers = async (req, res) => {
 const updateUserStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
+  console.log('Request received to update status', { id, status }); // Log request details
 
   if (!id || !status) {
     return res.status(400).json({ message: 'Invalid request data' });
@@ -293,7 +295,8 @@ const updateUserStatus = async (req, res) => {
 
     res.status(200).json({ message: 'User status updated successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error. Please try again later.' });
+    console.error('Error updating user status:', error); // Log error details
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
@@ -305,7 +308,7 @@ const updateUserRole = async (req, res) => {
     await db.execute('UPDATE user SET user_role = ? WHERE user_id = ?', [user_role, id]);
     res.status(200).json({ message: 'User role updated successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error. Please try again later.' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
@@ -333,7 +336,7 @@ const deleteUser = async (req, res) => {
     await db.execute('DELETE FROM user WHERE user_id = ?', [id]);
     res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error. Please try again later.' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
@@ -350,7 +353,7 @@ const getMetrics = async (req, res) => {
       upcomingEvent: upcomingEvents[0] || null,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error. Please try again later.' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 

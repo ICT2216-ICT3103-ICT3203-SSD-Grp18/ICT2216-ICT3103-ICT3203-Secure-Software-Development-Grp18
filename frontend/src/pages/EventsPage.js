@@ -17,20 +17,24 @@ const EventPage = () => {
     const initialSearchTerm = query.get('search') || '';
     const [browseConcert, setBrowseConcert] = useState([]);
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
-    const [error, setError] = useState('');
-
 
     useEffect(() => {
         const fetchBrowseConcert = async () => {
             try {
                 const response = await apiClient.get('/events/browse');
+                console.log('Fetch Browse Concert Response:', response);
                 if (response.status !== 200) {
-                   setBrowseConcert(response.data)
-                }else {
-                   setError(`Error fetching browse concerts: ${response.statusText}`);
+                    throw new Error(`Network response was not ok: ${response.statusText}`);
                 }
+                console.log('Browse Concert Data:', response.data);
+                setBrowseConcert(response.data);
             } catch (error) {
-                setError('Error fetching browse concerts. Please try again later.');
+                console.error('Error fetching browse concerts:', error);
+                if (error.response) {
+                    console.error('Error response data:', error.response.data);
+                    console.error('Error response status:', error.response.status);
+                    console.error('Error response headers:', error.response.headers);
+                }
             }
         };
         fetchBrowseConcert();

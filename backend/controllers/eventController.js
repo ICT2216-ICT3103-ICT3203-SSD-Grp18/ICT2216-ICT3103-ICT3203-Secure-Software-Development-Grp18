@@ -21,7 +21,8 @@ const getUpcomingEvents = async (req, res) => {
     const formattedEvents = formatEvents(events);
     res.json(formattedEvents);
   } catch (error) {
-    res.status(500).json({ message: 'Server error. Please try again later.' });
+    console.error('Error fetching upcoming events:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -36,7 +37,8 @@ const getBrowseConcerts = async (req, res) => {
     const formattedEvents = formatEvents(events);
     res.json(formattedEvents);
   } catch (error) {
-    res.status(500).json({ message: 'Server error. Please try again later.' });
+    console.error('Error fetching browse concerts:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -56,7 +58,8 @@ const getTopSelling = async (req, res) => {
     console.log("hello")
     console.log(res)
   } catch (error) {
-    res.status(500).json({ message: 'Server error. Please try again later.' });
+    console.error('Error fetching events with lowest ticket availability:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -97,7 +100,8 @@ const getEventById = async (req, res) => {
     res.json({ ...event, categories });
 
   } catch (error) {
-    res.status(500).json({ message: 'Server error. Please try again later.' });
+    console.error('Error fetching event by ID:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 

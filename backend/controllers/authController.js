@@ -19,7 +19,6 @@ const sanitizeInput = (input) => {
 };
 
 const hashPassword = async (password) => {
-  // Generate a 32-byte random salt
   const salt = crypto.randomBytes(32).toString('hex');
   const hash = await new Promise((resolve, reject) => {
     crypto.pbkdf2(password, salt, 100000, 64, 'sha512', (err, derivedKey) => {
@@ -27,7 +26,6 @@ const hashPassword = async (password) => {
       resolve(derivedKey.toString('hex'));
     });
   });
-  // Return the combined salt and hash in the format 'salt:hash'
   return `${salt}:${hash}`;
 };
 
@@ -113,7 +111,7 @@ const login = [
         return res.status(401).json({ message: 'Invalid email or password' });
       }
     } catch (error) {
-      console.error('Error during login:', error.message);
+      console.error('Error during login:', error);
       return res.status(500).json({ message: 'Server error', error: error.message });
     }
   }
@@ -168,6 +166,7 @@ const register = [
 
       res.status(201).json({ message: 'User registered successfully', userId: result.insertId });
     } catch (error) {
+      console.error('Error inserting user:', error);
       res.status(500).json({ message: 'Server error', error: error.message });
     }
   }
@@ -186,6 +185,7 @@ const logout = async (req, res) => {
       res.status(200).json({ message: 'Logout successful' });
     });
   } catch (error) {
+    console.error('Error during logout:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -207,6 +207,7 @@ const checkAuth = (req, res) => {
 
 const getUser = (req, res) => {
   const user = req.user;
+
   if (user) {
     res.status(200).json({ email: user.email, role: user.role });
   } else {
@@ -234,6 +235,7 @@ const forgotPassword = async (req, res) => {
     res.status(202).json({ message: 'Password reset email sent. Please check your email.' });
 
   } catch (error) {
+    console.error('Error during password reset:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -274,6 +276,7 @@ const resetPassword = [
 
       res.status(200).json({ message: 'Password reset successfully' });
     } catch (error) {
+      console.error('Error during password reset:', error);
       res.status(500).json({ message: 'Server error', error: error.message });
     }
   }
@@ -343,6 +346,7 @@ const verifyOtp = async (req, res) => {
       return res.status(200).json({ status: 200, message: 'Login successful', user: { id: user.user_id, email: user.email, role: user.user_role } });
     });
   } catch (error) {
+    console.error('Error during OTP verification:', error);
     return res.status(500).json({ status: 500, message: 'Server error', error: error.message });
   }
 };

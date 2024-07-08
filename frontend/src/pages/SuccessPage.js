@@ -7,8 +7,6 @@ import apiClient from '../axiosConfig';
 
 const SuccessPage = () => {
   const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchUserEmail = async () => {
@@ -17,12 +15,10 @@ const SuccessPage = () => {
         if (response.status === 200) {
           setEmail(response.data.email);
         } else {
-          setError('Failed to fetch user email. Please try again later.');
+          console.error('Failed to fetch user email');
         }
       } catch (error) {
-        setError('Error fetching user email. Please try again later.');
-      } finally {
-        setLoading(false);
+        console.error('Error fetching user email:', error);
       }
     };
 
@@ -33,12 +29,6 @@ const SuccessPage = () => {
     <div className="completion-page">
       <Navbar />
       <div className="completion-content">
-      {loading ? (
-          <p>Loading...</p>
-        ) : error ? (
-          <p className="error-message">{error}</p>
-        ) : (
-          <>
         <img src={successImage} alt="Success" className="result-image" />
         <h1>Payment Successful!</h1>
         <p>Your tickets have been sent to</p>
@@ -48,9 +38,6 @@ const SuccessPage = () => {
           <p>+65 82729292</p>
           <p>TicketingHuat@Ticketinghuat.com</p>
         </div>
-        </>
-       )}
-
       </div>
       <Footer />
     </div>

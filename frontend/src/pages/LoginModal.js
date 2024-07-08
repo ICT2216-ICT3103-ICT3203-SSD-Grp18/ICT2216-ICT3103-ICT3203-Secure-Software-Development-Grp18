@@ -79,6 +79,7 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
       const result = await login({ email: sanitizedEmail, password: sanitizedPassword });
       if (result.otpRequired) {
         setIsOtpSent(true);
+
         // set OTP expiration time from now
         setOtpExpireTime(Date.now() + 5 * 60 * 1000); 
         alert('OTP sent to your email');
@@ -87,13 +88,8 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
         onClose();
       }
     } catch (error) {
-
-      if (error.response && error.response.status === 401) { 
-        alert('Invalid email or password. Please try again.');
-    } else {
-        alert('Login failed. Please check your credentials and try again.');
+      alert('Login failed. Please check your credentials and try again.');
     }
-   }
   };
 
   const handleVerifyOtp = async (e) => {
@@ -109,14 +105,9 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
         setIsOtpSent(false);
       }
     } catch (error) {
-      if (error.response && error.response.status === 400) {
-       alert('Invalid OTP. Please try again.');
-       setIsOtpSent(false);
-    }else {
-       alert(`Error: ${error.message}`);
+      alert(`Error: ${error.message}`);
+      setIsOtpSent(false);
     }
-    setIsOtpSent(false)
-   }
   };
 
   const handleSignUp = async (e) => {
@@ -171,8 +162,6 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
     } catch (error) {
       if (error.response && error.response.status === 409) {
         setErrors({ email: 'This email address is already registered. Please use a different email.' });
-      }else if(error.response && error.response.status === 400){
-        alert('Invalid data. Please check your inputs and try again.');
       } else {
         alert('Registration failed. Please try again.');
       }

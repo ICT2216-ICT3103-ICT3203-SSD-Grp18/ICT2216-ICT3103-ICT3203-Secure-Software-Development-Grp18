@@ -24,7 +24,8 @@ const EventDetailPage = () => {
       try {
         const response = await apiClient.get(`/events/${eventId}`, { withCredentials: true });
         if (response.status !== 200) {
-        
+          throw new Error(`Network response was not ok: ${response.statusText}`);
+        }
         const data = response.data;
         setEvent(data);
 
@@ -44,13 +45,9 @@ const EventDetailPage = () => {
         }
 
         setLoading(false);
-      }else{
-        setError(`Error fetching event details: ${response.statusText}`);
-      }
-
       } catch (error) {
-        setError('Error fetching event details. Please try again later.'); 
-      }finally{
+        setError(error.message);
+      } finally {
         setLoading(false);
       }
     };
@@ -73,13 +70,9 @@ const EventDetailPage = () => {
       if (isLoggedIn) {
         try {
           const response = await apiClient.get(`/raffle/hasEntered?eventId=${eventId}`, { withCredentials: true });
-          if (response.status === 200) {
           setHasEnteredRaffle(response.data.hasEntered);
-          }else{
-          setError(`Error checking raffle entry: ${response.statusText}`);
-          }
         } catch (error) {
-          setError('Error checking raffle entry. Please try again later.');
+          console.error('Error checking raffle entry:', error);
         }
       }
     };

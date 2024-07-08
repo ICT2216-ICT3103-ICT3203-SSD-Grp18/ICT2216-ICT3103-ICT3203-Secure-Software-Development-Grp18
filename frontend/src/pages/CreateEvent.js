@@ -46,7 +46,7 @@ const validateRaffleDate = (raffleStart, raffleEnd, eventDate) => {
   const start = new Date(raffleStart);
   const end = new Date(raffleEnd);
   const event = new Date(eventDate);
-  if (!raffleStart || !raffleEnd || !eventDate) return true;
+  if (!raffleStart || !raffleEnd || !eventDate) return true; // Skip validation if any date is missing
   return start <= end && start < event && end < event;
 };
 
@@ -208,17 +208,10 @@ const CreateEvent = () => {
           image: null,
         });
         setErrors({});
-      } else {
-        alert('Failed to create event');
       }
     } catch (error) {
-      if (error.response && error.response.status === 400) {
-        alert('Error: Invalid input. Please check your data and try again.');
-      } else if (error.response && error.response.status === 500) {
-        alert('Error: Server error. Please try again later.');
-      } else {
-        alert('Failed to create event. Please try again.');
-      }
+      console.error('Error creating event:', error);
+      alert('Failed to create event');
     }
   };
 

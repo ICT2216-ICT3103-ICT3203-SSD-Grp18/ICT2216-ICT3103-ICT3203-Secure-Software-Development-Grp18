@@ -12,6 +12,8 @@ const router = express.Router();
 
 // Event management routes
 router.post('/events', authenticateToken, isAdmin, upload.single('image'), (req, res, next) => {
+  console.log('Request received:', req.body);
+  console.log('File received:', req.file);
   next();
 }, createEvent);
 

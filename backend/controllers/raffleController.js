@@ -1,12 +1,12 @@
 const db = require('../utils/db');
 
 const enterRaffle = async (req, res) => {
-    const { eventId, ticketCount } = req.body; 
+    const { eventId, ticketCount } = req.body; // Include ticketCount in request body
     const userId = req.user.id;
 
-    console.log('eventId:', eventId); 
-    console.log('userId:', userId);   
-    console.log('ticketCount:', ticketCount); 
+    console.log('eventId:', eventId); // Log eventId
+    console.log('userId:', userId);   // Log userId
+    console.log('ticketCount:', ticketCount); // Log ticketCount
 
     try {
         // Fetch event details to get raffle start date
@@ -40,6 +40,7 @@ const enterRaffle = async (req, res) => {
 
         res.status(201).json({ message: 'Raffle entry successful.', entryId: result.insertId });
     } catch (error) {
+        console.error('Error entering raffle:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
@@ -54,6 +55,7 @@ const hasUserEnteredRaffle = async (req, res) => {
         const userHasEntered = existingEntry.length > 0;
         res.status(200).json({ hasEntered: userHasEntered });
     } catch (error) {
+        console.error('Error checking raffle entry:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
