@@ -82,7 +82,7 @@ pipeline {
         stage('Run Unit Tests') {
             steps {
                 dir('backend') {
-                    withCredentials([usernamePassword(credentialsId: 'db_credentials', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASSWORD'), string(credentialsId: 'db_name', variable: 'DB_NAME')]) {
+                    withCredentials([usernamePassword(credentialsId: 'db_credentials', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASSWORD'), string(credentialsId: 'db_name', variable: 'DB_NAME'), usernamePassword(credentialsId: 'smtp_credentials', usernameVariable: 'SMTP_USER', passwordVariable: 'SMTP_PASSWORD')]) {
                         sh 'npx jest --detectOpenHandles --forceExit __tests__'
                     }
                 }
