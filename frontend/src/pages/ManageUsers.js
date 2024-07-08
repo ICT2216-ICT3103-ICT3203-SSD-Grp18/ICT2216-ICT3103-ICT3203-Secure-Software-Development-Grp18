@@ -117,7 +117,8 @@ const ManageUsers = () => {
   };
 
   const validatePhoneNumber = (phoneNumber) => {
-    return validator.isMobilePhone(phoneNumber, 'en-SG');
+    const phoneNumberRegex = /^\d{1,15}$/;
+    return phoneNumberRegex.test(phoneNumber);
   };
 
   const validatePassword = (password) => {
