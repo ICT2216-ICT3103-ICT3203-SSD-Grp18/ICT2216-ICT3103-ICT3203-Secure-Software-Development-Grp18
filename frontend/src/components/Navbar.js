@@ -32,7 +32,7 @@ const Navbar = () => {
             <li><Link to="/">Concerts</Link></li>
             <li><Link to="/events">Events</Link></li>
             <li><Link to="/aboutus">About us</Link></li>
-            {user?.role === 'admin' && (
+            {user && ['admin', 'event', 'cus_support'].includes(user.role) && (
               <li><Link to="/admin">Admin Dashboard</Link></li>
             )}
             {isLoggedIn ? (
