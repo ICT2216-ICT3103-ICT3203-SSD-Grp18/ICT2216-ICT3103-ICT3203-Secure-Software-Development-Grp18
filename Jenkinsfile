@@ -90,12 +90,8 @@ pipeline {
         }
         stage('Archive Test Results') {
             steps {
-                junit 'junit.xml'
-            }
-        }
-        stage('Archive Artifacts') {
-            steps {
-                archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
+                junit 'backend/reports/junit.xml'
+                archiveArtifacts artifacts: 'backend/reports/junit/junit.xml'
             }
         }
         stage('List and Archive Dependencies') {
@@ -106,7 +102,10 @@ pipeline {
                 archiveArtifacts artifacts: 'dependencyupdates.txt', fingerprint: true
             }
         }
-        stage('Build Frontend') {
+        stage('Deploy to Web Server') {
+            when {
+                branch 'main'
+            }
             steps {
                 dir('frontend') {
                     sh '''
@@ -114,13 +113,6 @@ pipeline {
                     CI=false npm run build
                     '''
                 }
-            }
-        }
-        stage('Deploy to Web Server') {
-            when {
-                branch 'main'
-            }
-            steps {
                 sshagent(['jenkins_ssh_agent']) {
                     sh '''
                     mkdir -p ~/.ssh
@@ -138,7 +130,7 @@ pipeline {
                     if [ -d /var/www/html ]; then
                         cd /var/www/html && npm install
                     fi
-                    if [ -d /var/www/html/backend]; then
+                    if [ -d /var/www/html/backend ]; then
                         cd /var/www/html/backend && npm install
                     fi
                     if [ -d /var/www/html/frontend ]; then
