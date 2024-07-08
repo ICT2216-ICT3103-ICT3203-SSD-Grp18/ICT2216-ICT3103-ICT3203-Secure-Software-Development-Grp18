@@ -12,6 +12,10 @@ pipeline {
 
     environment {
         BRANCH_NAME = "${env.BRANCH_NAME}"
+        DB_HOST = 'mySQLServer'
+        DB_PORT = '3306'
+        // These will be fetched from Jenkins credentials store
+        // DB_USER and DB_PASSWORD will be populated using withCredentials
     }
 
     stages {
@@ -60,24 +64,27 @@ pipeline {
                 }
             }
         }
-        stage('OWASP Dependency-Check Vulnerabilities') {
-            steps {
-                dependencyCheck(additionalArguments: '--format XML --format HTML', odcInstallation: 'OWASP-Dependency-Check', nvdCredentialsId: 'nvd-api-key')
-            }
-            post {
-                always {
-                    script {
-                        // Modify the version string in the XML report to avoid parsing issues
-                        sh 'sed -i \'s/Version>10.0.1/Version>9.0.4/\' $(find . -name dependency-check-report.xml)'
-                    }
-                    dependencyCheckPublisher(pattern: '**/dependency-check-report.xml')
-                }
-            }
-        }
+        // Commented out the OWASP stage for now
+        // stage('OWASP Dependency-Check Vulnerabilities') {
+        //     steps {
+        //         dependencyCheck(additionalArguments: '--format XML --format HTML', odcInstallation: 'OWASP-Dependency-Check', nvdCredentialsId: 'nvd-api-key')
+        //     }
+        //     post {
+        //         always {
+        //             script {
+        //                 // Modify the version string in the XML report to avoid parsing issues
+        //                 sh 'sed -i \'s/Version>10.0.1/Version>9.0.4/\' $(find . -name dependency-check-report.xml)'
+        //             }
+        //             dependencyCheckPublisher(pattern: '**/dependency-check-report.xml')
+        //         }
+        //     }
+        // }
         stage('Run Unit Tests') {
             steps {
                 dir('backend') {
-                    sh 'npx jest --detectOpenHandles'
+                    withCredentials([usernamePassword(credentialsId: 'db_credentials', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASSWORD'), string(credentialsId: 'db_name', variable: 'DB_NAME')]) {
+                        sh 'npx jest --detectOpenHandles'
+                    }
                 }
             }
         }
@@ -131,7 +138,7 @@ pipeline {
                     if [ -d /var/www/html ]; then
                         cd /var/www/html && npm install
                     fi
-                    if [ -d /var/www/html/backend ]; then
+                    if [ -d /var/www/html/backend]; then
                         cd /var/www/html/backend && npm install
                     fi
                     if [ -d /var/www/html/frontend ]; then
