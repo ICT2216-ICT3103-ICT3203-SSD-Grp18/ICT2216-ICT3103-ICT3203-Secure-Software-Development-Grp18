@@ -12,6 +12,10 @@ pipeline {
 
     environment {
         BRANCH_NAME = "${env.BRANCH_NAME}"
+        DB_HOST = 'mySQLServer'
+        DB_PORT = '3306'
+        // These will be fetched from Jenkins credentials store
+        // DB_USER and DB_PASSWORD will be populated using withCredentials
     }
 
     stages {
@@ -76,18 +80,22 @@ pipeline {
         }
         stage('Run Unit Tests') {
             steps {
-                sh 'npm test'
-                sh 'ls -la' // Debug step to verify the report file
+                dir('backend') {
+                    withCredentials([
+                        usernamePassword(credentialsId: 'db_credentials', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASSWORD'), 
+                        string(credentialsId: 'db_name', variable: 'DB_NAME'), 
+                        usernamePassword(credentialsId: 'smtp_credentials', usernameVariable: 'EMAIL_USER', passwordVariable: 'EMAIL_PASS'),
+                        string(credentialsId: 'jwt_secret', variable: 'JWT_SECRET')
+                    ]) {
+                        sh 'npx jest --detectOpenHandles --forceExit __tests__'
+                    }
+                }
             }
         }
         stage('Archive Test Results') {
             steps {
                 junit 'junit.xml'
-            }
-        }
-        stage('Archive Artifacts') {
-            steps {
-                archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'junit.xml', fingerprint: true
             }
         }
         stage('List and Archive Dependencies') {
@@ -98,7 +106,10 @@ pipeline {
                 archiveArtifacts artifacts: 'dependencyupdates.txt', fingerprint: true
             }
         }
-        stage('Build Frontend') {
+        stage('Deploy to Web Server') {
+            when {
+                branch 'main'
+            }
             steps {
                 dir('frontend') {
                     sh '''
@@ -106,13 +117,6 @@ pipeline {
                     CI=false npm run build
                     '''
                 }
-            }
-        }
-        stage('Deploy to Web Server') {
-            when {
-                branch 'main'
-            }
-            steps {
                 sshagent(['jenkins_ssh_agent']) {
                     sh '''
                     mkdir -p ~/.ssh
