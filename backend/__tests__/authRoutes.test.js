@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const authRoutes = require('../routes/authRoutes');
+const db = require('../utils/db'); // Ensure this points to your db mock or real db
 
 // Set up the express app for testing
 const app = express();
@@ -17,6 +18,18 @@ app.use(session({
   saveUninitialized: false,
 }));
 app.use('/api/auth', authRoutes);
+
+// Clean up the database before each test
+beforeEach(async () => {
+  await db.execute('DELETE FROM user WHERE email = ?', ['test@example.com']);
+  // Add more cleanup queries if needed
+});
+
+// Clean up the database after all tests
+afterAll(async () => {
+  await db.execute('DELETE FROM user WHERE email = ?', ['test@example.com']);
+  await db.end(); // Close the database connection pool
+});
 
 describe('Auth Routes', () => {
   it('should return validation error for empty name on POST /register', async () => {
