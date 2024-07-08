@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const eventRoutes = require('./routes/eventRoutes');
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const ticketRoutes = require('./routes/ticketRoutes'); 
 const cors = require('cors');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
@@ -76,6 +77,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api', eventRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api', orderRoutes);
+app.use('/api', ticketRoutes); // Ensure this prefixes the routes with '/api'
 
 
 app.listen(PORT, () => {
