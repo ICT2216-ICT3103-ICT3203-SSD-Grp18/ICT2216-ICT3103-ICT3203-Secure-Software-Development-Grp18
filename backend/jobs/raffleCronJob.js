@@ -2,8 +2,8 @@ const cron = require('node-cron');
 const db = require('../utils/db');
 const { sendNotification } = require('../utils/sendNotification');
 
-// Function to pick a random winner
-const pickWinner = async (eventId) => {
+// Function to pick random winners
+const pickWinners = async (eventId) => {
   try {
     // Fetch all raffle entries for the event
     const [entries] = await db.query('SELECT * FROM raffle_entries WHERE event_id = ?', [eventId]);
@@ -12,44 +12,54 @@ const pickWinner = async (eventId) => {
       return;
     }
 
-    console.log(`Total entries for event ID ${eventId}: ${entries.length}`);
-
-    // Select a random entry
-    const winnerIndex = Math.floor(Math.random() * entries.length);
-    const winnerEntry = entries[winnerIndex];
-
-    console.log(`Winner selected: Entry ID ${winnerEntry.entry_id}, User ID ${winnerEntry.user_id}`);
-
-    // Update the raffle entry to mark the user as a winner
-    const [updateResult] = await db.execute('UPDATE raffle_entries SET is_winner = TRUE WHERE entry_id = ?', [winnerEntry.entry_id]);
-
-    if (updateResult.affectedRows === 0) {
-      console.log(`Failed to update entry ID ${winnerEntry.entry_id} as a winner.`);
-      return;
-    }
-
-    // Fetch the event details
-    const [event] = await db.query('SELECT event_id, event_name, description, date, start_time, location FROM events WHERE event_id = ?', [eventId]);
+    // Fetch the event details including ticket availability
+    const [event] = await db.query('SELECT event_id, event_name, description, date, start_time, location, ticket_availability FROM events WHERE event_id = ?', [eventId]);
     if (event.length === 0) {
       console.log(`Event with ID: ${eventId} not found.`);
       return;
     }
 
-    console.log('Fetched event data:', event[0]);
+    const { event_name, description, date, start_time, location, ticket_availability } = event[0];
 
-    // Ensure event_id is present
-    if (!event[0].event_id) {
-      throw new Error('Event ID is undefined');
+    // Check if there are tickets available
+    if (ticket_availability <= 0) {
+      console.log(`No tickets available for event ID: ${eventId}.`);
+      return;
     }
 
-    const { event_name, description, date, start_time, location } = event[0];
+    console.log(`Total entries for event ID ${eventId}: ${entries.length}`);
+    console.log(`Tickets available for event ID ${eventId}: ${ticket_availability}`);
 
-    // Send notification to the winner with event details, number of tickets, and category
-    await sendNotification(winnerEntry.user_id, event[0], winnerEntry.num_of_seats, winnerEntry.category);
+    // Randomly select winners up to the number of available tickets
+    const winners = [];
+    for (let i = 0; i < ticket_availability && entries.length > 0; i++) {
+      const winnerIndex = Math.floor(Math.random() * entries.length);
+      winners.push(entries.splice(winnerIndex, 1)[0]);
+    }
 
-    console.log(`Winner notified: Entry ID ${winnerEntry.entry_id}, User ID ${winnerEntry.user_id}`);
+    for (const winner of winners) {
+      console.log(`Winner selected: Entry ID ${winner.entry_id}, User ID ${winner.user_id}`);
+
+      // Update the raffle entry to mark the user as a winner
+      const [updateResult] = await db.execute('UPDATE raffle_entries SET is_winner = TRUE WHERE entry_id = ?', [winner.entry_id]);
+
+      if (updateResult.affectedRows === 0) {
+        console.log(`Failed to update entry ID ${winner.entry_id} as a winner.`);
+        continue;
+      }
+
+      // Send notification to the winner with event details, number of tickets, and category
+      await sendNotification(winner.user_id, event[0], winner.num_of_seats, winner.category);
+
+      console.log(`Winner notified: Entry ID ${winner.entry_id}, User ID ${winner.user_id}`);
+    }
+
+    // Update ticket availability
+    const newTicketAvailability = ticket_availability - winners.length;
+    await db.execute('UPDATE events SET ticket_availability = ? WHERE event_id = ?', [newTicketAvailability, eventId]);
+
   } catch (error) {
-    console.error('Error picking winner:', error);
+    console.error('Error picking winners:', error);
   }
 };
 
@@ -62,16 +72,10 @@ cron.schedule('0 0 * * *', async () => {
     const [events] = await db.query('SELECT event_id FROM events WHERE raffle_end_date <= NOW() AND raffle_end_date IS NOT NULL');
 
     for (const event of events) {
-      await pickWinner(event.event_id);
+      await pickWinners(event.event_id);
     }
   } catch (error) {
     console.error('Error running raffle job:', error);
   }
 });
 
-// For manual testing purposes, run the pickWinner function with a specific event ID
-const manualTestEventId = 6; // Replace with the event ID you want to test
-(async () => {
-  console.log(`Running manual raffle pick job for event ID: ${manualTestEventId}...`);
-  await pickWinner(manualTestEventId);
-})();
