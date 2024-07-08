@@ -57,7 +57,6 @@ const ManageEvents = () => {
   const [error, setError] = useState('');
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [errors, setErrors] = useState({});
-  
 
   useEffect(() => {
     fetchEvents();
@@ -205,10 +204,11 @@ const ManageEvents = () => {
   }
 };
 
-const handleDeleteEvent = async () => {
-  try {
-    const response = await apiClient.delete(`/admin/events/${selectedEvent.event_id}`, { withCredentials: true });
-    if (response.status === 200) {
+  const handleDeleteEvent = async () => {
+    try {
+      await apiClient.delete(`/admin/events/${selectedEvent.event_id}`, { withCredentials: true });
+      if (response.status === 200) {
+
       fetchEvents(); // Refresh event list after deleting event
       setModalIsOpen(false);
     } else {

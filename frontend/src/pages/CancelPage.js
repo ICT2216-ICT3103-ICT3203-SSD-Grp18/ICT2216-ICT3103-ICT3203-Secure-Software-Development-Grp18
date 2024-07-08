@@ -1,12 +1,14 @@
-import React, { useState } from 'react';  // Added useState import
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 // import cancelImage from '../styles/images/completion/cancel.png'; // Add a cancel image
 
+
 const CancelPage = () => {
   const navigate = useNavigate();
-  const [error, setError] = useState(null);  // useState hook usage
+  const [error, setError] = useState(null);
+  
 
   const handleGoBack = () => {
     try {
@@ -15,6 +17,7 @@ const CancelPage = () => {
       setError('Failed to navigate to the home page. Please try again later.');
     }
   };
+
 
   return (
     <div className="completion-page">
@@ -35,5 +38,6 @@ const CancelPage = () => {
     </div>
   );
 };
+
 
 export default CancelPage;
