@@ -35,15 +35,13 @@ const authenticateToken = async (req, res, next) => {
   });
 };
 
-const isAdmin = (req, res, next) => {
-  if (req.user && req.user.role === 'admin') {
+const isAdminDashboardUser = (req, res, next) => {
+  if (req.user && ['admin', 'event', 'cus_support'].includes(req.user.role)) {
     next();
   } else {
     res.sendStatus(403);
   }
 };
 
+module.exports = { authenticateToken, isAdminDashboardUser };
 
-
-
-module.exports = { authenticateToken, isAdmin };

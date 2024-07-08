@@ -1,0 +1,61 @@
+@font-face {
+    font-family: 'GeneralSans-Med';
+    src: url(../fonts/GeneralSans/GeneralSans-Medium.otf);
+  }
+  
+  @font-face {
+    font-family: 'GeneralSans-Reg';
+    src: url(../fonts/GeneralSans/GeneralSans-Regular.otf);
+  }
+  
+  .ticket-card {
+    width: 285px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 1rem;
+    background-color: #fff;
+  }
+  
+  .ticket-information {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+  }
+  
+  .ticket-details {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+  }
+  
+  .ticket-cat {
+    font-family: 'GeneralSans-Med';
+    font-size: 16px;
+    margin-bottom: 0.5rem;
+  }
+  
+  .ticket-price, .ticket-status, .ticket-seat, .ticket-transferred-date {
+    font-family: 'GeneralSans-Reg';
+    font-size: 14px;
+    color: #666;
+    margin: 0.2rem 0;
+  }
+  
+  .transfer-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    align-self: center;
+    margin-top: 1rem;
+  }
+  
+  .transfer-button:hover {
+    background-color: #0056b3;
+  }
+  
