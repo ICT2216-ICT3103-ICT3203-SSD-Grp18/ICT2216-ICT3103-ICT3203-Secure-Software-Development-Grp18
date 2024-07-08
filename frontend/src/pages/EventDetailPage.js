@@ -105,7 +105,8 @@ const EventDetailPage = () => {
     if (hasEnteredRaffle) {
       alert('You have already entered the raffle for this event');
       return;
-    } else {
+    }
+    else {
       navigate(`/ticket/${eventId}`);
     }
   };
@@ -126,53 +127,53 @@ const EventDetailPage = () => {
     <div className="event-detail-page">
       <Navbar />
       <div className="event-detail-page-content">
-        <header className="event-header">
-          <div className="header-container">
-            <div className="share-buttons">
-              <p>Share</p>
-              <a href="#link"><i className="bi bi-link"></i></a>
-              <a href="#instagram"><i className="bi bi-instagram"></i></a>
-              <a href="#twitter"><i className="bi bi-twitter"></i></a>
-              <a href="#facebook"><i className="bi bi-facebook"></i></a>
-            </div>
-            <img src={`data:image/png;base64,${event.image}`} alt={event.event_name} className="event-image" />
+      <header className="event-header">
+        <div className="header-container">
+          <div className="share-buttons">
+            <p>Share</p>
+            <a href="#link"><i className="bi bi-link"></i></a>
+            <a href="#instagram"><i className="bi bi-instagram"></i></a>
+            <a href="#twitter"><i class="bi bi-twitter"></i></a>
+            <a href="#facebook"><i class="bi bi-facebook"></i></a>
           </div>
-        </header>
-        <div className="event-content">
-          <div className="event-main">
-            <h1>{event.event_name}</h1>
-            <p className="event-location"><i className="bi bi-geo-alt"></i> {event.location}</p>
-            <p className="event-date"><i className="bi bi-calendar"></i> {new Date(event.date).toLocaleString()}</p>
-            <p className="event-description">{event.description}</p>
-          </div>
-          <div className="ticket-info">
-            <p className="ticket-price">Tickets priced at </p>
-            <p className="ticket-price-range"><span>{event.ticket_price}</span></p>
-            {raffleEnded ? (
-              <p className="raffle-countdown">Raffle ended</p>
-            ) : timeLeft > 0 ? (
-              <div>
-                <p className="raffle-countdown">
-                  {raffleStarted ? 'Raffle ending in: ' : 'Raffle starts in: '}
-                  {formatTimeLeft()}
-                </p>
-                {raffleStarted && !hasEnteredRaffle && (
-                  <button className="btn btn-primary rafflebtn" onClick={handleRaffleClick}>
-                    Enter Raffle
-                  </button>
-                )}
-                {raffleStarted && hasEnteredRaffle && (
-                  <p className="raffle-entered">You have already entered the raffle</p>
-                )}
-              </div>
-            ) : (
-              <button className="btn btn-primary rafflebtn" onClick={handleRaffleClick}>
-                Enter Raffle
-              </button>
-            )}
-          </div>
+          <img src={`data:image/png;base64,${event.image}`} alt={event.event_name} className="event-image" />
         </div>
-        <TicketingEventDetails />
+      </header>
+      <div className="event-content">
+        <div className="event-main">
+          <h1>{event.event_name}</h1>
+          <p className="event-location"><i className="bi bi-geo-alt"></i> {event.location}</p>
+          <p className="event-date"><i className="bi bi-calendar"></i> {new Date(event.date).toLocaleString()}</p>
+          <p className="event-description">{event.description}</p>
+        </div>
+        <div className="ticket-info">
+          <p className="ticket-price">Tickets starting at </p>
+          <p className="ticket-price-range"><span>{event.price_cat5}</span></p>
+          {raffleEnded ? (
+            <p className="raffle-countdown">Raffle ended</p>
+          ) : timeLeft > 0 ? (
+            <div>
+              <p className="raffle-countdown">
+                {raffleStarted ? 'Raffle ending in: ' : 'Raffle starts in: '}
+                {formatTimeLeft()}
+              </p>
+              {raffleStarted && !hasEnteredRaffle && (
+                <button className="btn btn-primary rafflebtn" onClick={handleRaffleClick}>
+                  Enter Raffle
+                </button>
+              )}
+              {raffleStarted && hasEnteredRaffle && (
+                <p className="raffle-entered">You have already entered the raffle</p>
+              )}
+            </div>
+          ) : (
+            <button className="btn btn-primary rafflebtn" onClick={handleRaffleClick}>
+              Enter Raffle
+            </button>
+          )}
+        </div>
+      </div>
+      <TicketingEventDetails />
       </div>
       <Footer />
     </div>
