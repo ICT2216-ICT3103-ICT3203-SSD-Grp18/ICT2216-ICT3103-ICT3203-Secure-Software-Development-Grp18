@@ -90,7 +90,7 @@ pipeline {
         }
         stage('Archive Test Results') {
             steps {
-                junit 'backend/junit.xml'
+                junit 'junit.xml'
             }
         }
         stage('Archive Artifacts') {
