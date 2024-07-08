@@ -114,7 +114,7 @@ const ManageEvents = () => {
       if (!validateText(sanitizedValue)) {
         error = 'Invalid input. Only letters and spaces are allowed.';
       }
-    } else if (name.startsWith('price_')) {
+    } else if (name === 'ticket_price') {
       if (!validatePrice(sanitizedValue)) {
         error = 'Invalid price. Must be a whole number between 0 and 1000.';
       }
@@ -152,8 +152,7 @@ const ManageEvents = () => {
   const validateForm = () => {
     const {
       event_name, description, organiser,
-      ticket_availability, price_vip, price_cat1,
-      price_cat2, price_cat3, price_cat4, price_cat5,
+      ticket_availability, ticket_price,
       date, raffle_start_date, raffle_end_date, start_time, location
     } = selectedEvent;
 
@@ -163,12 +162,7 @@ const ManageEvents = () => {
       validateText(organiser) &&
       description.length > 0 &&
       validateTicketAvailability(ticket_availability) &&
-      validatePrice(price_vip) &&
-      validatePrice(price_cat1) &&
-      validatePrice(price_cat2) &&
-      validatePrice(price_cat3) &&
-      validatePrice(price_cat4) &&
-      validatePrice(price_cat5) &&
+      validatePrice(ticket_price) &&
       validateDate(date) &&
       validateStartTime(start_time) &&
       validateLocation(location) &&
@@ -339,80 +333,15 @@ const ManageEvents = () => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Price VIP"
-                  name="price_vip"
-                  value={selectedEvent.price_vip}
+                  label="Ticket Price"
+                  name="ticket_price"
+                  value={selectedEvent.ticket_price}
                   onChange={handleInputChange}
                   fullWidth
                   margin="normal"
                   variant="standard"
-                  error={!!errors.price_vip}
-                  helperText={errors.price_vip}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Price Cat 1"
-                  name="price_cat1"
-                  value={selectedEvent.price_cat1}
-                  onChange={handleInputChange}
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!errors.price_cat1}
-                  helperText={errors.price_cat1}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Price Cat 2"
-                  name="price_cat2"
-                  value={selectedEvent.price_cat2}
-                  onChange={handleInputChange}
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!errors.price_cat2}
-                  helperText={errors.price_cat2}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Price Cat 3"
-                  name="price_cat3"
-                  value={selectedEvent.price_cat3}
-                  onChange={handleInputChange}
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!errors.price_cat3}
-                  helperText={errors.price_cat3}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Price Cat 4"
-                  name="price_cat4"
-                  value={selectedEvent.price_cat4}
-                  onChange={handleInputChange}
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!errors.price_cat4}
-                  helperText={errors.price_cat4}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Price Cat 5"
-                  name="price_cat5"
-                  value={selectedEvent.price_cat5}
-                  onChange={handleInputChange}
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!errors.price_cat5}
-                  helperText={errors.price_cat5}
+                  error={!!errors.ticket_price}
+                  helperText={errors.ticket_price}
                 />
               </Grid>
               <Grid item xs={12}>
