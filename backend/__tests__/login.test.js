@@ -176,7 +176,7 @@ describe('Auth Routes - Login', () => {
       .post('/api/auth/login')
       .send({
         email: 'sigs51451@gmail.com',
-        password: 'Orange@23',
+        password: 'Password69$$',
       });
 
     expect(response.status).toBe(200);  // Expect a successful login
@@ -237,7 +237,7 @@ describe('Auth Routes - Login', () => {
       .post('/api/auth/reset-password')
       .send({
         token: resetToken,
-        newPassword: 'Orange@23',
+        newPassword: 'Password69$$',
       });
 
     expect(response.status).toBe(200); // Expect a successful password reset
@@ -251,7 +251,7 @@ describe('Auth Routes - Login', () => {
       .post('/api/auth/login')
       .send({
         email: 'sigs51451@gmail.com',
-        password: 'Orange@23',
+        password: 'Password69$$',
       });
 
     expect(response1.status).toBe(200);  // Expect a successful login
