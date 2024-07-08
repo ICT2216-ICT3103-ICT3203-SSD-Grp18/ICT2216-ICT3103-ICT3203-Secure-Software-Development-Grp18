@@ -4,8 +4,6 @@ const db = require('../utils/db');
 const Stripe = require('stripe');
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
-
-
 // Endpoint to get order details
 router.get('/orders/:userId/:eventId', async (req, res) => {
   const { userId, eventId } = req.params;
@@ -100,15 +98,7 @@ router.get('/user-events/:userId/:eventId', async (req, res) => {
       e.image,
       r.num_of_seats,
       r.category,
-      CASE 
-        WHEN r.category = 'VIP' THEN e.price_vip
-        WHEN r.category = 'CAT 1' THEN e.price_cat1
-        WHEN r.category = 'CAT 2' THEN e.price_cat2
-        WHEN r.category = 'CAT 3' THEN e.price_cat3
-        WHEN r.category = 'CAT 4' THEN e.price_cat4
-        WHEN r.category = 'CAT 5' THEN e.price_cat5
-        ELSE NULL
-      END AS ticket_price
+      e.ticket_price
     FROM
       user u
     JOIN
@@ -134,9 +124,4 @@ router.get('/user-events/:userId/:eventId', async (req, res) => {
   }
 });
 
-
-
-
-
 module.exports = router;
-
