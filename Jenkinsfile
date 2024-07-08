@@ -90,8 +90,8 @@ pipeline {
         }
         stage('Archive Test Results') {
             steps {
-                junit 'backend/reports/junit.xml'
-                archiveArtifacts artifacts: 'backend/reports/junit/junit.xml'
+                junit 'junit.xml'
+                archiveArtifacts artifacts: 'junit.xml', fingerprint: true
             }
         }
         stage('List and Archive Dependencies') {
