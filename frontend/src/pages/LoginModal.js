@@ -298,6 +298,7 @@ const LoginModal = ({ isOpen, onClose, isLogin: initialIsLogin }) => {
             <label>
               Email Address:
               <input
+                className="auth-form-input"
                 type="email"
                 name="email"
                 value={email}
