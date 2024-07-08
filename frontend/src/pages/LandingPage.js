@@ -17,6 +17,8 @@ const LandingPage = () => {
   const [loginOpen, setLoginOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [topSelling, setTopSelling] = useState([]);
+  const [error, setError] = useState('');
+
 
   useEffect(() => {
     const fetchUpcomingEvents = async () => {

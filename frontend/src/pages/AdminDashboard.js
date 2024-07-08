@@ -14,6 +14,8 @@ const AdminDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [currentView, setCurrentView] = useState('dashboard');
+  const [error, setError] = useState('');
+
   const [metrics, setMetrics] = useState({
     activeUsers: 0,
     totalEvents: 0,

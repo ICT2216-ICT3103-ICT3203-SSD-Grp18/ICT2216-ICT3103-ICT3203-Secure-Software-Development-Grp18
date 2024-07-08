@@ -79,15 +79,15 @@ const ManageUsers = () => {
 
     try {
       const updatedStatus = user.status === 'active' ? 'inactive' : 'active';
-      await apiClient.put(`/admin/users/${user.user_id}/status`, { status: updatedStatus }, { withCredentials: true });
-      if (response.status ===200) {
-      fetchUsers(); // Refresh user list after update
+      const response = await apiClient.put(`/admin/users/${user.user_id}/status`, { status: updatedStatus }, { withCredentials: true });
+      if (response.status === 200) {
+        fetchUsers(); // Refresh user list after update
         if (selectedUser && selectedUser.user_id === user.user_id) {
           setSelectedUser({ ...selectedUser, status: updatedStatus });
+        }
+      } else {
+        setError('Error updating user status');
       }
-    }else{
-      setError('Error updating user status');
-    } 
     } catch (error) {
       setError('Error updating user status');
     }
@@ -95,17 +95,16 @@ const ManageUsers = () => {
 
   const handleRoleChange = async (user, newRole) => {
     try {
-      await apiClient.put(`/admin/users/${user.user_id}/role`, { user_role: newRole }, { withCredentials: true });
+      const response = await apiClient.put(`/admin/users/${user.user_id}/role`, { user_role: newRole }, { withCredentials: true });
       if (response.status === 200) {
-      fetchUsers(); // Refresh user list after update
-      if (selectedUser && selectedUser.user_id === user.user_id) {
-        setSelectedUser({ ...selectedUser, user_role: newRole });
+        fetchUsers(); // Refresh user list after update
+        if (selectedUser && selectedUser.user_id === user.user_id) {
+          setSelectedUser({ ...selectedUser, user_role: newRole });
+        }
+      } else {
+        setError('Error updating user role');
       }
-    } else {
-      setError('Error updating user role');
-    } 
-
-  }catch (error) {
+    } catch (error) {
       setError('Error updating user role');
     }
   };
