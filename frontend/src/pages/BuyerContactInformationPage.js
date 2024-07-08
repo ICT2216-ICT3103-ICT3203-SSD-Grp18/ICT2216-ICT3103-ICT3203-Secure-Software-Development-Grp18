@@ -20,11 +20,13 @@ const BuyerContactInformationPage = () => {
   const [eventDetails, setEventDetails] = useState({});
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await apiClient.get(`/user-events/${userId}/${eventId}`);
+        if (response.status === 200) {
         const data = response.data;
 
         setBuyerInfo({
@@ -45,6 +47,9 @@ const BuyerContactInformationPage = () => {
           numOfSeats: data.num_of_seats, // Make sure this is set
           totalPrice: data.num_of_seats * data.ticket_price,
         });
+      } else {
+        setError('Failed to fetch event data');
+      }
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -70,25 +75,8 @@ const BuyerContactInformationPage = () => {
     });
   };
 
-  // const handleConfirm = async () => {
-  //   try {
-  //     const response = await apiClient.post('/create-checkout-session', {
-  //       eventId: eventId,
-  //       ticketPrice: eventDetails.ticketPrice,
-  //       numOfSeats: eventDetails.numOfSeats,
-  //       eventName: eventDetails.eventName,
-  //       eventImage: eventDetails.eventImage,
-  //     });
-  //     const { url } = response.data;
-  //     window.location.href = url; // Redirect to Stripe Checkout
-  //   } catch (error) {
-  //     console.error('Error creating checkout session:', error);
-  //   }
-  // };
-
   const handleConfirm = async () => {
     try {
-      console.log('Event Details:', eventDetails); // Log event details to verify
   
       if (!eventDetails.numOfSeats || eventDetails.numOfSeats <= 0) {
         throw new Error('Number of seats must be greater than zero');
@@ -101,10 +89,16 @@ const BuyerContactInformationPage = () => {
         eventName: eventDetails.eventName,
         eventImage: eventDetails.eventImage,
       });
+
+      if (response.status === 200) {
       const { url } = response.data;
-      window.location.href = url; // Redirect to Stripe Checkout
-    } catch (error) {
-      console.error('Error creating checkout session:', error);
+      window.location.href = url; 
+    } else {
+
+      setError('Failed to create checkout session');
+    }
+  }catch (error) {
+    setError('Error creating checkout session: ' + error.message);
     }
   };
 

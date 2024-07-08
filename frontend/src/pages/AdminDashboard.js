@@ -22,7 +22,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (!user || user.role !== 'admin') {
-      navigate('/'); // Redirect non-admin users to home
+      navigate('/'); 
     } else {
       fetchMetrics();
     }
@@ -31,11 +31,15 @@ const AdminDashboard = () => {
   const fetchMetrics = async () => {
     try {
       const response = await apiClient.get('/admin/metrics', { withCredentials: true });
+      if (response.status === 200) {
       setMetrics(response.data);
-    } catch (error) {
-      console.error('Error fetching metrics:', error);
+    } else {
+      setError('Failed to fetch metrics');
     }
-  };
+  } catch (error) {
+    setError('Error fetching metrics: ' + error.message);
+  }
+};
 
   const renderView = () => {
     switch (currentView) {
@@ -79,6 +83,7 @@ const AdminDashboard = () => {
       <div className="main-content">
         <Navbar />
         <div className="content">
+        {error && <p className="error-message">{error}</p>}
           {renderView()}
         </div>
       </div>

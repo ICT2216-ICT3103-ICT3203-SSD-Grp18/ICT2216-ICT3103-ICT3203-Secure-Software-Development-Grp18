@@ -23,7 +23,14 @@ const ResetPasswordPage = () => {
         setMessage('Error resetting password');
       }
     } catch (error) {
-      setMessage(`Error: ${error.message}`);
+      const status = error.response?.status;
+      if (status === 400) {
+        setMessage('Invalid or expired token. Please request a new one.');
+      } else if (status === 500) {
+        setMessage('Server error. Please try again later.');
+      } else {
+        setMessage(`Error: ${error.response?.data?.message || error.message}`);
+      }
     }
   };
 

@@ -17,20 +17,19 @@ const TicketPage = () => {
 
   useEffect(() => {
     const fetchEventDetails = async () => {
-      console.log(`Fetching event details for event ID: ${eventId}`);
+     
       try {
         const response = await apiClient.get(`/events/${eventId}`, { withCredentials: true });
         if (response.status !== 200) {
           throw new Error(`Network response was not ok: ${response.statusText}`);
         }
         const data = response.data;
-        console.log('Event details fetched:', data);
         setEvent(data);
         setCategories(data.categories || []);
         setTicketCount((data.categories || []).map(() => 0));
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching event details:', error);
+        setError('Failed to load event details. Please try again later.');
         setLoading(false);
       }
     };
@@ -39,7 +38,6 @@ const TicketPage = () => {
   }, [eventId]);
 
   const incrementTicket = (index) => {
-    console.log(`Incrementing ticket count for category index: ${index}`);
     const newTicketCount = [...ticketCount];
     const selectedCategories = newTicketCount.filter(count => count > 0).length;
 
@@ -50,18 +48,16 @@ const TicketPage = () => {
       newTicketCount[index]++;
       setTicketCount(newTicketCount);
     }
-    console.log('Updated ticket count:', newTicketCount);
   };
 
   const decrementTicket = (index) => {
-    console.log(`Decrementing ticket count for category index: ${index}`);
     const newTicketCount = [...ticketCount];
     if (newTicketCount[index] > 0) {
       newTicketCount[index]--;
       setTicketCount(newTicketCount);
       setError('');
     }
-    console.log('Updated ticket count:', newTicketCount);
+   
   };
 
   const hasSelectedTickets = ticketCount.some(count => count > 0);
@@ -76,9 +72,12 @@ const TicketPage = () => {
       // Check if user has already entered the raffle
       const checkEntryResponse = await apiClient.get(`/raffle/hasEntered?eventId=${eventId}`, { withCredentials: true });
   
-      if (checkEntryResponse.data.hasEntered) {
+      if (checkEntryResponse.status === 200 && checkEntryResponse.data.hasEntered) {
         alert('You have already entered the raffle for this event');
         navigate(`/ticket/${eventId}`);
+        return;
+      } else if (checkEntryResponse.status !== 200) {
+        alert('Error checking raffle entry. Please try again.');
         return;
       }
   
@@ -91,13 +90,39 @@ const TicketPage = () => {
       } else {
         alert(`Error: ${response.data.message}`);
       }
-    } catch (error) {
-      alert(`Error: ${error.response?.data?.message || error.message}`);
+    }  catch (error) {
+      const status = error.response?.status;
+      switch (status) {
+        case 400:
+          alert('Bad request. Please check your input and try again.');
+          break;
+        case 401:
+          alert('Unauthorized. Please log in and try again.');
+          break;
+        case 403:
+          alert('Forbidden. You are not allowed to perform this action.');
+          break;
+        case 404:
+          alert('Resource not found. Please try again.');
+          break;
+        case 409:
+          alert('Conflict. You have already entered the raffle.');
+          break;
+        case 500:
+          alert('Internal server error. Please try again later.');
+          break;
+        default:
+          alert(`Error: ${error.response?.data?.message || error.message}`);
+      }
     }
   };
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
   }
 
   if (!event) {

@@ -14,7 +14,7 @@ router.get('/orders/:userId/:eventId', async (req, res) => {
     if (order.length === 0) {
       return res.status(404).json({ message: 'Order not found' });
     }
-    res.json(order[0]);
+    res.status(200).json(order[0]);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -28,7 +28,7 @@ router.get('/user/:userId', async (req, res) => {
     if (user.length === 0) {
       return res.status(404).json({ message: 'User not found' });
     }
-    res.json(user[0]);
+    res.status(200).json(user[0]);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -47,46 +47,16 @@ router.get('/events/:eventId', async (req, res) => {
      if (event[0].image) {
       event[0].image = `data:image/jpeg;base64,${event[0].image.toString('base64')}`;
     }
-    res.json(event[0]);
+    res.status(200).json(event[0]);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
-// router.post('/create-checkout-session', async (req, res) => {
-//     const { eventId, ticketPrice, numOfSeats, eventName, eventImage } = req.body;
-  
-//     try {
-//       const session = await stripe.checkout.sessions.create({
-//         payment_method_types: ['card'],
-//         line_items: [{
-//           price_data: {
-//             currency: 'SGD',
-//             product_data: {
-//               name: eventName,
-//               images: [eventImage],
-//             },
-//             unit_amount: ticketPrice * 100, // assuming ticketPrice is in dollars, needs to be in cents for Stripe
-//           },
-//           quantity: numOfSeats, // Ensure quantity is passed and is a number
-//         }],
-//         mode: 'payment',
-//         success_url: `${process.env.CLIENT_URL}/success.html`,
-//         cancel_url: `${process.env.CLIENT_URL}/cancel.html`,
-//       });
-  
-//       res.json({ url: session.url });
-//     } catch (error) {
-//       console.error('Stripe API Error:', error.message);
-//       res.status(500).json({ error: 'Internal Server Error', details: error.message });
-//     }
-//   });
 
 
 router.post('/create-checkout-session', async (req, res) => {
     const { eventId, ticketPrice, numOfSeats, eventName, eventImage } = req.body;
-    
-    console.log('Received body:', req.body); // Log the received request body
   
     try {
       const session = await stripe.checkout.sessions.create({
@@ -98,16 +68,16 @@ router.post('/create-checkout-session', async (req, res) => {
               name: eventName,
               images: [eventImage],
             },
-            unit_amount: ticketPrice * 100, // assuming ticketPrice is in dollars, needs to be in cents for Stripe
+            unit_amount: ticketPrice * 100, 
           },
-          quantity: numOfSeats, // Ensure quantity is passed and is a number
+          quantity: numOfSeats, 
         }],
         mode: 'payment',
         success_url: `${process.env.CLIENT_URL}/success`,
         cancel_url: `${process.env.CLIENT_URL}/cancel`,
       });
     
-      res.json({ url: session.url });
+      res.status(200).json({ url: session.url });
     } catch (error) {
       console.error('Stripe API Error:', error.message);
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
@@ -158,7 +128,7 @@ router.get('/user-events/:userId/:eventId', async (req, res) => {
       result[0].image = `data:image/jpeg;base64,${result[0].image.toString('base64')}`;
     }
     
-    res.json(result[0]);
+    res.status(200).json(result[0]);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

@@ -67,10 +67,13 @@ const ManageEvents = () => {
     setError('');
     try {
       const response = await apiClient.get('/admin/events', { withCredentials: true });
+      if (response.status === 200) {
       setEvents(response.data);
-    } catch (error) {
+    }else {
       setError('Error fetching events');
-      console.error('Error fetching events:', error);
+    }
+    } catch (error) {
+      setError('Error fetching events. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -82,14 +85,18 @@ const ManageEvents = () => {
     setError('');
     try {
       const response = await apiClient.get(`/admin/events/search?event_name=${searchTerm}`, { withCredentials: true });
+    if (response.status === 200) {
+
       setEvents(response.data);
-    } catch (error) {
+    } else {
       setError('Error searching events');
-      console.error('Error searching events:', error);
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (error) {
+    setError('Error searching events. Please try again later.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleEventClick = (event) => {
     const { image, ...eventDataWithoutImage } = event; // Destructure to exclude image data
@@ -185,26 +192,32 @@ const ManageEvents = () => {
 
     try {
       const response = await apiClient.put(`/admin/events/${selectedEvent.event_id}`, selectedEvent, { withCredentials: true });
-      console.log('Event updated:', response.data);
+      if (response.status === 200) {
+
       fetchEvents(); // Refresh event list after updating event
       setModalIsOpen(false);
-    } catch (error) {
+    } else {
       setError('Error updating event');
-      console.error('Error updating event:', error);
     }
-  };
+  } catch (error) {
+    setError('Error updating event. Please try again later.');
+  }
+};
 
   const handleDeleteEvent = async () => {
     try {
       await apiClient.delete(`/admin/events/${selectedEvent.event_id}`, { withCredentials: true });
-      console.log('Event deleted');
+      if (response.status === 200) {
+
       fetchEvents(); // Refresh event list after deleting event
       setModalIsOpen(false);
-    } catch (error) {
+    } else {
       setError('Error deleting event');
-      console.error('Error deleting event:', error);
     }
-  };
+  } catch (error) {
+    setError('Error deleting event. Please try again later.');
+  }
+};
 
   const handleClose = () => {
     setModalIsOpen(false);

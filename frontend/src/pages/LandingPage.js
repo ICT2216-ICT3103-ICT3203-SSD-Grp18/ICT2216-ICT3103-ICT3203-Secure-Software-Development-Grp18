@@ -22,57 +22,38 @@ const LandingPage = () => {
     const fetchUpcomingEvents = async () => {
       try {
         const response = await apiClient.get('/events/upcoming');
-        console.log('Fetch Upcoming Events Response:', response);
         if (response.status !== 200) {
           throw new Error(`Network response was not ok: ${response.statusText}`);
         }
-        console.log('Upcoming Events Data:', response.data);
         setUpcomingEvents(response.data);
       } catch (error) {
-        console.error('Error fetching upcoming events:', error);
-        if (error.response) {
-          console.error('Error response data:', error.response.data);
-          console.error('Error response status:', error.response.status);
-          console.error('Error response headers:', error.response.headers);
-        }
+        handleError(error, 'upcoming events')
+
       }
     };
 
     const fetchBrowseConcert = async () => {
       try {
         const response = await apiClient.get('/events/browse');
-        console.log('Fetch Browse Concert Response:', response);
         if (response.status !== 200) {
           throw new Error(`Network response was not ok: ${response.statusText}`);
         }
-        console.log('Browse Concert Data:', response.data);
         setBrowseConcert(response.data);
       } catch (error) {
-        console.error('Error fetching browse concerts:', error);
-        if (error.response) {
-          console.error('Error response data:', error.response.data);
-          console.error('Error response status:', error.response.status);
-          console.error('Error response headers:', error.response.headers);
-        }
+        handleError(error, 'browse concerts');
+
       }
     };
 
     const fetchTopSelling = async () => {
       try {
         const response = await apiClient.get('/events/topselling');
-        console.log('Fetch Top selling Concert Response:', response);
         if (response.status !== 200) {
           throw new Error(`Network response was not ok: ${response.statusText}`);
         }
-        console.log(' Top selling Concert Data:', response.data);
         setTopSelling(response.data);
       } catch (error) {
-        console.error('Error fetching Top selling Concert:', error);
-        if (error.response) {
-          console.error('Error response data:', error.response.data);
-          console.error('Error response status:', error.response.status);
-          console.error('Error response headers:', error.response.headers);
-        }
+        handleError(error, 'top selling concerts');
       }
     };
 
@@ -80,6 +61,22 @@ const LandingPage = () => {
     fetchBrowseConcert();
     fetchTopSelling();
   }, []);
+
+  const handleError = (error, context) => {
+    if (error.response) {
+      setError({
+        context,
+        status: error.response.status,
+        message: error.response.data.message || error.response.statusText,
+      });
+    } else {
+      setError({
+        context,
+        status: 'Network Error',
+        message: error.message,
+      });
+    }
+  };
 
   const handleEventClick = (eventId) => {
     navigate(`/event/${eventId}`);
@@ -115,6 +112,13 @@ const LandingPage = () => {
           </button>
         </div>
       </header>
+      {error && (
+        <div className="error-message">
+          <p>Error fetching {error.context}:</p>
+          <p>Status: {error.status}</p>
+          <p>Message: {error.message}</p>
+        </div>
+      )}
       <UpcomingEvents events={upcomingEvents} onEventClick={handleEventClick} />
       <HotOffers />
       <TopSelling events={topSelling} onEventClick={handleEventClick} />

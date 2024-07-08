@@ -34,10 +34,13 @@ const ManageUsers = () => {
     setError('');
     try {
       const response = await apiClient.get('/admin/users', { withCredentials: true });
-      setUsers(response.data);
+      if (response.status === 200) {
+        setUsers(response.data);
+      } else {
+        setError('Error fetching users');
+      }
     } catch (error) {
       setError('Error fetching users');
-      console.error('Error fetching users:', error);
     } finally {
       setLoading(false);
     }
@@ -53,10 +56,13 @@ const ManageUsers = () => {
         throw new Error('Invalid email format');
       }
       const response = await apiClient.get(`/admin/users/search?email=${sanitizedTerm}`, { withCredentials: true });
+      if (response.status === 200) {
       setUsers(response.data);
+      }else{
+      setError('Error searching users');
+      }
     } catch (error) {
       setError('Error searching users');
-      console.error('Error searching users:', error);
     } finally {
       setLoading(false);
     }
@@ -74,26 +80,33 @@ const ManageUsers = () => {
     try {
       const updatedStatus = user.status === 'active' ? 'inactive' : 'active';
       await apiClient.put(`/admin/users/${user.user_id}/status`, { status: updatedStatus }, { withCredentials: true });
+      if (response.status ===200) {
       fetchUsers(); // Refresh user list after update
-      if (selectedUser && selectedUser.user_id === user.user_id) {
-        setSelectedUser({ ...selectedUser, status: updatedStatus });
+        if (selectedUser && selectedUser.user_id === user.user_id) {
+          setSelectedUser({ ...selectedUser, status: updatedStatus });
       }
+    }else{
+      setError('Error updating user status');
+    } 
     } catch (error) {
       setError('Error updating user status');
-      console.error('Error updating user status:', error);
     }
   };
 
   const handleRoleChange = async (user, newRole) => {
     try {
       await apiClient.put(`/admin/users/${user.user_id}/role`, { user_role: newRole }, { withCredentials: true });
+      if (response.status === 200) {
       fetchUsers(); // Refresh user list after update
       if (selectedUser && selectedUser.user_id === user.user_id) {
         setSelectedUser({ ...selectedUser, user_role: newRole });
       }
-    } catch (error) {
+    } else {
       setError('Error updating user role');
-      console.error('Error updating user role:', error);
+    } 
+
+  }catch (error) {
+      setError('Error updating user role');
     }
   };
 
