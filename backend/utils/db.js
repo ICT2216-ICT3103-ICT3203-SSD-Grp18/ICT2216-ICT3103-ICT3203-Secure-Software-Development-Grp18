@@ -26,13 +26,16 @@ const pool = mysql.createPool({
   },
 });
 
-pool.getConnection((err, connection) => {
-  if (err) {
-    console.error('Database connection failed: ' + err.stack);
-    return;
-  }
-  console.log('Connected to database.');
-  connection.release();
-});
+// Conditionally connect to the database only if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.error('Database connection failed: ' + err.stack);
+      return;
+    }
+    console.log('Connected to database.');
+    connection.release();
+  });
+}
 
 module.exports = pool.promise();

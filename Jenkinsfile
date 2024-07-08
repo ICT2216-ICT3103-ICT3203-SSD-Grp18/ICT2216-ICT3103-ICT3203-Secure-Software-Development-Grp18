@@ -27,7 +27,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    def checkoutVars = checkout([$class: 'GitSCM', branches: [[name: "*/${BRANCH_NAME}"]], userRemoteConfigs: [[url: 'https://github.com/ICT2216-ICT3103-ICT3203-SSD-Grp18/Ticketing_Huat_Test.git', credentialsId: 'PAT_Jenkins']]])
+                    def checkoutVars = checkout([$class: 'GitSCM', branches: [[name: "*/${BRANCH_NAME}"]], userRemoteConfigs: [[url: 'https://github.com/ICT2216-ICT3103-ICT3203-SSD-Grp18/ICT2216-ICT3103-ICT3203-Secure-Software-Development-Grp18.git', credentialsId: 'PAT_Jenkins']]])
                     env.GIT_COMMIT = checkoutVars.GIT_COMMIT
                 }
             }
@@ -74,12 +74,39 @@ pipeline {
                 }
             }
         }
+        stage('Run Unit Tests') {
+            steps {
+                dir('backend') {
+                    sh 'npx jest --detectOpenHandles'
+                }
+            }
+        }
+        stage('Archive Test Results') {
+            steps {
+                junit 'backend/junit.xml'
+            }
+        }
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
+            }
+        }
         stage('List and Archive Dependencies') {
             steps {
                 sh 'npm list --all > dependencies.txt || true'
                 archiveArtifacts artifacts: 'dependencies.txt', fingerprint: true
                 sh 'npm outdated > dependencyupdates.txt || true'
                 archiveArtifacts artifacts: 'dependencyupdates.txt', fingerprint: true
+            }
+        }
+        stage('Build Frontend') {
+            steps {
+                dir('frontend') {
+                    sh '''
+                    # Set CI to false to not treat warnings as errors
+                    CI=false npm run build
+                    '''
+                }
             }
         }
         stage('Deploy to Web Server') {
@@ -111,7 +138,7 @@ pipeline {
                         cd /var/www/html/frontend && npm install
                     fi
                     if [ -d /var/www/html ]; then
-                        cd /var/www/html && pm2 start npm --name app -- start
+                        cd /var/www/html && pm2 delete 0 && pm2 start npm --name app -- start
                     fi
                     "
                     '''
@@ -127,7 +154,7 @@ pipeline {
                         sh """
                         curl -H "Authorization: token $GITHUB_TOKEN" -X POST \
                         -d '{"title":"Merge ${BRANCH_NAME}","head":"${BRANCH_NAME}","base":"main"}' \
-                        https://api.github.com/repos/ICT2216-ICT3103-ICT3203-SSD-Grp18/Ticketing_Huat_Test/pulls
+                        https://api.github.com/repos/ICT2216-ICT3103-ICT3203-SSD-Grp18/ICT2216-ICT3103-ICT3203-Secure-Software-Development-Grp18/pulls
                         """
                     }
                 }

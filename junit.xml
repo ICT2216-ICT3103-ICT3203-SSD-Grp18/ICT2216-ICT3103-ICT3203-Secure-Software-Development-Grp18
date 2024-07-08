@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="13" failures="0" errors="0" time="5.377">
+  <testsuite name="ResetPasswordPage" errors="0" failures="0" skipped="0" timestamp="2024-07-08T13:40:03" time="2.029" tests="4">
+    <testcase classname="ResetPasswordPage renders ResetPasswordPage component" name="ResetPasswordPage renders ResetPasswordPage component" time="0.088">
+    </testcase>
+    <testcase classname="ResetPasswordPage displays error message when passwords do not match" name="ResetPasswordPage displays error message when passwords do not match" time="0.035">
+    </testcase>
+    <testcase classname="ResetPasswordPage displays success message on successful password reset" name="ResetPasswordPage displays success message on successful password reset" time="0.027">
+    </testcase>
+    <testcase classname="ResetPasswordPage displays error message on failed password reset" name="ResetPasswordPage displays error message on failed password reset" time="0.021">
+    </testcase>
+  </testsuite>
+  <testsuite name="AuthController Unit Tests" errors="0" failures="0" skipped="0" timestamp="2024-07-08T13:40:03" time="2.536" tests="2">
+    <testcase classname="AuthController Unit Tests verifyOtp should return 400 if email or OTP is missing" name="AuthController Unit Tests verifyOtp should return 400 if email or OTP is missing" time="0.009">
+    </testcase>
+    <testcase classname="AuthController Unit Tests verifyOtp should return 401 if OTP is invalid" name="AuthController Unit Tests verifyOtp should return 401 if OTP is invalid" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="LoginModal Component" errors="0" failures="0" skipped="0" timestamp="2024-07-08T13:40:03" time="2.884" tests="2">
+    <testcase classname="LoginModal Component handles login submission with valid data" name="LoginModal Component handles login submission with valid data" time="0.159">
+    </testcase>
+    <testcase classname="LoginModal Component handles sign up submission with valid data" name="LoginModal Component handles sign up submission with valid data" time="0.044">
+    </testcase>
+  </testsuite>
+  <testsuite name="LoginModal Input Validation and Sanitization" errors="0" failures="0" skipped="0" timestamp="2024-07-08T13:40:03" time="2.924" tests="3">
+    <testcase classname="LoginModal Input Validation and Sanitization should sanitize input to prevent XSS attack during login" name="LoginModal Input Validation and Sanitization should sanitize input to prevent XSS attack during login" time="0.191">
+    </testcase>
+    <testcase classname="LoginModal Input Validation and Sanitization should not allow password without required complexity during login" name="LoginModal Input Validation and Sanitization should not allow password without required complexity during login" time="0.028">
+    </testcase>
+    <testcase classname="LoginModal Input Validation and Sanitization should handle OTP login flow correctly" name="LoginModal Input Validation and Sanitization should handle OTP login flow correctly" time="0.035">
+    </testcase>
+  </testsuite>
+  <testsuite name="sendOtp" errors="0" failures="0" skipped="0" timestamp="2024-07-08T13:40:03" time="3.579" tests="2">
+    <testcase classname="sendOtp should send OTP email" name="sendOtp should send OTP email" time="1.01">
+    </testcase>
+    <testcase classname="sendPasswordResetEmail should send password reset email" name="sendPasswordResetEmail should send password reset email" time="1.003">
+    </testcase>
+  </testsuite>
+</testsuites>

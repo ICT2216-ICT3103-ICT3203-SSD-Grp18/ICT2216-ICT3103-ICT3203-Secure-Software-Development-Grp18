@@ -35,7 +35,7 @@ const sendOtp = async (email, otp) => {
 };
 
 const sendPasswordResetEmail = async (email, token) => {
-  const resetUrl = `http://localhost:3000/reset-password/${token}`;
+  const resetUrl = `https://ticketinghuat.ninja/reset-password/${token}`;
   const mailOptions = {
     from: `"TicketingHuat" <${process.env.EMAIL_USER}>`,
     to: email,
