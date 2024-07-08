@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await apiClient.get('/auth/check-auth', { withCredentials: true });
+        const response = await apiClient.get('/auth/check', { withCredentials: true });
         if (response.data.active) {
           setIsLoggedIn(true);
           const userResponse = await apiClient.get('/auth/getUser', { withCredentials: true });

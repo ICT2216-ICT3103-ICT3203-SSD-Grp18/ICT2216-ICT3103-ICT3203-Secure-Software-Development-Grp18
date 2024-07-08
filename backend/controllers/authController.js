@@ -7,8 +7,6 @@ const crypto = require('crypto');
 const jwtSecret = process.env.JWT_SECRET;
 const he = require('he');
 
-const otps = {}; // Temporarily store OTPs
-
 const sanitizeInput = (input) => {
   if (typeof input === 'string') {
     const sanitized = sanitizeHtml(input.trim(), {
@@ -42,11 +40,18 @@ const verifyPassword = async (password, storedHash) => {
   return hash === key;
 };
 
-const generateOtpWithExpiry = () => {
+const generateOtpWithExpiry = async (userId) => {
   const otp = crypto.randomInt(100000, 999999).toString();
-  //i set to 5 mins
-  const expiresAt = new Date(Date.now() + 5 * 60 * 1000); 
-  return { otp, expiresAt };
+  // expire 5 mins
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+  // Insert OTP into the database
+  await db.execute(
+    'INSERT INTO otps (user_id, otp, expires_at) VALUES (?, ?, ?)',
+    [userId, otp, expiresAt]
+  );
+
+  return otp;
 };
 
 const login = [
@@ -88,9 +93,8 @@ const login = [
         // reset login attempt
         await db.execute('UPDATE user SET login_attempts = 0, lock_until = NULL WHERE email = ?', [email]);
 
-        const { otp, expiresAt } = generateOtpWithExpiry();
-        otps[email] = { otp, expiresAt };
-        
+        const otp = await generateOtpWithExpiry(user.user_id);
+        console.log(otp)
         await sendOtp(email, otp); 
 
         return res.status(200).json({ message: 'OTP sent to your email', otpRequired: true });
@@ -278,100 +282,105 @@ const resetPassword = [
   }
 ];
 
-
 const verifyOtp = async (req, res) => {
   const { email, otp } = req.body;
+
   try {
     if (!email || !otp) {
       return res.status(400).json({ status: 400, message: 'Email and OTP are required' });
     }
 
-    const storedOtpData = otps[email];
-    if (storedOtpData && storedOtpData.otp === otp) {
-      if (new Date() > storedOtpData.expiresAt) {
+    const [userRows] = await db.execute('SELECT user_id FROM user WHERE email = ?', [email]);
+    if (userRows.length === 0) {
+      return res.status(401).json({ status: 401, message: 'Invalid email' });
+    }
 
-        // Invalidate expired OTP
-        delete otps[email]; 
-        return res.status(401).json({ status: 401, message: 'OTP has expired' });
-      }
-      // Invalidate OTP after successful verification
-      delete otps[email]; 
+    const userId = userRows[0].user_id;
 
-      const [rows] = await db.execute('SELECT * FROM user WHERE email = ?', [email]);
-      const user = rows[0];
-
-      // Invalidate any existing sessions
-      await db.execute('UPDATE user SET session_token = NULL, session_expiry = NULL WHERE email = ?', [email]);
-
-      // Regenerate the session
-      req.session.regenerate(async (err) => {
-        if (err) {
-          return res.status(500).json({ status: 500, message: 'Failed to regenerate session' });
-        }
-
-        // Store user information in the session
-        req.session.userId = user.user_id;
-        req.session.email = user.email;
-
-        // Store the session ID and expiry in the database
-        const sessionToken = req.sessionID;
-        const sessionExpiry = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
-
-        await db.execute('UPDATE user SET session_token = ?, session_expiry = ? WHERE email = ?', [sessionToken, sessionExpiry, email]);
-
-        // Generate JWT
-        const token = jwt.sign({ id: user.user_id, email: user.email, role: user.user_role, sessionToken }, jwtSecret, { expiresIn: '30m' });
-
-        res.cookie('token', token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'Strict',
-          maxAge: 30 * 60 * 1000, // 30 minutes
-        });
-
-        return res.status(200).json({ status: 200, message: 'Login successful', user: { id: user.user_id, email: user.email, role: user.user_role } });
-      });
-    } else {
+    const [otpRows] = await db.execute('SELECT * FROM otps WHERE user_id = ? AND otp = ?', [userId, otp]);
+    if (otpRows.length === 0) {
       return res.status(401).json({ status: 401, message: 'Invalid OTP' });
     }
+
+    const storedOtpData = otpRows[0];
+    if (new Date() > storedOtpData.expires_at) {
+      return res.status(401).json({ status: 401, message: 'OTP has expired' });
+    }
+
+    // Delete OTP after use
+    await db.execute('DELETE FROM otps WHERE otp_id = ?', [storedOtpData.otp_id]);
+
+    const [rows] = await db.execute('SELECT * FROM user WHERE email = ?', [email]);
+    const user = rows[0];
+
+    // Invalidate any existing sessions
+    await db.execute('UPDATE user SET session_token = NULL, session_expiry = NULL WHERE email = ?', [email]);
+
+    // Regenerate the session
+    req.session.regenerate(async (err) => {
+      if (err) {
+        return res.status(500).json({ status: 500, message: 'Failed to regenerate session' });
+      }
+
+      // Store user information in the session
+      req.session.userId = user.user_id;
+      req.session.email = user.email;
+      req.session.role = user.user_role;
+
+      // Store the session ID and expiry in the database
+      const sessionToken = req.sessionID;
+      const sessionExpiry = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+      await db.execute('UPDATE user SET session_token = ?, session_expiry = ? WHERE email = ?', [sessionToken, sessionExpiry, email]);
+
+      // Generate JWT
+      const token = jwt.sign({ id: user.user_id, email: user.email, role: user.user_role, sessionToken }, jwtSecret, { expiresIn: '2m' });
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict',
+        maxAge: 30 * 60 * 1000, // 30 minutes
+      });
+
+      return res.status(200).json({ status: 200, message: 'Login successful', user: { id: user.user_id, email: user.email, role: user.user_role } });
+    });
   } catch (error) {
     console.error('Error during OTP verification:', error);
     return res.status(500).json({ status: 500, message: 'Server error', error: error.message });
   }
 };
 
-const extendSession = (req, res) => {
-  const token = req.cookies.token;
-
-  if (!token) {
-    return res.status(401).json({ message: 'No token provided' });
-  }
-
-  jwt.verify(token, jwtSecret, async (err, user) => {
-    if (err) {
-      return res.status(403).json({ message: 'Token is not valid' });
+const extendSession = async (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({ message: 'No active session found' });
     }
 
-    // Regenerate the session
+    const userId = req.session.userId;
+
+    // Get user details from the database
+    const [rows] = await db.execute('SELECT * FROM user WHERE user_id = ?', [userId]);
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const user = rows[0];
+
     req.session.regenerate(async (err) => {
       if (err) {
         return res.status(500).json({ message: 'Failed to regenerate session' });
       }
 
-      // Store user information in the session
-      req.session.userId = user.id;
+      req.session.userId = userId;
       req.session.email = user.email;
+      req.session.role = user.user_role; 
 
-      // Store the session ID and expiry in the database if needed
       const sessionToken = req.sessionID;
-      const sessionExpiry = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+      const sessionExpiry = new Date(Date.now() + 30 * 60 * 1000); 
 
-      // Generate a new JWT
-      const newToken = jwt.sign(
-        { id: user.id, email: user.email, role: user.role, sessionToken },
-        jwtSecret,
-        { expiresIn: '30m' }
-      );
+      await db.execute('UPDATE user SET session_token = ?, session_expiry = ? WHERE user_id = ?', [sessionToken, sessionExpiry, userId]);
+
+      const newToken = jwt.sign({ id: userId, email: user.email, role: user.user_role, sessionToken }, jwtSecret, { expiresIn: '30m' });
 
       res.cookie('token', newToken, {
         httpOnly: true,
@@ -382,7 +391,10 @@ const extendSession = (req, res) => {
 
       return res.status(200).json({ success: true, message: 'Session extended', token: newToken });
     });
-  });
+  } catch (error) {
+    console.error('Error during session extension:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
 };
 
 module.exports = { login, verifyOtp, register, logout, checkAuth, getUser, forgotPassword, resetPassword, extendSession };
