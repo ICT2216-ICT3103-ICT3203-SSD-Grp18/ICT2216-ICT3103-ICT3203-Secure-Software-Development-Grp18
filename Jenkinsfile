@@ -83,7 +83,7 @@ pipeline {
             steps {
                 dir('backend') {
                     withCredentials([usernamePassword(credentialsId: 'db_credentials', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASSWORD'), string(credentialsId: 'db_name', variable: 'DB_NAME')]) {
-                        sh 'npx jest --detectOpenHandles --forceExit'
+                        sh 'npx jest --detectOpenHandles --forceExit __tests__'
                     }
                 }
             }

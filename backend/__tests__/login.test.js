@@ -175,8 +175,8 @@ describe('Auth Routes - Login', () => {
     const response = await request(app)
       .post('/api/auth/login')
       .send({
-        email: 'chewygreg@gmail.com',
-        password: 'Password69$$',
+        email: 'sigs51451@gmail.com',
+        password: 'Orange@23',
       });
 
     expect(response.status).toBe(200);  // Expect a successful login
@@ -184,14 +184,14 @@ describe('Auth Routes - Login', () => {
     expect(response.body).toHaveProperty('otpRequired', true);
 
     // Fetch the OTP from the database
-    const otp = await getOtpForUser('chewygreg@gmail.com');
+    const otp = await getOtpForUser('sigs51451@gmail.com');
     expect(otp).not.toBeNull(); // Ensure the OTP was fetched
 
     // Verify the OTP
     const otpResponse = await request(app)
       .post('/api/auth/verify-otp')
       .send({
-        email: 'chewygreg@gmail.com',
+        email: 'sigs51451@gmail.com',
         otp: otp,
       });
 
@@ -199,7 +199,7 @@ describe('Auth Routes - Login', () => {
     expect(otpResponse.body).toHaveProperty('message', 'Login successful');
     expect(otpResponse.body).toHaveProperty('user');
     expect(otpResponse.body.user).toHaveProperty('id');
-    expect(otpResponse.body.user).toHaveProperty('email', 'chewygreg@gmail.com');
+    expect(otpResponse.body.user).toHaveProperty('email', 'sigs51451@gmail.com');
     expect(otpResponse.body.user).toHaveProperty('role');
   });
 
@@ -207,14 +207,14 @@ describe('Auth Routes - Login', () => {
     const response = await request(app)
       .post('/api/auth/forgot-password')
       .send({
-        email: 'chewygreg@gmail.com',
+        email: 'sigs51451@gmail.com',
       });
 
     expect(response.status).toBe(202); // Expect the email to be sent
     expect(response.body).toHaveProperty('message', 'Password reset email sent. Please check your email.');
 
     // Verify that the reset token was stored in the database
-    const [rows] = await db.execute('SELECT reset_token FROM user WHERE email = ?', ['chewygreg@gmail.com']);
+    const [rows] = await db.execute('SELECT reset_token FROM user WHERE email = ?', ['sigs51451@gmail.com']);
     expect(rows.length).toBeGreaterThan(0);
     expect(rows[0].reset_token).not.toBeNull();
   });
@@ -224,11 +224,11 @@ describe('Auth Routes - Login', () => {
     await request(app)
       .post('/api/auth/forgot-password')
       .send({
-        email: 'chewygreg@gmail.com',
+        email: 'sigs51451@gmail.com',
       });
 
     // Fetch the reset token from the database
-    const [rows] = await db.execute('SELECT reset_token FROM user WHERE email = ?', ['chewygreg@gmail.com']);
+    const [rows] = await db.execute('SELECT reset_token FROM user WHERE email = ?', ['sigs51451@gmail.com']);
     const resetToken = rows[0].reset_token;
     expect(resetToken).not.toBeNull();
 
@@ -237,21 +237,21 @@ describe('Auth Routes - Login', () => {
       .post('/api/auth/reset-password')
       .send({
         token: resetToken,
-        newPassword: 'Password69$$',
+        newPassword: 'Orange@23',
       });
 
     expect(response.status).toBe(200); // Expect a successful password reset
     expect(response.body).toHaveProperty('message', 'Password reset successfully');
 
     // Verify that the reset token is nullified in the database
-    const [nullifiedTokenRows] = await db.execute('SELECT reset_token FROM user WHERE email = ?', ['chewygreg@gmail.com']);
+    const [nullifiedTokenRows] = await db.execute('SELECT reset_token FROM user WHERE email = ?', ['sigs51451@gmail.com']);
     expect(nullifiedTokenRows[0].reset_token).toBeNull();
 
     const response1 = await request(app)
       .post('/api/auth/login')
       .send({
-        email: 'chewygreg@gmail.com',
-        password: 'Password69$$',
+        email: 'sigs51451@gmail.com',
+        password: 'Orange@23',
       });
 
     expect(response1.status).toBe(200);  // Expect a successful login
