@@ -7,13 +7,13 @@ import '../styles/css/ManageUsers.css';
 
 // Sanitization function
 const sanitizeInput = (input) => {
-  const sanitized = DOMPurify.sanitize(input);
+  const sanitized = DOMPurify.sanitize(input.trim());
   return he.encode(sanitized);
 };
 
 // Validation functions
 const validateText = (text) => {
-  const textRegex = /^[a-zA-Z0-9\s.,!?'"@#$%^&*()_+\-=\[\]{};:\\|<>\/~`]+$/;
+  const textRegex = /^[a-zA-Z\s]+$/;
   return textRegex.test(text);
 };
 

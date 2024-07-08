@@ -12,6 +12,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AboutUs from './pages/AboutUsPage';
 import EventPage from './pages/EventsPage';
 import SessionManager from './SessionManager';
+import LoginModal from './pages/LoginModal'; 
 import ResetPasswordPage from './pages/ResetPasswordPage'; 
 import BuyerContactInformationPage from './pages/BuyerContactInformationPage';
 import SuccessPage from './pages/SuccessPage';
